@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MBV — Manava Bandhutva Vedike — Occupational Training Platform
 
-## Getting Started
+Web platform for **Manava Bandhutva Vedike (MBV)**, an NGO running free occupational
+training programs for youth (18+) across Karnataka, India.
 
-First, run the development server:
+> 📋 Product plan: [`PLAN.md`](./PLAN.md) · Data model: [`docs/DATA_MODEL.md`](./docs/DATA_MODEL.md)
+
+## Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Web/App | Next.js 16 (App Router, TypeScript) + Tailwind CSS 4 |
+| Database | PostgreSQL + Prisma 7 |
+| Auth | Auth.js v5 (Credentials + RBAC) |
+| i18n | next-intl v4 — **Kannada + English** |
+| LMS (later) | Moodle integration |
+| Hosting | AWS Mumbai (`ap-south-1`) |
+
+## Prerequisites
+
+- Node.js 20+ and npm
+- Docker Desktop (for local PostgreSQL)
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Install dependencies
+npm install
+
+# 2. Start PostgreSQL
+docker compose up -d
+
+# 3. Configure environment
+#    .env is already provided for local dev. Generate a real secret:
+npx auth secret        # writes AUTH_SECRET into .env
+
+# 4. Create the database schema
+npm run db:migrate     # prisma migrate dev
+
+# 5. Seed roles, permissions, an admin user, sample districts
+npm run db:seed        # admin@mbv.local / ChangeMe123!
+
+# 6. Run the dev server
+npm run dev            # http://localhost:3000  (redirects to /en)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run db:generate` | Generate the Prisma client |
+| `npm run db:migrate` | Create/apply a dev migration |
+| `npm run db:push` | Push schema without a migration |
+| `npm run db:studio` | Open Prisma Studio |
+| `npm run db:seed` | Seed baseline data |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project structure
 
-## Learn More
+```
+src/
+  app/
+    [locale]/          # Localized routes (en, kn)
+      layout.tsx       # Root layout + NextIntlClientProvider
+      page.tsx         # Landing page
+    api/auth/[...nextauth]/route.ts   # Auth.js handlers
+  i18n/                # next-intl routing, request, navigation config
+  messages/            # en.json, kn.json translation catalogs
+  lib/prisma.ts        # Prisma client singleton
+  auth.ts              # Auth.js configuration
+  proxy.ts             # Next 16 "proxy" (locale routing middleware)
+prisma/
+  schema.prisma        # Phase 1 data model + Auth.js models
+  seed.ts              # Baseline seed
+docs/DATA_MODEL.md     # ERD
+PLAN.md                # Product & architecture plan
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Roadmap
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Phase 1 (current): **Training Operations Core** — programs, courses, cohorts,
+sessions, scheduling, attendance, trainee/trainer records, bulk import.
+See [`PLAN.md`](./PLAN.md) for all phases.

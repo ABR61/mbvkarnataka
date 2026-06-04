@@ -1,0 +1,25 @@
+# Local development services for the MBV platform.
+# Start with:  docker compose up -d
+# Stop with:   docker compose down   (add -v to also wipe the database volume)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mbv-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mbv
+      POSTGRES_PASSWORD: mbv_dev_password
+      POSTGRES_DB: mbv
+    ports:
+      - "5432:5432"
+    volumes:
+      - mbv-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mbv -d mbv"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mbv-pgdata:
