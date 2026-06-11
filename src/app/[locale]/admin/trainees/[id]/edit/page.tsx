@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { districtOptions } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { TraineeForm } from "../../trainee-form";
+import { TraineeLoginForm } from "../../trainee-login-form";
 import { updateTrainee, deleteTrainee } from "../../actions";
 
 export default async function EditTraineePage({
@@ -16,7 +17,10 @@ export default async function EditTraineePage({
   setRequestLocale(locale);
   await requirePermission("trainee.manage");
 
-  const person = await prisma.person.findUnique({ where: { id } });
+  const person = await prisma.person.findUnique({
+    where: { id },
+    include: { user: true },
+  });
   if (!person || person.kind !== "TRAINEE") notFound();
 
   const districts = await districtOptions(locale);
@@ -43,6 +47,17 @@ export default async function EditTraineePage({
           districtId: person.districtId ?? "",
         }}
       />
+
+      <section className="flex max-w-2xl flex-col gap-2 border-t border-gray-200 pt-4 dark:border-gray-800">
+        <h2 className="text-lg font-semibold">{t("portalLogin")}</h2>
+        {person.userId ? (
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t("hasLogin", { email: person.user?.email ?? "" })}
+          </p>
+        ) : (
+          <TraineeLoginForm locale={locale} id={person.id} />
+        )}
+      </section>
 
       <div className="max-w-2xl border-t border-gray-200 pt-4 dark:border-gray-800">
         <DeleteButton

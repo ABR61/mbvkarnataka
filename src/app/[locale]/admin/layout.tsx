@@ -19,6 +19,8 @@ export default async function AdminLayout({
 
   const session = await auth();
   if (!session?.user) redirect(`/${locale}/sign-in`);
+  // Users with no staff permissions (i.e. trainees) belong in the portal.
+  if (session.user.permissions.length === 0) redirect(`/${locale}/portal`);
 
   return (
     <div className="flex min-h-screen flex-1">

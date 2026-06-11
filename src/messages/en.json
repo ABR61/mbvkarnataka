@@ -89,6 +89,26 @@
     "serial": "Serial",
     "issued": "Issued"
   },
+  "Portal": {
+    "myPortal": "My portal",
+    "signOut": "Sign out",
+    "greeting": "Hello, {name}",
+    "noProfile": "No trainee profile is linked to this account.",
+    "myPrograms": "My programs",
+    "noPrograms": "You're not enrolled in any program yet.",
+    "mySchedule": "My schedule",
+    "noSchedule": "No sessions scheduled yet.",
+    "myCertificates": "My certificates",
+    "noCertificates": "No certificates yet.",
+    "viewCertificate": "View",
+    "status_ENROLLED": "Enrolled",
+    "status_COMPLETED": "Completed",
+    "status_DROPPED": "Dropped",
+    "attendance_PRESENT": "Present",
+    "attendance_ABSENT": "Absent",
+    "attendance_LATE": "Late",
+    "attendance_EXCUSED": "Excused"
+  },
   "Reports": {
     "title": "Reports",
     "intro": "Organisation-wide and district-wise training metrics.",
@@ -255,7 +275,14 @@
     "newTitle": "New trainee",
     "editTitle": "Edit trainee",
     "empty": "No trainees yet.",
-    "confirmDelete": "Delete this trainee? This cannot be undone."
+    "confirmDelete": "Delete this trainee? This cannot be undone.",
+    "portalLogin": "Portal login",
+    "hasLogin": "Has a portal login: {email}",
+    "loginHint": "Create a login so this trainee can access the self-service portal.",
+    "createLogin": "Create login",
+    "loginCreated": "Login created. The trainee can now sign in.",
+    "password": "Password",
+    "passwordMin": "Password must be at least 8 characters."
   },
   "Trainers": {
     "title": "Trainers",
