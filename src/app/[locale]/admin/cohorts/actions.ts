@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
-import { cohortInput, cohortFromForm, parseDate } from "@/lib/validation/cohort";
+import {
+  cohortInput,
+  cohortFromForm,
+  parseDate,
+  ENROLLMENT_STATUSES,
+} from "@/lib/validation/cohort";
 import { randomCode, certificateSerial } from "@/lib/certificate";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
 
@@ -120,6 +125,36 @@ export async function enrollTrainee(
     cohortId,
     personId,
   });
+
+  revalidatePath(`/${locale}/admin/cohorts/${cohortId}/edit`);
+  return { ok: true };
+}
+
+export async function updateEnrollmentStatus(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const locale = localeOf(formData);
+  const session = await requirePermission(PERMISSION);
+  const id = formData.get("id") as string;
+  const cohortId = formData.get("cohortId") as string;
+  const status = formData.get("status") as string;
+  if (!id) return { error: "notFound" };
+  if (!(ENROLLMENT_STATUSES as readonly string[]).includes(status)) {
+    return { error: "invalid" };
+  }
+
+  // Exit reason only applies when a trainee leaves early.
+  const exitReason =
+    status === "DROPPED"
+      ? ((formData.get("exitReason") as string) ?? "").trim() || null
+      : null;
+
+  await prisma.enrollment.update({
+    where: { id },
+    data: { status: status as (typeof ENROLLMENT_STATUSES)[number], exitReason },
+  });
+  await writeAudit(session.user.id, "update", "Enrollment", id, { status });
 
   revalidatePath(`/${locale}/admin/cohorts/${cohortId}/edit`);
   return { ok: true };

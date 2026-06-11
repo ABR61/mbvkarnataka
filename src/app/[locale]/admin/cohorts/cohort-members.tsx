@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
+import { ENROLLMENT_STATUSES } from "@/lib/validation/cohort";
 import type { FormState } from "@/lib/forms";
 
 type Option = { id: string; name: string };
@@ -80,6 +81,47 @@ export function AssignTrainerForm({
       {state.error && (
         <span className="text-sm text-red-600">{t(`assignError_${state.error}`)}</span>
       )}
+    </form>
+  );
+}
+
+export function EnrollmentStatusForm({
+  locale,
+  id,
+  cohortId,
+  status,
+  exitReason,
+  action,
+}: {
+  locale: string;
+  id: string;
+  cohortId: string;
+  status: string;
+  exitReason: string;
+  action: (prev: FormState, formData: FormData) => Promise<FormState>;
+}) {
+  const t = useTranslations("Cohorts");
+  const [state, formAction, pending] = useActionState(action, {});
+
+  return (
+    <form action={formAction} className="flex flex-wrap items-center gap-1">
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="cohortId" value={cohortId} />
+      <select name="status" defaultValue={status} className={`${field} py-1`}>
+        {ENROLLMENT_STATUSES.map((s) => (
+          <option key={s} value={s}>{t(`enrollmentStatus_${s}`)}</option>
+        ))}
+      </select>
+      <input
+        name="exitReason"
+        defaultValue={exitReason}
+        placeholder={t("exitReason")}
+        className={`${field} w-28 py-1`}
+      />
+      <button type="submit" disabled={pending} className="text-sm text-emerald-700 hover:underline disabled:opacity-50">
+        {state.ok ? "✓" : t("set")}
+      </button>
     </form>
   );
 }

@@ -10,12 +10,17 @@ import {
 } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { CohortForm } from "../../cohort-form";
-import { EnrollForm, AssignTrainerForm } from "../../cohort-members";
+import {
+  EnrollForm,
+  AssignTrainerForm,
+  EnrollmentStatusForm,
+} from "../../cohort-members";
 import {
   updateCohort,
   deleteCohort,
   enrollTrainee,
   unenrollTrainee,
+  updateEnrollmentStatus,
   assignTrainer,
   unassignTrainer,
   issueCertificate,
@@ -134,7 +139,16 @@ export default async function EditCohortPage({
               {cohort.enrollments.map((e) => (
                 <tr key={e.id}>
                   <td className={td}>{personName(e.person)}</td>
-                  <td className={`${td} text-gray-500`}>{e.status}</td>
+                  <td className={td}>
+                    <EnrollmentStatusForm
+                      locale={locale}
+                      id={e.id}
+                      cohortId={cohort.id}
+                      status={e.status}
+                      exitReason={e.exitReason ?? ""}
+                      action={updateEnrollmentStatus}
+                    />
+                  </td>
                   <td className={`${td} text-gray-500`}>
                     {t("attendance")}: {attendancePct(e.personId)}
                   </td>

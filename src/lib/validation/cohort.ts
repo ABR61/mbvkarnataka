@@ -13,6 +13,9 @@ export const COHORT_STATUSES = [
   "CANCELLED",
 ] as const;
 
+export const ENROLLMENT_STATUSES = ["ENROLLED", "COMPLETED", "DROPPED"] as const;
+export type EnrollmentStatusValue = (typeof ENROLLMENT_STATUSES)[number];
+
 export const cohortInput = z.object({
   programId: z.string().trim().min(1, "required"),
   centerId: z.string().trim().min(1, "required"),
