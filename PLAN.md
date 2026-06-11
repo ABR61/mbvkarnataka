@@ -269,15 +269,14 @@ Goal: let the public discover programs and **apply online without an account**, 
 - The apply form is **unauthenticated** (a public server action — zod-validated, honeypot for basic spam defense, captures DPDP consent + IP on the `Application`). No rate-limiting in the MVP (noted).
 - Conversion: an accepted application becomes a `Person(TRAINEE)` (+ a real `ConsentRecord`) and, optionally, an `Enrollment` into a chosen cohort.
 
-### Slice 2.1 — Application model + public programs browsing
-- `Application` model + `ApplicationStatus` (SUBMITTED/UNDER_REVIEW/ACCEPTED/REJECTED/CONVERTED) + migration; add `application.manage` to the RBAC matrix + seed.
-- `(public)` layout (header: Programs / Apply / language / Staff sign-in). Public **programs listing** (`/[locale]/programs`, active only) + **program detail** (`/[locale]/programs/[id]`), bilingual + SEO.
+### Slice 2.1 — Application model + public programs browsing ✅ DONE (2026-06-11)
+- ✅ `Application` model + `ApplicationStatus` + migration; `application.manage` permission (Admin/CenterManager/Coordinator) + seed.
+- ✅ `(public)` route group with header/footer; public **programs listing** + **program detail** (bilingual, SEO, Apply CTA). Both `force-dynamic` (DB-free build).
 
-### Slice 2.2 — Online application
-- Public **apply** form (`/[locale]/apply`, optional `?program=`): applicant name/phone/email/DOB/district/program + consent. Public `createApplication` action (validation + honeypot + consent/IP). Confirmation page.
+### Slice 2.2 — Online application ✅ DONE (2026-06-11)
+- ✅ Public **apply** form (`?program=` prefill) + unauthenticated `createApplication` (honeypot, zod, required DPDP consent + IP); inline thank-you. Verified: anon submit creates `Application(SUBMITTED)`.
 
-### Slice 2.3 — Applicant pipeline (back-office)
-- Applications list + detail (gated `application.manage`): filter by status, review note, status transitions.
-- **Convert** accepted applicant → `Person(TRAINEE)` + `ConsentRecord` (+ optional `Enrollment` into a cohort); set status CONVERTED and link `personId`.
+### Slice 2.3 — Applicant pipeline (back-office) ✅ DONE (2026-06-11)
+- ✅ Applications list (status-filter chips) + detail (gated `application.manage`): status transitions + review note; **convert** → `Person(TRAINEE)` + `ConsentRecord` (+ optional `Enrollment`, capacity-guarded), status CONVERTED, `personId` linked. Verified end-to-end on the production build.
 
-Cross-cutting: i18n (`Public`, `Apply`, `Applications` namespaces), audit on staff mutations, unit tests for the new validation, an e2e smoke for the apply flow.
+**Phase 2 complete.** Cross-cutting done: `Public`/`Apply`/`Applications` i18n (en + kn), audit on staff mutations, unit tests for application validation (45 unit total). *Optional follow-ups:* e2e smoke for the apply flow; richer marketing pages (impact stories, news).
