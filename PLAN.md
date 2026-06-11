@@ -216,11 +216,11 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met (verified via live HTTP):** trainee created with consent record; trainer created with login — **the new trainer signs in successfully**, sees only permitted nav (Attendance, not Centers), and is denied `/admin/centers` server-side.
 - *Note:* sample trainee (Asha Kumari) + trainer (`ravi@mbv.local` / `TrainerPass1`) remain in the dev DB from verification. Forbidden access currently throws a 500 — a branded 403 page is a later refinement.
 
-### Slice 4 — Cohorts + Enrollment
-- **Cohort** CRUD (program + center + coordinator + dates + capacity + status).
-- **Trainer assignment** to cohorts.
-- **Enroll / unenroll** trainees with capacity and duplicate guards.
-- **AC:** open a cohort, assign a trainer, enroll 5 trainees; enrolling past capacity or twice is blocked.
+### Slice 4 — Cohorts + Enrollment ✅ DONE (2026-06-11)
+- ✅ **Cohort** CRUD (program + center + coordinator + dates + capacity + status; unique `code`), gated by `cohort.manage`. Create lands on the cohort's manage page.
+- ✅ Rich **manage page**: cohort fields + **enrollment** (enroll/unenroll with **capacity + duplicate guards**) + **trainer assignment** (assign/unassign with role). Inline `useActionState` forms surface guard errors without navigation.
+- ✅ **AC met (verified via live HTTP):** created a cohort (capacity 2), enrolled 2 trainees, **3rd enroll blocked (capacity)**, **re-enroll blocked (duplicate)**, trainer assigned as "lead"; audit rows for cohort/enrollment/assignment.
+- *Note:* a sample cohort `TLR-2026-01` + test trainees (Alpha/Beta/Gamma) + "Test Center" remain in the dev DB from verification.
 
 ### Slice 5 — Sessions + Attendance *(the operational core)*
 - **Session** scheduling per cohort (course, venue, trainer, date, start/end time).
