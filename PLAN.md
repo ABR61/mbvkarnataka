@@ -248,10 +248,11 @@ Fixed gaps found in the current scaffold.
 **Phase 1 (Training Operations Core) — feature-complete (2026-06-11).** All six slices built on `phase-1-training-ops`, each verified against a live/production server. The back-office covers auth+RBAC, geography & curriculum, people (+consent) & trainers (+logins), cohorts/enrollment, sessions/attendance, and bulk CSV import — fully bilingual (en/kn), audit-logged, permission-gated.
 
 **Remaining before calling Phase 1 "done-done":**
-1. **Automated tests** (unit/integration/e2e) — the cross-cutting item not yet started.
-2. **CI** (GitHub Actions) — lint/typecheck/prisma validate/build/test.
-3. **403 page** — `requirePermission` currently throws a 500 on forbidden; add a branded 403.
+1. ✅ **Unit tests** (Vitest) — 41 tests over CSV/RBAC/localized/forms/validation. *Integration (server actions vs test DB) + e2e still TODO.*
+2. ✅ **CI** (GitHub Actions) — npm ci → prisma generate → prisma validate → lint → typecheck → test → build.
+3. ✅ **403 page** — `requirePermission` now calls `forbidden()`; bilingual `[locale]/forbidden.tsx`.
 4. **Enrollment import** trainee matching by phone is ambiguity-prone — consider a stable import key.
-5. Open the PR for `phase-1-training-ops` → `main` when ready.
+5. **Integration + e2e tests** — server actions against a throwaway Postgres; smoke e2e on sign-in + attendance.
+6. Open the PR for `phase-1-training-ops` → `main` (no git remote yet — needs a GitHub repo created + push authorized).
 
 Then **Phase 2 — Public site + online admissions**.
