@@ -310,5 +310,7 @@ Reuses the established CRUD/RBAC/audit pattern. New permission `finance.manage` 
 - ✅ `Expense` CRUD (Decimal amount→INR, date, category, vendor, links, status PENDING/APPROVED/PAID) with status filter + running total; `finance.manage` (Admin, Finance).
 - ✅ `Budget` (one per program) set/update; budgets page shows **budget vs spent (APPROVED+PAID) vs remaining** (over-budget in red). Verified: ₹5,000 expense + ₹20,000 budget → spent ₹5,000 / remaining ₹15,000. 5 unit tests.
 
-### Slice 4.2 — Vendors + grants *(later)*
-- Vendor records + payments; grant/funder accounting; finance lines in the district report.
+### Slice 4.2 — Vendors + grants ✅ DONE (2026-06-11)
+- ✅ `Vendor` CRUD; expenses link to a managed vendor (`Expense.vendorId`, legacy free-text fallback).
+- ✅ `Grant` CRUD (funder accounting) with a total-received sum. Verified: grant ₹500,000 → total ₹5,00,000.00 (INR lakh formatting); vendor appears in the expense select.
+- *Deferred:* explicit vendor payments + finance lines in the district report.
