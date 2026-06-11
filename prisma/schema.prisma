@@ -140,6 +140,7 @@ model Person {
   trainerAssignments TrainerAssignment[]
   documents          Document[]
   consentRecords     ConsentRecord[]
+  application        Application?
 
   @@index([districtId])
   @@index([kind])
@@ -155,8 +156,9 @@ model District {
   code  String? @unique
   state String  @default("Karnataka")
 
-  centers Center[]
-  persons Person[]
+  centers      Center[]
+  persons      Person[]
+  applications Application[]
 }
 
 model Center {
@@ -200,8 +202,9 @@ model Program {
   status        String   @default("active")
   createdAt     DateTime @default(now())
 
-  courses Course[]
-  cohorts Cohort[]
+  courses      Course[]
+  cohorts      Cohort[]
+  applications Application[]
 }
 
 model Course {
@@ -354,6 +357,37 @@ model AuditLog {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Admissions (Phase 2)
+// ─────────────────────────────────────────────────────────────
+
+model Application {
+  id          String            @id @default(cuid())
+  firstName   String
+  lastName    String?
+  phone       String
+  email       String?
+  dateOfBirth DateTime?
+  gender      Gender?
+  districtId  String?
+  programId   String? // program of interest
+  message     String? // free text from the applicant
+  status      ApplicationStatus @default(SUBMITTED)
+  reviewNote  String? // staff note
+  consentAt   DateTime? // when the applicant gave DPDP consent
+  ipAddress   String?
+  personId    String?           @unique // set when converted to a trainee
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  district District? @relation(fields: [districtId], references: [id])
+  program  Program?  @relation(fields: [programId], references: [id])
+  person   Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([programId])
+}
+
+// ─────────────────────────────────────────────────────────────
 // Enums
 // ─────────────────────────────────────────────────────────────
 
@@ -374,6 +408,14 @@ enum PersonKind {
   TRAINEE
   TRAINER
   STAFF
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
+  CONVERTED
 }
 
 enum CenterStatus {

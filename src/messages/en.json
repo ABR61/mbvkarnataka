@@ -5,7 +5,24 @@
     "subtitle": "Free occupational training for youth across Karnataka.",
     "phase": "Phase 1 — Training Operations Core (in development)",
     "language": "Language",
-    "signIn": "Staff sign in"
+    "signIn": "Staff sign in",
+    "browsePrograms": "Browse programs",
+    "applyNow": "Apply now"
+  },
+  "Public": {
+    "programs": "Programs",
+    "apply": "Apply",
+    "staffSignIn": "Staff sign in",
+    "programsTitle": "Training programs",
+    "programsIntro": "Free, blended occupational training for youth across Karnataka.",
+    "programsEmpty": "No programs are open right now. Please check back soon.",
+    "weeks": "{count, plural, one {# week} other {# weeks}}",
+    "hours": "{count, plural, one {# hour} other {# hours}}",
+    "coursesCount": "{count, plural, =0 {No courses} one {# course} other {# courses}}",
+    "coursesIncluded": "Courses included",
+    "learnMore": "Learn more",
+    "backToPrograms": "Back to programs",
+    "applyToProgram": "Apply for this program"
   },
   "SignIn": {
     "title": "Sign in",

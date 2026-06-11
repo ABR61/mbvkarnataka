@@ -258,4 +258,26 @@ Fixed gaps found in the current scaffold.
 
 **Test pyramid:** 41 unit + 6 integration (DB) + 4 e2e (HTTP). CI: `verify` · `integration` · `e2e`.
 
-Then **Phase 2 — Public site + online admissions**.
+---
+
+## 15. Phase 2 — Public site + online admissions: Build Plan
+
+Goal: let the public discover programs and **apply online without an account**, and let staff run the **applicant → trainee pipeline**. Reuses the Phase-1 primitives (localized fields, server actions, audit, RBAC). New data: `Application`. New permission: `application.manage` (Admin, CenterManager, Coordinator).
+
+**Conventions / decisions:**
+- Public marketing pages live in a `(public)` route group under `/[locale]` with their own header/footer; SEO metadata (title/description) per page. Bilingual.
+- The apply form is **unauthenticated** (a public server action — zod-validated, honeypot for basic spam defense, captures DPDP consent + IP on the `Application`). No rate-limiting in the MVP (noted).
+- Conversion: an accepted application becomes a `Person(TRAINEE)` (+ a real `ConsentRecord`) and, optionally, an `Enrollment` into a chosen cohort.
+
+### Slice 2.1 — Application model + public programs browsing
+- `Application` model + `ApplicationStatus` (SUBMITTED/UNDER_REVIEW/ACCEPTED/REJECTED/CONVERTED) + migration; add `application.manage` to the RBAC matrix + seed.
+- `(public)` layout (header: Programs / Apply / language / Staff sign-in). Public **programs listing** (`/[locale]/programs`, active only) + **program detail** (`/[locale]/programs/[id]`), bilingual + SEO.
+
+### Slice 2.2 — Online application
+- Public **apply** form (`/[locale]/apply`, optional `?program=`): applicant name/phone/email/DOB/district/program + consent. Public `createApplication` action (validation + honeypot + consent/IP). Confirmation page.
+
+### Slice 2.3 — Applicant pipeline (back-office)
+- Applications list + detail (gated `application.manage`): filter by status, review note, status transitions.
+- **Convert** accepted applicant → `Person(TRAINEE)` + `ConsentRecord` (+ optional `Enrollment` into a cohort); set status CONVERTED and link `personId`.
+
+Cross-cutting: i18n (`Public`, `Apply`, `Applications` namespaces), audit on staff mutations, unit tests for the new validation, an e2e smoke for the apply flow.

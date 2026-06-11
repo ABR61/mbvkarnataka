@@ -10,6 +10,7 @@ export const PERMISSIONS = [
   "attendance.mark", // mark attendance for a session
   "trainee.manage", // trainee (Person) records
   "trainer.manage", // trainer records & assignments
+  "application.manage", // admissions: applicant pipeline
   "report.view", // dashboards & exports
 ] as const;
 
@@ -36,12 +37,14 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
     "session.manage",
     "trainee.manage",
     "trainer.manage",
+    "application.manage",
     "report.view",
   ],
   Coordinator: [
     "cohort.manage",
     "session.manage",
     "trainee.manage",
+    "application.manage",
     "report.view",
   ],
   Trainer: ["session.manage", "attendance.mark"],
