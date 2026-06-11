@@ -58,6 +58,11 @@ export async function venueOptions(locale: string): Promise<Option[]> {
     .sort(byName);
 }
 
+export async function vendorOptions(): Promise<Option[]> {
+  const vendors = await prisma.vendor.findMany({ orderBy: { name: "asc" } });
+  return vendors.map((v) => ({ id: v.id, name: v.name }));
+}
+
 export async function cohortOptions(locale: string): Promise<Option[]> {
   const cohorts = await prisma.cohort.findMany({
     include: { program: true, center: true },

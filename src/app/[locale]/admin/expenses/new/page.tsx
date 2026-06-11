@@ -1,6 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requirePermission } from "@/lib/auth-guards";
-import { programOptions, cohortOptions, centerOptions } from "@/lib/options";
+import {
+  programOptions,
+  cohortOptions,
+  centerOptions,
+  vendorOptions,
+} from "@/lib/options";
 import { ExpenseForm } from "../expense-form";
 import { createExpense } from "../actions";
 
@@ -13,10 +18,11 @@ export default async function NewExpensePage({
   setRequestLocale(locale);
   await requirePermission("finance.manage");
 
-  const [programs, cohorts, centers] = await Promise.all([
+  const [programs, cohorts, centers, vendors] = await Promise.all([
     programOptions(locale),
     cohortOptions(locale),
     centerOptions(locale),
+    vendorOptions(),
   ]);
   const t = await getTranslations("Expenses");
 
@@ -28,6 +34,7 @@ export default async function NewExpensePage({
         programs={programs}
         cohorts={cohorts}
         centers={centers}
+        vendors={vendors}
         action={createExpense}
       />
     </div>

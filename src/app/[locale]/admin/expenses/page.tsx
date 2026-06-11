@@ -32,7 +32,7 @@ export default async function ExpensesPage({
   const [rows, total, totalAgg] = await Promise.all([
     prisma.expense.findMany({
       where,
-      include: { program: true },
+      include: { program: true, vendorRecord: true },
       orderBy: { incurredOn: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -94,7 +94,7 @@ export default async function ExpensesPage({
                 <td className={td}>{e.incurredOn.toISOString().slice(0, 10)}</td>
                 <td className={`${td} tabular-nums`}>{formatINR(e.amount.toString())}</td>
                 <td className={td}>{e.category ?? "—"}</td>
-                <td className={td}>{e.vendor ?? "—"}</td>
+                <td className={td}>{e.vendorRecord?.name ?? e.vendor ?? "—"}</td>
                 <td className={td}>{e.program ? localized(e.program.name, locale) : "—"}</td>
                 <td className={td}>{t(`status_${e.status}`)}</td>
                 <td className={td}>

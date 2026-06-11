@@ -2,7 +2,12 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
-import { programOptions, cohortOptions, centerOptions } from "@/lib/options";
+import {
+  programOptions,
+  cohortOptions,
+  centerOptions,
+  vendorOptions,
+} from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ExpenseForm } from "../../expense-form";
 import { updateExpense, deleteExpense } from "../../actions";
@@ -19,10 +24,11 @@ export default async function EditExpensePage({
   const expense = await prisma.expense.findUnique({ where: { id } });
   if (!expense) notFound();
 
-  const [programs, cohorts, centers] = await Promise.all([
+  const [programs, cohorts, centers, vendors] = await Promise.all([
     programOptions(locale),
     cohortOptions(locale),
     centerOptions(locale),
+    vendorOptions(),
   ]);
   const t = await getTranslations("Expenses");
   const tc = await getTranslations("Common");
@@ -36,13 +42,14 @@ export default async function EditExpensePage({
         programs={programs}
         cohorts={cohorts}
         centers={centers}
+        vendors={vendors}
         action={updateExpense}
         defaults={{
           id: expense.id,
           amount: expense.amount.toString(),
           incurredOn: expense.incurredOn.toISOString().slice(0, 10),
           category: expense.category ?? "",
-          vendor: expense.vendor ?? "",
+          vendorId: expense.vendorId ?? "",
           note: expense.note ?? "",
           programId: expense.programId ?? "",
           cohortId: expense.cohortId ?? "",

@@ -13,6 +13,7 @@ export function ExpenseForm({
   programs,
   cohorts,
   centers,
+  vendors,
   action,
   defaults = {},
 }: {
@@ -20,13 +21,14 @@ export function ExpenseForm({
   programs: Option[];
   cohorts: Option[];
   centers: Option[];
+  vendors: Option[];
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaults?: {
     id?: string;
     amount?: string;
     incurredOn?: string;
     category?: string;
-    vendor?: string;
+    vendorId?: string;
     note?: string;
     programId?: string;
     cohortId?: string;
@@ -93,10 +95,7 @@ export function ExpenseForm({
           <span className="font-medium">{t("category")}</span>
           <input name="category" defaultValue={defaults.category} className={field} />
         </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">{t("vendor")}</span>
-          <input name="vendor" defaultValue={defaults.vendor} className={field} />
-        </label>
+        {select("vendorId", t("vendor"), vendors, defaults.vendorId)}
       </div>
 
       {select("programId", t("program"), programs, defaults.programId)}

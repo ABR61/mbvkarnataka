@@ -166,6 +166,34 @@
     "remaining": "Remaining",
     "set": "Set"
   },
+  "Vendors": {
+    "title": "Vendors",
+    "new": "New vendor",
+    "newTitle": "New vendor",
+    "editTitle": "Edit vendor",
+    "name": "Name",
+    "contactPerson": "Contact person",
+    "email": "Email",
+    "emailInvalid": "Enter a valid email.",
+    "note": "Note",
+    "empty": "No vendors yet.",
+    "confirmDelete": "Delete this vendor? This cannot be undone."
+  },
+  "Grants": {
+    "title": "Grants",
+    "new": "New grant",
+    "newTitle": "New grant",
+    "editTitle": "Edit grant",
+    "totalReceived": "Total received",
+    "funder": "Funder",
+    "amount": "Amount",
+    "amountInvalid": "Enter an amount like 100000.00",
+    "reference": "Reference",
+    "receivedOn": "Received on",
+    "note": "Note",
+    "empty": "No grants yet.",
+    "confirmDelete": "Delete this grant? This cannot be undone."
+  },
   "Reports": {
     "title": "Reports",
     "intro": "Organisation-wide and district-wise training metrics.",
@@ -225,6 +253,8 @@
     "sessions": "Sessions",
     "expenses": "Expenses",
     "budgets": "Budgets",
+    "vendors": "Vendors",
+    "grants": "Grants",
     "reports": "Reports",
     "users": "Users",
     "moodle": "Moodle (LMS)"

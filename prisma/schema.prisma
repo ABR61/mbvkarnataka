@@ -432,26 +432,53 @@ model Budget {
 }
 
 model Expense {
-  id         String        @id @default(cuid())
-  amount     Decimal       @db.Decimal(12, 2)
-  incurredOn DateTime
-  category   String?
-  vendor     String?
-  note       String?
-  status     ExpenseStatus @default(PENDING)
-  programId  String?
-  cohortId   String?
-  centerId   String?
+  id          String        @id @default(cuid())
+  amount      Decimal       @db.Decimal(12, 2)
+  incurredOn  DateTime
+  category    String?
+  vendor      String? // legacy free-text vendor (superseded by vendorId)
+  note        String?
+  status      ExpenseStatus @default(PENDING)
+  programId   String?
+  cohortId    String?
+  centerId    String?
+  vendorId    String?
   createdById String?
-  createdAt  DateTime      @default(now())
+  createdAt   DateTime      @default(now())
 
-  program Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
-  cohort  Cohort?  @relation(fields: [cohortId], references: [id], onDelete: SetNull)
-  center  Center?  @relation(fields: [centerId], references: [id], onDelete: SetNull)
+  program       Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
+  cohort        Cohort?  @relation(fields: [cohortId], references: [id], onDelete: SetNull)
+  center        Center?  @relation(fields: [centerId], references: [id], onDelete: SetNull)
+  vendorRecord  Vendor?  @relation(fields: [vendorId], references: [id], onDelete: SetNull)
 
   @@index([programId])
   @@index([status])
   @@index([incurredOn])
+}
+
+model Vendor {
+  id            String   @id @default(cuid())
+  name          String
+  contactPerson String?
+  phone         String?
+  email         String?
+  note          String?
+  createdAt     DateTime @default(now())
+
+  expenses Expense[]
+}
+
+model Grant {
+  id          String   @id @default(cuid())
+  funder      String
+  amount      Decimal  @db.Decimal(14, 2)
+  reference   String?
+  receivedOn  DateTime
+  note        String?
+  createdById String?
+  createdAt   DateTime @default(now())
+
+  @@index([receivedOn])
 }
 
 // ─────────────────────────────────────────────────────────────

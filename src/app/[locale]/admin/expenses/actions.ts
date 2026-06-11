@@ -20,7 +20,7 @@ function expenseData(d: ReturnType<typeof expenseInput.parse>) {
     amount: d.amount, // string → Prisma Decimal (precise)
     incurredOn: parseDate(d.incurredOn) ?? new Date(),
     category: d.category || null,
-    vendor: d.vendor || null,
+    vendorId: d.vendorId || null,
     note: d.note || null,
     programId: d.programId || null,
     cohortId: d.cohortId || null,

@@ -11,7 +11,7 @@ export const expenseInput = z.object({
   amount: money,
   incurredOn: z.string().trim().min(1, "required"), // YYYY-MM-DD
   category: optionalStr,
-  vendor: optionalStr,
+  vendorId: optionalStr,
   note: optionalStr,
   programId: optionalStr,
   cohortId: optionalStr,
@@ -26,7 +26,7 @@ export function expenseFromForm(formData: FormData) {
     amount: formData.get("amount"),
     incurredOn: formData.get("incurredOn"),
     category: formData.get("category") ?? "",
-    vendor: formData.get("vendor") ?? "",
+    vendorId: formData.get("vendorId") ?? "",
     note: formData.get("note") ?? "",
     programId: formData.get("programId") ?? "",
     cohortId: formData.get("cohortId") ?? "",
@@ -38,5 +38,21 @@ export function expenseFromForm(formData: FormData) {
 export const budgetInput = z.object({
   programId: z.string().trim().min(1, "required"),
   amount: money,
+  note: optionalStr,
+});
+
+export const vendorInput = z.object({
+  name: z.string().trim().min(1, "required"),
+  contactPerson: optionalStr,
+  phone: optionalStr,
+  email: z.union([z.literal(""), z.email("invalid")]).optional().default(""),
+  note: optionalStr,
+});
+
+export const grantInput = z.object({
+  funder: z.string().trim().min(1, "required"),
+  amount: money,
+  reference: optionalStr,
+  receivedOn: z.string().trim().min(1, "required"),
   note: optionalStr,
 });
