@@ -122,6 +122,8 @@
     "myCertificates": "ನನ್ನ ಪ್ರಮಾಣಪತ್ರಗಳು",
     "noCertificates": "ಇನ್ನೂ ಯಾವುದೇ ಪ್ರಮಾಣಪತ್ರಗಳಿಲ್ಲ.",
     "viewCertificate": "ವೀಕ್ಷಿಸಿ",
+    "editProfile": "ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ",
+    "profileSaved": "ಪ್ರೊಫೈಲ್ ಉಳಿಸಲಾಗಿದೆ ✓",
     "status_ENROLLED": "ನೋಂದಾಯಿತ",
     "status_COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ",
     "status_DROPPED": "ತೊರೆದಿದ್ದಾರೆ",

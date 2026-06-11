@@ -122,6 +122,8 @@
     "myCertificates": "My certificates",
     "noCertificates": "No certificates yet.",
     "viewCertificate": "View",
+    "editProfile": "Edit profile",
+    "profileSaved": "Profile saved ✓",
     "status_ENROLLED": "Enrolled",
     "status_COMPLETED": "Completed",
     "status_DROPPED": "Dropped",

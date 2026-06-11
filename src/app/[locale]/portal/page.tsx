@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
+import { Link } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -52,9 +53,17 @@ export default async function PortalPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-bold">
-        {t("greeting", { name: person.firstName })}
-      </h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">
+          {t("greeting", { name: person.firstName })}
+        </h1>
+        <Link
+          href="/portal/profile"
+          className="shrink-0 rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+        >
+          {t("editProfile")}
+        </Link>
+      </div>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-semibold">{t("myPrograms")}</h2>
