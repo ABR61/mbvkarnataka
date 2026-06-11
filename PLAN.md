@@ -252,8 +252,10 @@ Fixed gaps found in the current scaffold.
 2. ✅ **CI** (GitHub Actions) — `verify` job (ci → generate → validate → lint → typecheck → test → build) + `integration` job (postgres service → migrate deploy → integration tests).
 3. ✅ **403 page** — `requirePermission` now calls `forbidden()`; bilingual `[locale]/forbidden.tsx`.
 4. ✅ **Integration tests** — 6 tests vs a migrated test DB (unique enrollment/trainer/district-code; cascade deletes for cohort/person/session).
-5. **e2e smoke** (sign-in + attendance) — still TODO (needs Playwright or similar; not set up).
-6. **Enrollment import** trainee matching by phone is ambiguity-prone — consider a stable import key.
+5. ✅ **e2e smoke** — HTTP-level suite (anon redirect, sign-in render, admin login → dashboard, bad-password reject) + CI `e2e` job (build → start → run). Browser-driven e2e (Playwright) still optional.
+6. **Enrollment import** trainee matching by phone is ambiguity-prone (ambiguous matches already error) — could add an optional stable key (Person id / email).
 7. Open the PR for `phase-1-training-ops` → `main` (**no git remote yet** — needs a GitHub repo created + push authorized).
+
+**Test pyramid:** 41 unit + 6 integration (DB) + 4 e2e (HTTP). CI: `verify` · `integration` · `e2e`.
 
 Then **Phase 2 — Public site + online admissions**.
