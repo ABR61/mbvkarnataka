@@ -22,6 +22,7 @@ function baseData(d: CourseInput) {
     name: toLocalized(d.nameEn, d.nameKn),
     sequence: d.sequence,
     hours: d.hours,
+    moodleCourseId: d.moodleCourseId,
   };
 }
 

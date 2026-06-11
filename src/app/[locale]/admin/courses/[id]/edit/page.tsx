@@ -46,6 +46,7 @@ export default async function EditCoursePage({
           descKn: desc.kn ?? "",
           sequence: course.sequence,
           hours: course.hours,
+          moodleCourseId: course.moodleCourseId,
         }}
       />
 

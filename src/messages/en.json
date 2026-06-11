@@ -192,6 +192,8 @@
     "program": "Program",
     "sequence": "Seq.",
     "hours": "Hours",
+    "moodleCourseId": "Moodle course ID",
+    "moodleHint": "Optional — links this course to a Moodle course for LMS sync.",
     "empty": "No courses yet.",
     "confirmDelete": "Delete this course? This cannot be undone."
   },

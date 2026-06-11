@@ -209,12 +209,13 @@ model Program {
 }
 
 model Course {
-  id          String  @id @default(cuid())
-  programId   String
-  name        Json // { en, kn }
-  description Json? // { en, kn }
-  sequence    Int     @default(0)
-  hours       Int?
+  id             String  @id @default(cuid())
+  programId      String
+  name           Json // { en, kn }
+  description    Json? // { en, kn }
+  sequence       Int     @default(0)
+  hours          Int?
+  moodleCourseId Int? // maps this course to a Moodle course (LMS integration)
 
   program  Program           @relation(fields: [programId], references: [id], onDelete: Cascade)
   sessions TrainingSession[]
@@ -253,9 +254,10 @@ model Enrollment {
   id         String           @id @default(cuid())
   personId   String
   cohortId   String
-  enrolledOn DateTime         @default(now())
-  status     EnrollmentStatus @default(ENROLLED)
-  exitReason String?
+  enrolledOn     DateTime         @default(now())
+  status         EnrollmentStatus @default(ENROLLED)
+  exitReason     String?
+  moodleEnrolled Boolean          @default(false) // provisioned to Moodle?
 
   person      Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
   cohort      Cohort       @relation(fields: [cohortId], references: [id], onDelete: Cascade)

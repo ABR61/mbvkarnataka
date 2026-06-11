@@ -18,6 +18,7 @@ export const courseInput = z.object({
   descKn: z.string().trim().optional().default(""),
   sequence: sequenceInt,
   hours: optionalInt,
+  moodleCourseId: optionalInt,
 });
 
 export type CourseInput = z.infer<typeof courseInput>;
@@ -31,5 +32,6 @@ export function courseFromForm(formData: FormData) {
     descKn: formData.get("descKn") ?? "",
     sequence: formData.get("sequence") ?? "",
     hours: formData.get("hours") ?? "",
+    moodleCourseId: formData.get("moodleCourseId") ?? "",
   };
 }

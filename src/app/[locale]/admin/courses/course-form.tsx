@@ -24,6 +24,7 @@ export function CourseForm({
     descKn?: string;
     sequence?: number;
     hours?: number | null;
+    moodleCourseId?: number | null;
   };
 }) {
   const t = useTranslations("Courses");
@@ -102,6 +103,18 @@ export function CourseForm({
           />
         </label>
       </div>
+
+      <label className="flex max-w-xs flex-col gap-1 text-sm">
+        <span className="font-medium">{t("moodleCourseId")}</span>
+        <input
+          name="moodleCourseId"
+          type="number"
+          min={0}
+          defaultValue={defaults.moodleCourseId ?? ""}
+          className={field}
+        />
+        <span className="text-xs text-gray-400">{t("moodleHint")}</span>
+      </label>
 
       <div className="mt-2 flex items-center gap-3">
         <button
