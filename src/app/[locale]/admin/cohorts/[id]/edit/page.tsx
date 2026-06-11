@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
-import { localized } from "@/lib/localized";
 import {
   programOptions,
   centerOptions,
@@ -57,8 +56,31 @@ export default async function EditCohortPage({
   const enrollCandidates = allTrainees.filter((t) => !enrolledIds.has(t.id));
   const assignCandidates = allTrainers.filter((t) => !assignedIds.has(t.id));
 
+  // Per-trainee attendance: PRESENT or LATE counts as attended over all sessions.
+  const sessions = await prisma.trainingSession.findMany({
+    where: { cohortId: id },
+    select: { id: true },
+  });
+  const totalSessions = sessions.length;
+  const attendances = totalSessions
+    ? await prisma.attendance.findMany({
+        where: { sessionId: { in: sessions.map((s) => s.id) } },
+        select: { personId: true, status: true },
+      })
+    : [];
+  const attendedByPerson = new Map<string, number>();
+  for (const a of attendances) {
+    if (a.status === "PRESENT" || a.status === "LATE") {
+      attendedByPerson.set(a.personId, (attendedByPerson.get(a.personId) ?? 0) + 1);
+    }
+  }
+  const attendancePct = (personId: string) => {
+    if (totalSessions === 0) return "—";
+    const attended = attendedByPerson.get(personId) ?? 0;
+    return `${attended}/${totalSessions} (${Math.round((attended / totalSessions) * 100)}%)`;
+  };
+
   const t = await getTranslations("Cohorts");
-  const tc = await getTranslations("Common");
 
   const atCapacity =
     cohort.capacity != null && cohort.enrollments.length >= cohort.capacity;
@@ -108,6 +130,9 @@ export default async function EditCohortPage({
                 <tr key={e.id}>
                   <td className={td}>{personName(e.person)}</td>
                   <td className={`${td} text-gray-500`}>{e.status}</td>
+                  <td className={`${td} text-gray-500`}>
+                    {t("attendance")}: {attendancePct(e.personId)}
+                  </td>
                   <td className={`${td} text-right`}>
                     <form action={unenrollTrainee} className="inline">
                       <input type="hidden" name="locale" value={locale} />

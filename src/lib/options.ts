@@ -40,3 +40,34 @@ export async function personOptions(kinds: PersonKind[]): Promise<Option[]> {
   });
   return people.map((p) => ({ id: p.id, name: personName(p) })).sort(byName);
 }
+
+export async function courseOptions(locale: string): Promise<Option[]> {
+  const courses = await prisma.course.findMany({ include: { program: true } });
+  return courses
+    .map((c) => ({
+      id: c.id,
+      name: `${localized(c.name, locale)} · ${localized(c.program.name, locale)}`,
+    }))
+    .sort(byName);
+}
+
+export async function venueOptions(locale: string): Promise<Option[]> {
+  const venues = await prisma.venue.findMany({ include: { center: true } });
+  return venues
+    .map((v) => ({ id: v.id, name: `${v.name} · ${localized(v.center.name, locale)}` }))
+    .sort(byName);
+}
+
+export async function cohortOptions(locale: string): Promise<Option[]> {
+  const cohorts = await prisma.cohort.findMany({
+    include: { program: true, center: true },
+  });
+  return cohorts
+    .map((c) => ({
+      id: c.id,
+      name:
+        c.code ??
+        `${localized(c.program.name, locale)} · ${localized(c.center.name, locale)}`,
+    }))
+    .sort(byName);
+}

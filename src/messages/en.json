@@ -29,7 +29,7 @@
     "cohorts": "Cohorts",
     "trainees": "Trainees",
     "trainers": "Trainers",
-    "attendance": "Attendance",
+    "sessions": "Sessions",
     "reports": "Reports",
     "users": "Users"
   },
@@ -187,7 +187,39 @@
     "assignError_duplicate": "Already assigned.",
     "assignError_invalid": "Invalid request.",
     "remove": "Remove",
+    "attendance": "Attendance",
     "deleteCohort": "Delete cohort",
     "confirmDelete": "Delete this cohort? Enrollments and sessions will be removed. This cannot be undone."
+  },
+  "Sessions": {
+    "title": "Sessions",
+    "new": "New session",
+    "newTitle": "Schedule session",
+    "editTitle": "Edit session",
+    "empty": "No sessions yet.",
+    "cohort": "Cohort",
+    "course": "Course",
+    "venue": "Venue",
+    "trainer": "Trainer",
+    "date": "Date",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "topic": "Topic",
+    "marked": "Marked",
+    "markAttendance": "Mark attendance",
+    "status_SCHEDULED": "Scheduled",
+    "status_COMPLETED": "Completed",
+    "status_CANCELLED": "Cancelled",
+    "confirmDelete": "Delete this session? Attendance records will be removed."
+  },
+  "Attendance": {
+    "title": "Attendance",
+    "noTrainees": "No trainees enrolled in this cohort.",
+    "allPresent": "Mark all present",
+    "saveAttendance": "Save attendance",
+    "status_PRESENT": "Present",
+    "status_ABSENT": "Absent",
+    "status_LATE": "Late",
+    "status_EXCUSED": "Excused"
   }
 }

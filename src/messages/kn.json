@@ -29,7 +29,7 @@
     "cohorts": "ತಂಡಗಳು",
     "trainees": "ಪ್ರಶಿಕ್ಷಣಾರ್ಥಿಗಳು",
     "trainers": "ತರಬೇತುದಾರರು",
-    "attendance": "ಹಾಜರಾತಿ",
+    "sessions": "ಅವಧಿಗಳು",
     "reports": "ವರದಿಗಳು",
     "users": "ಬಳಕೆದಾರರು"
   },
@@ -187,7 +187,39 @@
     "assignError_duplicate": "ಈಗಾಗಲೇ ನಿಯೋಜಿಸಲಾಗಿದೆ.",
     "assignError_invalid": "ಅಮಾನ್ಯ ವಿನಂತಿ.",
     "remove": "ತೆಗೆದುಹಾಕಿ",
+    "attendance": "ಹಾಜರಾತಿ",
     "deleteCohort": "ತಂಡ ಅಳಿಸಿ",
     "confirmDelete": "ಈ ತಂಡವನ್ನು ಅಳಿಸುವುದೇ? ನೋಂದಣಿಗಳು ಮತ್ತು ಅವಧಿಗಳು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ. ಇದನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗದು."
+  },
+  "Sessions": {
+    "title": "ಅವಧಿಗಳು",
+    "new": "ಹೊಸ ಅವಧಿ",
+    "newTitle": "ಅವಧಿ ನಿಗದಿಪಡಿಸಿ",
+    "editTitle": "ಅವಧಿ ಸಂಪಾದಿಸಿ",
+    "empty": "ಇನ್ನೂ ಯಾವುದೇ ಅವಧಿಗಳಿಲ್ಲ.",
+    "cohort": "ತಂಡ",
+    "course": "ಕೋರ್ಸ್",
+    "venue": "ಸ್ಥಳ",
+    "trainer": "ತರಬೇತುದಾರ",
+    "date": "ದಿನಾಂಕ",
+    "startTime": "ಪ್ರಾರಂಭ ಸಮಯ",
+    "endTime": "ಅಂತಿಮ ಸಮಯ",
+    "topic": "ವಿಷಯ",
+    "marked": "ಗುರುತಿಸಲಾಗಿದೆ",
+    "markAttendance": "ಹಾಜರಾತಿ ಗುರುತಿಸಿ",
+    "status_SCHEDULED": "ನಿಗದಿತ",
+    "status_COMPLETED": "ಪೂರ್ಣಗೊಂಡಿದೆ",
+    "status_CANCELLED": "ರದ್ದುಗೊಂಡಿದೆ",
+    "confirmDelete": "ಈ ಅವಧಿಯನ್ನು ಅಳಿಸುವುದೇ? ಹಾಜರಾತಿ ದಾಖಲೆಗಳು ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ."
+  },
+  "Attendance": {
+    "title": "ಹಾಜರಾತಿ",
+    "noTrainees": "ಈ ತಂಡದಲ್ಲಿ ಯಾವುದೇ ಪ್ರಶಿಕ್ಷಣಾರ್ಥಿಗಳು ನೋಂದಾಯಿಸಿಲ್ಲ.",
+    "allPresent": "ಎಲ್ಲರನ್ನೂ ಹಾಜರು ಎಂದು ಗುರುತಿಸಿ",
+    "saveAttendance": "ಹಾಜರಾತಿ ಉಳಿಸಿ",
+    "status_PRESENT": "ಹಾಜರು",
+    "status_ABSENT": "ಗೈರು",
+    "status_LATE": "ತಡವಾಗಿ",
+    "status_EXCUSED": "ವಿನಾಯಿತಿ"
   }
 }
