@@ -89,6 +89,27 @@
     "serial": "Serial",
     "issued": "Issued"
   },
+  "Users": {
+    "title": "Users",
+    "new": "New user",
+    "newTitle": "New user",
+    "editTitle": "Edit user",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordMin": "Password must be at least 8 characters.",
+    "roles": "Roles",
+    "locale": "Language",
+    "emailError_invalid": "Enter a valid email.",
+    "emailError_taken": "That email is already in use.",
+    "status_ACTIVE": "Active",
+    "status_INACTIVE": "Inactive",
+    "status_SUSPENDED": "Suspended",
+    "resetPassword": "Reset password",
+    "newPassword": "New password",
+    "passwordReset": "Password reset ✓",
+    "confirmDelete": "Delete this user and their login? This cannot be undone."
+  },
   "Portal": {
     "myPortal": "My portal",
     "signOut": "Sign out",

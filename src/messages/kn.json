@@ -89,6 +89,27 @@
     "serial": "ಸರಣಿ",
     "issued": "ನೀಡಿದ ದಿನಾಂಕ"
   },
+  "Users": {
+    "title": "ಬಳಕೆದಾರರು",
+    "new": "ಹೊಸ ಬಳಕೆದಾರ",
+    "newTitle": "ಹೊಸ ಬಳಕೆದಾರ",
+    "editTitle": "ಬಳಕೆದಾರ ಸಂಪಾದಿಸಿ",
+    "name": "ಹೆಸರು",
+    "email": "ಇಮೇಲ್",
+    "password": "ಪಾಸ್‌ವರ್ಡ್",
+    "passwordMin": "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 8 ಅಕ್ಷರಗಳಾಗಿರಬೇಕು.",
+    "roles": "ಪಾತ್ರಗಳು",
+    "locale": "ಭಾಷೆ",
+    "emailError_invalid": "ಮಾನ್ಯ ಇಮೇಲ್ ನಮೂದಿಸಿ.",
+    "emailError_taken": "ಆ ಇಮೇಲ್ ಈಗಾಗಲೇ ಬಳಕೆಯಲ್ಲಿದೆ.",
+    "status_ACTIVE": "ಸಕ್ರಿಯ",
+    "status_INACTIVE": "ನಿಷ್ಕ್ರಿಯ",
+    "status_SUSPENDED": "ಅಮಾನತು",
+    "resetPassword": "ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಿ",
+    "newPassword": "ಹೊಸ ಪಾಸ್‌ವರ್ಡ್",
+    "passwordReset": "ಪಾಸ್‌ವರ್ಡ್ ಮರುಹೊಂದಿಸಲಾಗಿದೆ ✓",
+    "confirmDelete": "ಈ ಬಳಕೆದಾರ ಮತ್ತು ಅವರ ಲಾಗಿನ್ ಅಳಿಸುವುದೇ? ಇದನ್ನು ರದ್ದುಗೊಳಿಸಲಾಗದು."
+  },
   "Portal": {
     "myPortal": "ನನ್ನ ಪೋರ್ಟಲ್",
     "signOut": "ಸೈನ್ ಔಟ್",
