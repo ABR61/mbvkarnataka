@@ -222,10 +222,12 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met (verified via live HTTP):** created a cohort (capacity 2), enrolled 2 trainees, **3rd enroll blocked (capacity)**, **re-enroll blocked (duplicate)**, trainer assigned as "lead"; audit rows for cohort/enrollment/assignment.
 - *Note:* a sample cohort `TLR-2026-01` + test trainees (Alpha/Beta/Gamma) + "Test Center" remain in the dev DB from verification.
 
-### Slice 5 — Sessions + Attendance *(the operational core)*
-- **Session** scheduling per cohort (course, venue, trainer, date, start/end time).
-- **Attendance** roster: bulk-mark present/absent/late/excused in one save, editable, records `markedBy`/`markedAt`.
-- **AC:** schedule sessions for a cohort, mark a full roster in a single save, view per-trainee attendance %.
+### Slice 5 — Sessions + Attendance *(the operational core)* ✅ DONE (2026-06-11)
+- ✅ **Session** CRUD per cohort (course, venue, trainer, date, start/end time, bilingual topic, status), gated by `session.manage`.
+- ✅ **Attendance** roster: bulk-mark PRESENT/ABSENT/LATE/EXCUSED in one save (upsert → editable/re-savable), records `markedBy`/`markedAt`, "mark all present" helper; gated by `attendance.mark`. Uses `useActionState` for pending state + consistency.
+- ✅ **Per-trainee attendance %** (PRESENT+LATE / total sessions) on the cohort manage page.
+- ✅ **AC met (verified on the production build):** scheduled a session, bulk-marked 2 trainees in one POST (markedBy set), re-marked to confirm upsert (no duplicate rows), saw `1/1 (100%)` on the cohort page.
+- *Verification note:* the headless curl harness reliably drives `useActionState` forms (full encrypted payload) but not `$ACTION_ID`-only direct-action forms on the prod server — which is partly why `markAttendance` was made a `useActionState` action.
 
 ### Slice 6 — Bulk CSV import
 - Import **People** and **Enrollment** (downloadable template, row-level validation, **dry-run preview**, error report, then commit).
