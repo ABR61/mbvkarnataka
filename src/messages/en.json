@@ -34,5 +34,33 @@
     "yourRoles": "Your roles",
     "signOut": "Sign out",
     "dashboardIntro": "Training Operations back-office. Use the sidebar to navigate."
+  },
+  "Common": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search…",
+    "actions": "Actions",
+    "required": "This field is required.",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {total}",
+    "district": "District",
+    "address": "Address",
+    "phone": "Phone",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "Centers": {
+    "title": "Centers",
+    "new": "New center",
+    "newTitle": "New center",
+    "editTitle": "Edit center",
+    "name": "Name",
+    "empty": "No centers yet.",
+    "confirmDelete": "Delete this center? This cannot be undone."
   }
 }
