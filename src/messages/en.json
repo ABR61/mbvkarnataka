@@ -24,6 +24,19 @@
     "backToPrograms": "Back to programs",
     "applyToProgram": "Apply for this program"
   },
+  "Apply": {
+    "title": "Apply for training",
+    "intro": "Fill in your details and our team will get in touch. All fields except name and phone are optional.",
+    "program": "Program of interest",
+    "message": "Anything you'd like to tell us?",
+    "consentLabel": "I consent to MBV processing my personal data for admissions (DPDP Act, 2023).",
+    "consentRequired": "Consent is required to apply.",
+    "submit": "Submit application",
+    "submitting": "Submitting…",
+    "thanksTitle": "Thank you for applying!",
+    "thanksBody": "We've received your application and will contact you soon.",
+    "backToPrograms": "Back to programs"
+  },
   "SignIn": {
     "title": "Sign in",
     "subtitle": "MBV staff portal",
