@@ -95,6 +95,12 @@ async function call<T>(wsfunction: string, params: unknown): Promise<T> {
 
 // Network methods (need a live Moodle).
 export const moodle = {
+  // Lightweight call for connection testing; returns site name + WS user.
+  getSiteInfo: () =>
+    call<{ sitename: string; username: string; release?: string }>(
+      "core_webservice_get_site_info",
+      {},
+    ),
   getCourses: () =>
     call<Array<{ id: number; shortname: string; fullname: string }>>(
       "core_course_get_courses",

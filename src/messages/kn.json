@@ -89,6 +89,21 @@
     "serial": "ಸರಣಿ",
     "issued": "ನೀಡಿದ ದಿನಾಂಕ"
   },
+  "Moodle": {
+    "title": "Moodle (LMS) ಸಂಯೋಜನೆ",
+    "status": "ಸಂಪರ್ಕ",
+    "state_notConfigured": "ಕಾನ್ಫಿಗರ್ ಮಾಡಿಲ್ಲ",
+    "state_connected": "ಸಂಪರ್ಕಗೊಂಡಿದೆ",
+    "state_error": "ಸಂಪರ್ಕ ದೋಷ",
+    "site": "ಸೈಟ್",
+    "wsUser": "ವೆಬ್-ಸೇವೆ ಬಳಕೆದಾರ",
+    "release": "ಆವೃತ್ತಿ",
+    "errorBody": "Moodle ತಲುಪಲಾಗಲಿಲ್ಲ: {message}",
+    "notConfiguredBody": "LMS ಸಿಂಕ್ ಸಕ್ರಿಯಗೊಳಿಸಲು ಪರಿಸರದಲ್ಲಿ MOODLE_URL ಮತ್ತು MOODLE_TOKEN ಹೊಂದಿಸಿ.",
+    "mapping": "ಕೋರ್ಸ್ ಮ್ಯಾಪಿಂಗ್",
+    "mappedCount": "{count, plural, =0 {ಇನ್ನೂ ಯಾವುದೇ ಕೋರ್ಸ್‌ಗಳನ್ನು Moodle‌ಗೆ ಮ್ಯಾಪ್ ಮಾಡಿಲ್ಲ.} one {# ಕೋರ್ಸ್ Moodle‌ಗೆ ಮ್ಯಾಪ್ ಆಗಿದೆ.} other {# ಕೋರ್ಸ್‌ಗಳು Moodle‌ಗೆ ಮ್ಯಾಪ್ ಆಗಿವೆ.}}",
+    "manageCourses": "ಕೋರ್ಸ್‌ಗಳನ್ನು ನಿರ್ವಹಿಸಿ"
+  },
   "SignIn": {
     "title": "ಸೈನ್ ಇನ್",
     "subtitle": "MBV ಸಿಬ್ಬಂದಿ ಪೋರ್ಟಲ್",
@@ -114,7 +129,8 @@
     "applications": "ಅರ್ಜಿಗಳು",
     "sessions": "ಅವಧಿಗಳು",
     "reports": "ವರದಿಗಳು",
-    "users": "ಬಳಕೆದಾರರು"
+    "users": "ಬಳಕೆದಾರರು",
+    "moodle": "Moodle (LMS)"
   },
   "Admin": {
     "title": "MBV ನಿರ್ವಹಣೆ",

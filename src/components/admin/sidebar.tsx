@@ -19,6 +19,7 @@ const NAV: { href: string; key: string; permission: Permission | null }[] = [
   { href: "/admin/sessions", key: "sessions", permission: "session.manage" },
   { href: "/admin/reports", key: "reports", permission: "report.view" },
   { href: "/admin/users", key: "users", permission: "user.manage" },
+  { href: "/admin/moodle", key: "moodle", permission: "user.manage" },
 ];
 
 export async function Sidebar() {

@@ -89,6 +89,21 @@
     "serial": "Serial",
     "issued": "Issued"
   },
+  "Moodle": {
+    "title": "Moodle (LMS) integration",
+    "status": "Connection",
+    "state_notConfigured": "Not configured",
+    "state_connected": "Connected",
+    "state_error": "Connection error",
+    "site": "Site",
+    "wsUser": "Web-service user",
+    "release": "Release",
+    "errorBody": "Could not reach Moodle: {message}",
+    "notConfiguredBody": "Set MOODLE_URL and MOODLE_TOKEN in the environment to enable LMS sync.",
+    "mapping": "Course mapping",
+    "mappedCount": "{count, plural, =0 {No courses are mapped to Moodle yet.} one {# course is mapped to Moodle.} other {# courses are mapped to Moodle.}}",
+    "manageCourses": "Manage courses"
+  },
   "SignIn": {
     "title": "Sign in",
     "subtitle": "MBV staff portal",
@@ -114,7 +129,8 @@
     "applications": "Applications",
     "sessions": "Sessions",
     "reports": "Reports",
-    "users": "Users"
+    "users": "Users",
+    "moodle": "Moodle (LMS)"
   },
   "Admin": {
     "title": "MBV Admin",
