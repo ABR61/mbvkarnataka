@@ -1,6 +1,6 @@
 # MBV — Manava Bandhutva Vedike — Occupational Training Platform
 
-> Organization: **Manava Bandhutva Vedike (MBV)** · Living planning document. Status: **DRAFT v0.3** · Phase 0 complete; Phase 1 build plan added (2026-06-11).
+> Organization: **Manava Bandhutva Vedike (MBV)** · Living planning document. Status: **v0.4** · Phase 0 + **Phase 1 feature-complete** (2026-06-11). Remaining: tests, CI, PR — see §14.
 > This is the shared spec we build from. Update it as decisions evolve.
 
 ---
@@ -229,20 +229,29 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met (verified on the production build):** scheduled a session, bulk-marked 2 trainees in one POST (markedBy set), re-marked to confirm upsert (no duplicate rows), saw `1/1 (100%)` on the cohort page.
 - *Verification note:* the headless curl harness reliably drives `useActionState` forms (full encrypted payload) but not `$ACTION_ID`-only direct-action forms on the prod server — which is partly why `markAttendance` was made a `useActionState` action.
 
-### Slice 6 — Bulk CSV import
-- Import **People** and **Enrollment** (downloadable template, row-level validation, **dry-run preview**, error report, then commit).
-- **AC:** import a 100-row CSV, see per-row validation results, commit only valid rows.
+### Slice 6 — Bulk CSV import ✅ DONE (2026-06-11)
+- ✅ Reusable import infra: `lib/csv.ts` parser, `ImportForm` (paste CSV → **dry-run preview** → commit valid rows only, per-row result table, template download).
+- ✅ **Trainee import** (`trainee.manage`): per-row validation (firstName, gender, DOB 18+, email, districtCode); commit creates each valid `Person(TRAINEE)` + a DPDP `ConsentRecord` (`v1-bulk`).
+- ✅ **Enrollment import** (`cohort.manage`): cohort-by-code + trainee-by-phone matching; unknown-cohort / trainee-not-found / ambiguous / duplicate (incl. in-batch) / capacity guards.
+- ✅ **AC met (verified on production build):** a 104-row trainee CSV (100 valid + 4 invalid) previewed as **100/104, nothing written**, then committed **exactly 100** (+100 consent records, 0 invalid inserted). Enrollment: 5 rows → 2 committed, rest correctly rejected.
 
 ### Cross-cutting (every slice)
-- `AuditLog` write on every create/update/delete.
-- en/kn UI strings kept in sync in [`src/messages`](../src/messages).
-- **Tests**: unit (zod schemas, RBAC helper), integration (server actions against a test DB), smoke e2e on sign-in + attendance.
-- **CI** (GitHub Actions): lint · typecheck · `prisma validate` · build · test.
+- ✅ `AuditLog` write on every create/update/delete (incl. bulk imports).
+- ✅ en/kn UI strings kept in sync in [`src/messages`](../src/messages).
+- ⬜ **Tests**: unit (zod schemas, RBAC helper), integration (server actions against a test DB), smoke e2e — *not yet written; see follow-ups*.
+- ⬜ **CI** (GitHub Actions): lint · typecheck · `prisma validate` · build · test — *not yet set up*.
 
 ---
 
-## 14. Immediate next actions
-1. ✅ Refine Phase 1 plan (this section).
-2. Confirm the three open items in §12.
-3. **Slice 0** — verify build + `db:migrate`/`db:seed` run clean on the dev machine, then harden auth session, role→permission seed, and 31-district seed.
-4. Proceed slice-by-slice (1 → 6).
+## 14. Status & follow-ups
+
+**Phase 1 (Training Operations Core) — feature-complete (2026-06-11).** All six slices built on `phase-1-training-ops`, each verified against a live/production server. The back-office covers auth+RBAC, geography & curriculum, people (+consent) & trainers (+logins), cohorts/enrollment, sessions/attendance, and bulk CSV import — fully bilingual (en/kn), audit-logged, permission-gated.
+
+**Remaining before calling Phase 1 "done-done":**
+1. **Automated tests** (unit/integration/e2e) — the cross-cutting item not yet started.
+2. **CI** (GitHub Actions) — lint/typecheck/prisma validate/build/test.
+3. **403 page** — `requirePermission` currently throws a 500 on forbidden; add a branded 403.
+4. **Enrollment import** trainee matching by phone is ambiguity-prone — consider a stable import key.
+5. Open the PR for `phase-1-training-ops` → `main` when ready.
+
+Then **Phase 2 — Public site + online admissions**.
