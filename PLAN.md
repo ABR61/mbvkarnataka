@@ -209,10 +209,12 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met (verified via live HTTP):** Centers full CRUD + Program create exercised end-to-end through the real server-action runtime (localized `{en,kn}` persisted, audit rows written); all list pages render with bilingual search + pagination; en + kn both render.
 - *Note:* a sample Program ("Tailoring and Garment Making") remains in the dev DB from verification.
 
-### Slice 3 — People + consent
-- **Person** CRUD (trainee / trainer / staff), optional `User` login link, district association.
-- **Consent capture** (`ConsentRecord`) on trainee creation — DPDP, adult.
-- **AC:** create a trainee with a recorded consent; create a trainer who also gets a login + role.
+### Slice 3 — People + consent ✅ DONE (2026-06-11)
+- ✅ Added `Person.kind` (TRAINEE/TRAINER/STAFF) discriminator (migration `add_person_kind`). Shared `PersonFields` form + `validation/person.ts` (incl. `parseDateOfBirth` enforcing the 18+ rule).
+- ✅ **Trainees** (`/admin/trainees`, `trainee.manage`): full CRUD; create captures an explicit **DPDP `ConsentRecord`** (required consent checkbox + client IP).
+- ✅ **Trainers** (`/admin/trainers`, `trainer.manage`): full CRUD; create **provisions a `User` login + Trainer role + Person atomically** (transaction, bcrypt, email-uniqueness); delete removes the linked login.
+- ✅ **AC met (verified via live HTTP):** trainee created with consent record; trainer created with login — **the new trainer signs in successfully**, sees only permitted nav (Attendance, not Centers), and is denied `/admin/centers` server-side.
+- *Note:* sample trainee (Asha Kumari) + trainer (`ravi@mbv.local` / `TrainerPass1`) remain in the dev DB from verification. Forbidden access currently throws a 500 — a branded 403 page is a later refinement.
 
 ### Slice 4 — Cohorts + Enrollment
 - **Cohort** CRUD (program + center + coordinator + dates + capacity + status).
