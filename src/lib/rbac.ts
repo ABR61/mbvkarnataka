@@ -11,6 +11,7 @@ export const PERMISSIONS = [
   "trainee.manage", // trainee (Person) records
   "trainer.manage", // trainer records & assignments
   "application.manage", // admissions: applicant pipeline
+  "finance.manage", // budgets & expenses
   "report.view", // dashboards & exports
 ] as const;
 
@@ -48,7 +49,7 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
     "report.view",
   ],
   Trainer: ["session.manage", "attendance.mark"],
-  Finance: ["report.view"],
+  Finance: ["finance.manage", "report.view"],
   Placement: ["report.view"],
   Trainee: [],
 };

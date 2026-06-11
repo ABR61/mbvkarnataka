@@ -135,6 +135,37 @@
     "attendance_LATE": "Late",
     "attendance_EXCUSED": "Excused"
   },
+  "Expenses": {
+    "title": "Expenses",
+    "new": "New expense",
+    "newTitle": "New expense",
+    "editTitle": "Edit expense",
+    "all": "All",
+    "total": "Total",
+    "amount": "Amount",
+    "amountInvalid": "Enter an amount like 1234.50",
+    "date": "Date",
+    "category": "Category",
+    "vendor": "Vendor",
+    "note": "Note",
+    "program": "Program",
+    "cohort": "Cohort",
+    "center": "Center",
+    "status_PENDING": "Pending",
+    "status_APPROVED": "Approved",
+    "status_PAID": "Paid",
+    "empty": "No expenses yet.",
+    "confirmDelete": "Delete this expense? This cannot be undone."
+  },
+  "Budgets": {
+    "title": "Budgets",
+    "intro": "Set a budget per program and track spend (approved + paid) against it.",
+    "program": "Program",
+    "budget": "Budget",
+    "spent": "Spent",
+    "remaining": "Remaining",
+    "set": "Set"
+  },
   "Reports": {
     "title": "Reports",
     "intro": "Organisation-wide and district-wise training metrics.",
@@ -192,6 +223,8 @@
     "trainers": "Trainers",
     "applications": "Applications",
     "sessions": "Sessions",
+    "expenses": "Expenses",
+    "budgets": "Budgets",
     "reports": "Reports",
     "users": "Users",
     "moodle": "Moodle (LMS)"

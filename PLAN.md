@@ -299,3 +299,16 @@ Goal: let the public discover programs and **apply online without an account**, 
 
 ### Slice 3.3 — Progress sync + SSO — *needs live Moodle*
 - Pull completion/grades from Moodle into `Enrollment`; SSO (OIDC/SAML or token) so trainees log in once. Scaffold + document; verify against a real instance.
+
+---
+
+## 17. Phase 4 — Finance: Build Plan
+
+Reuses the established CRUD/RBAC/audit pattern. New permission `finance.manage` (Admin, Finance). Money stored as Prisma `Decimal`, displayed as INR.
+
+### Slice 4.1 — Expenses + program budgets
+- `Expense` (amount, date, category, vendor, note, optional links to program/cohort/center, status PENDING/APPROVED/PAID) — full CRUD with filters.
+- `Budget` (one per program, amount) — set/update; a budgets page showing **budget vs spent (APPROVED+PAID) vs remaining** per program.
+
+### Slice 4.2 — Vendors + grants *(later)*
+- Vendor records + payments; grant/funder accounting; finance lines in the district report.

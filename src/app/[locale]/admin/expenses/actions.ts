@@ -1,0 +1,81 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { requirePermission } from "@/lib/auth-guards";
+import { writeAudit } from "@/lib/audit";
+import { parseDate } from "@/lib/validation/cohort";
+import { expenseInput, expenseFromForm } from "@/lib/validation/expense";
+import { zodFieldErrors, type FormState } from "@/lib/forms";
+
+const PERMISSION = "finance.manage" as const;
+
+function localeOf(formData: FormData): string {
+  return (formData.get("locale") as string) || "en";
+}
+
+function expenseData(d: ReturnType<typeof expenseInput.parse>) {
+  return {
+    amount: d.amount, // string → Prisma Decimal (precise)
+    incurredOn: parseDate(d.incurredOn) ?? new Date(),
+    category: d.category || null,
+    vendor: d.vendor || null,
+    note: d.note || null,
+    programId: d.programId || null,
+    cohortId: d.cohortId || null,
+    centerId: d.centerId || null,
+    status: d.status,
+  };
+}
+
+export async function createExpense(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const locale = localeOf(formData);
+  const session = await requirePermission(PERMISSION);
+
+  const parsed = expenseInput.safeParse(expenseFromForm(formData));
+  if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
+
+  const expense = await prisma.expense.create({
+    data: { ...expenseData(parsed.data), createdById: session.user.id },
+  });
+  await writeAudit(session.user.id, "create", "Expense", expense.id);
+
+  revalidatePath(`/${locale}/admin/expenses`);
+  redirect(`/${locale}/admin/expenses`);
+}
+
+export async function updateExpense(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const locale = localeOf(formData);
+  const session = await requirePermission(PERMISSION);
+  const id = formData.get("id") as string;
+  if (!id) return { error: "notFound" };
+
+  const parsed = expenseInput.safeParse(expenseFromForm(formData));
+  if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
+
+  await prisma.expense.update({ where: { id }, data: expenseData(parsed.data) });
+  await writeAudit(session.user.id, "update", "Expense", id);
+
+  revalidatePath(`/${locale}/admin/expenses`);
+  redirect(`/${locale}/admin/expenses`);
+}
+
+export async function deleteExpense(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const session = await requirePermission(PERMISSION);
+  const id = formData.get("id") as string;
+  if (!id) return;
+
+  await prisma.expense.delete({ where: { id } });
+  await writeAudit(session.user.id, "delete", "Expense", id);
+
+  revalidatePath(`/${locale}/admin/expenses`);
+  redirect(`/${locale}/admin/expenses`);
+}
