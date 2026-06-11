@@ -24,6 +24,13 @@ export default function HomePage() {
           ಕನ್ನಡ
         </Link>
       </nav>
+
+      <Link
+        href="/sign-in"
+        className="mt-2 rounded-md border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+      >
+        {t("signIn")}
+      </Link>
     </main>
   );
 }

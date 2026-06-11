@@ -196,10 +196,11 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met:** migrate + seed run clean, build + `tsc` pass, DB matrix verified.
 - *Deferred to Slice 1:* `requirePermission` currently redirects anonymous users to the Auth.js default sign-in and throws on forbidden — Slice 1 swaps in a branded localized sign-in + a 403 page.
 
-### Slice 1 — Auth UI + app shell
-- Bilingual **sign-in / sign-out** pages with error states; middleware protects `/admin/**`.
-- Back-office layout: permission-gated sidebar nav, user menu, **locale switcher**, dashboard landing.
-- **AC:** admin logs in *through the browser*, lands on the dashboard, sees only nav items their role permits; unauthenticated users are redirected to sign-in.
+### Slice 1 — Auth UI + app shell ✅ DONE (2026-06-11)
+- ✅ Bilingual **sign-in** page ([`/[locale]/sign-in`](../src/app/[locale]/sign-in/page.tsx)) with a client form (`useActionState`, pending + inline error states) backed by Auth.js `signIn` server actions ([`src/app/actions/auth.ts`](../src/app/actions/auth.ts)); **sign-out** via a form action in the topbar.
+- ✅ Back-office layout ([`/[locale]/admin/layout.tsx`](../src/app/[locale]/admin/layout.tsx)) with permission-gated sidebar (`<Can>`), user menu, **locale switcher**, and a dashboard landing showing the user's roles.
+- ✅ **AC met (verified via HTTP):** anon `/en/admin` → 307 to `/en/sign-in`; admin credentials login → 302 to dashboard with session cookie; authenticated dashboard renders; bad password → rejected with no session; renders in en + kn.
+- **Decision:** route protection lives in the **admin layout (Server Component)**, not the proxy — Next 16 docs state the proxy is for optimistic checks only, and importing the Prisma-backed auth into the edge proxy is unsafe. The layout runs on every `/admin/**` request and is the real authorization boundary.
 
 ### Slice 2 — Master data: Geography + Curriculum
 - **Districts** (read/edit — seeded), **Centers** CRUD, **Venues** CRUD.

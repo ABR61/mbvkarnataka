@@ -4,6 +4,35 @@
     "tagline": "Occupational Training Platform",
     "subtitle": "Free occupational training for youth across Karnataka.",
     "phase": "Phase 1 — Training Operations Core (in development)",
-    "language": "Language"
+    "language": "Language",
+    "signIn": "Staff sign in"
+  },
+  "SignIn": {
+    "title": "Sign in",
+    "subtitle": "MBV staff portal",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "signingIn": "Signing in…",
+    "error": {
+      "invalid": "Invalid email or password.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "centers": "Centers",
+    "cohorts": "Cohorts",
+    "trainees": "Trainees",
+    "attendance": "Attendance",
+    "reports": "Reports",
+    "users": "Users"
+  },
+  "Admin": {
+    "title": "MBV Admin",
+    "welcome": "Welcome, {name}",
+    "yourRoles": "Your roles",
+    "signOut": "Sign out",
+    "dashboardIntro": "Training Operations back-office. Use the sidebar to navigate."
   }
 }
