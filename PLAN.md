@@ -292,9 +292,10 @@ Goal: let the public discover programs and **apply online without an account**, 
 - ✅ **Issue** from the cohort manage page (`cohort.manage`) → creates the certificate + marks `Enrollment` COMPLETED (idempotent); printable certificate page (admin chrome hidden on print).
 - ✅ **Public verification** (`/[locale]/verify/[code]`). Unit-tested code/serial helper. **Verified end-to-end** on the production build.
 
-### Slice 3.2 — Moodle client + course mapping + enrolment provisioning — *config-gated*
-- Env config (`MOODLE_URL`, `MOODLE_TOKEN`); typed Moodle Web Services client (`src/lib/moodle.ts`) with **unit-tested URL/payload building**; graceful "not configured" state.
-- Attach points: `Course.moodleCourseId`, `Enrollment.moodleEnrolled`. Admin "sync enrolment to Moodle" action. (Live-verify on a real Moodle.)
+### Slice 3.2 — Moodle client + course mapping ✅ DONE (config-gated, 2026-06-11)
+- ✅ `MOODLE_URL`/`MOODLE_TOKEN` config (null when unset); `src/lib/moodle.ts` with unit-tested request-shaping (`flattenMoodleParams`, `buildMoodleUrl`, `moodleEnrolRequest`) + fetch client (getCourses/findUserByEmail/enrolUser/getCompletion).
+- ✅ Attach points `Course.moodleCourseId` (+ form mapping) and `Enrollment.moodleEnrolled`; migration. 7 unit tests.
+- ⚠️ **Not live-verified** — network calls need a real Moodle. Enrolment-sync wiring is deferred to Slice 3.3.
 
 ### Slice 3.3 — Progress sync + SSO — *needs live Moodle*
 - Pull completion/grades from Moodle into `Enrollment`; SSO (OIDC/SAML or token) so trainees log in once. Scaffold + document; verify against a real instance.
