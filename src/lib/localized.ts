@@ -17,3 +17,11 @@ export function toLocalized(en: string, kn?: string): LocalizedText {
   const trimmedKn = kn?.trim();
   return trimmedKn ? { en: en.trim(), kn: trimmedKn } : { en: en.trim() };
 }
+
+/** Like toLocalized, but returns null when both languages are empty (for optional fields). */
+export function toLocalizedOrNull(en: string, kn?: string): LocalizedText | null {
+  const e = en.trim();
+  const k = kn?.trim();
+  if (!e && !k) return null;
+  return k ? { en: e, kn: k } : { en: e };
+}

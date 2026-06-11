@@ -7,7 +7,11 @@ import type { Permission } from "@/lib/rbac";
 // Routes beyond /admin are built in later slices; links are wired ahead of them.
 const NAV: { href: string; key: string; permission: Permission | null }[] = [
   { href: "/admin", key: "dashboard", permission: null },
+  { href: "/admin/districts", key: "districts", permission: "center.manage" },
   { href: "/admin/centers", key: "centers", permission: "center.manage" },
+  { href: "/admin/venues", key: "venues", permission: "center.manage" },
+  { href: "/admin/programs", key: "programs", permission: "cohort.manage" },
+  { href: "/admin/courses", key: "courses", permission: "cohort.manage" },
   { href: "/admin/cohorts", key: "cohorts", permission: "cohort.manage" },
   { href: "/admin/trainees", key: "trainees", permission: "trainee.manage" },
   { href: "/admin/attendance", key: "attendance", permission: "attendance.mark" },

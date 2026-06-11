@@ -7,6 +7,7 @@ export function BilingualField({
   defaultEn = "",
   defaultKn = "",
   required = false,
+  multiline = false,
   error,
 }: {
   name: string;
@@ -14,9 +15,10 @@ export function BilingualField({
   defaultEn?: string;
   defaultKn?: string;
   required?: boolean;
+  multiline?: boolean;
   error?: string;
 }) {
-  const input =
+  const cls =
     "rounded-md border border-gray-300 px-3 py-2 text-base outline-none focus:border-emerald-500 dark:border-gray-700 dark:bg-gray-900";
 
   return (
@@ -26,20 +28,43 @@ export function BilingualField({
         {required && <span className="text-red-600"> *</span>}
       </span>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-        <input
-          name={`${name}En`}
-          defaultValue={defaultEn}
-          placeholder="English"
-          required={required}
-          className={input}
-        />
-        <input
-          name={`${name}Kn`}
-          defaultValue={defaultKn}
-          placeholder="ಕನ್ನಡ"
-          lang="kn"
-          className={input}
-        />
+        {multiline ? (
+          <>
+            <textarea
+              name={`${name}En`}
+              defaultValue={defaultEn}
+              placeholder="English"
+              required={required}
+              rows={3}
+              className={cls}
+            />
+            <textarea
+              name={`${name}Kn`}
+              defaultValue={defaultKn}
+              placeholder="ಕನ್ನಡ"
+              lang="kn"
+              rows={3}
+              className={cls}
+            />
+          </>
+        ) : (
+          <>
+            <input
+              name={`${name}En`}
+              defaultValue={defaultEn}
+              placeholder="English"
+              required={required}
+              className={cls}
+            />
+            <input
+              name={`${name}Kn`}
+              defaultValue={defaultKn}
+              placeholder="ಕನ್ನಡ"
+              lang="kn"
+              className={cls}
+            />
+          </>
+        )}
       </div>
       {error && <span className="text-sm text-red-600">{error}</span>}
     </div>

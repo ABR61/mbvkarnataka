@@ -21,7 +21,11 @@
   },
   "Nav": {
     "dashboard": "Dashboard",
+    "districts": "Districts",
     "centers": "Centers",
+    "venues": "Venues",
+    "programs": "Programs",
+    "courses": "Courses",
     "cohorts": "Cohorts",
     "trainees": "Trainees",
     "attendance": "Attendance",
@@ -62,5 +66,49 @@
     "name": "Name",
     "empty": "No centers yet.",
     "confirmDelete": "Delete this center? This cannot be undone."
+  },
+  "Districts": {
+    "title": "Districts",
+    "editTitle": "Edit district",
+    "name": "Name",
+    "code": "Code",
+    "state": "State"
+  },
+  "Venues": {
+    "title": "Venues",
+    "new": "New venue",
+    "newTitle": "New venue",
+    "editTitle": "Edit venue",
+    "name": "Name",
+    "center": "Center",
+    "capacity": "Capacity",
+    "empty": "No venues yet.",
+    "confirmDelete": "Delete this venue? This cannot be undone."
+  },
+  "Programs": {
+    "title": "Programs",
+    "new": "New program",
+    "newTitle": "New program",
+    "editTitle": "Edit program",
+    "name": "Name",
+    "description": "Description",
+    "category": "Category",
+    "durationWeeks": "Duration (weeks)",
+    "courses": "Courses",
+    "empty": "No programs yet.",
+    "confirmDelete": "Delete this program? This cannot be undone."
+  },
+  "Courses": {
+    "title": "Courses",
+    "new": "New course",
+    "newTitle": "New course",
+    "editTitle": "Edit course",
+    "name": "Name",
+    "description": "Description",
+    "program": "Program",
+    "sequence": "Seq.",
+    "hours": "Hours",
+    "empty": "No courses yet.",
+    "confirmDelete": "Delete this course? This cannot be undone."
   }
 }
