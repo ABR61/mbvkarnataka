@@ -287,10 +287,10 @@ Goal: let the public discover programs and **apply online without an account**, 
 
 > **Verification caveat:** the Moodle pieces (SSO, course/enrolment sync) need a **live, configured Moodle** to test end-to-end — not available in this dev environment. So Phase 3 leads with **certificates** (fully buildable + verifiable here), then builds the Moodle client **config-gated** with unit-tested request shaping; live Moodle verification is deferred to a real instance.
 
-### Slice 3.1 — Certificates (NGO's own format) — *verifiable now*
-- `Certificate` model (one per enrollment): snapshot of person + program names, unique `serialNumber` + `verifyCode`, issuedAt/by.
-- **Issue** from the cohort manage page (gate `cohort.manage`): creates the certificate and marks the `Enrollment` COMPLETED. Printable certificate page.
-- **Public verification** page (`/[locale]/verify/[code]`): anyone (e.g. an employer) confirms a certificate is genuine.
+### Slice 3.1 — Certificates (NGO's own format) ✅ DONE (2026-06-11)
+- ✅ `Certificate` model (one per enrollment, snapshots names, unique `serialNumber` + `verifyCode`); migration.
+- ✅ **Issue** from the cohort manage page (`cohort.manage`) → creates the certificate + marks `Enrollment` COMPLETED (idempotent); printable certificate page (admin chrome hidden on print).
+- ✅ **Public verification** (`/[locale]/verify/[code]`). Unit-tested code/serial helper. **Verified end-to-end** on the production build.
 
 ### Slice 3.2 — Moodle client + course mapping + enrolment provisioning — *config-gated*
 - Env config (`MOODLE_URL`, `MOODLE_TOKEN`); typed Moodle Web Services client (`src/lib/moodle.ts`) with **unit-tested URL/payload building**; graceful "not configured" state.
