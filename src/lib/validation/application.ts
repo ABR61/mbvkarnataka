@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { GENDERS } from "@/lib/validation/person";
 
+export const APPLICATION_STATUSES = [
+  "SUBMITTED",
+  "UNDER_REVIEW",
+  "ACCEPTED",
+  "REJECTED",
+  "CONVERTED",
+] as const;
+export type ApplicationStatusValue = (typeof APPLICATION_STATUSES)[number];
+
 const optionalStr = z.string().trim().optional().default("");
 const genderField = z.union([z.literal(""), z.enum(GENDERS)]).optional().default("");
 const emailOptional = z
