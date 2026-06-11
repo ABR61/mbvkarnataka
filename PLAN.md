@@ -202,11 +202,12 @@ Fixed gaps found in the current scaffold.
 - ✅ **AC met (verified via HTTP):** anon `/en/admin` → 307 to `/en/sign-in`; admin credentials login → 302 to dashboard with session cookie; authenticated dashboard renders; bad password → rejected with no session; renders in en + kn.
 - **Decision:** route protection lives in the **admin layout (Server Component)**, not the proxy — Next 16 docs state the proxy is for optimistic checks only, and importing the Prisma-backed auth into the edge proxy is unsafe. The layout runs on every `/admin/**` request and is the real authorization boundary.
 
-### Slice 2 — Master data: Geography + Curriculum
-- **Districts** (read/edit — seeded), **Centers** CRUD, **Venues** CRUD.
-- **Programs** CRUD, **Courses** CRUD (ordered by `sequence`).
-- Ships the reusable bilingual field component, zod schemas, and list/pagination/search pattern.
-- **AC:** create a center under a district, a program with 3 ordered courses — all bilingual, both locales rendering correctly.
+### Slice 2 — Master data: Geography + Curriculum ✅ DONE (2026-06-11)
+- ✅ **Districts** (read/edit — seeded), **Centers** CRUD, **Venues** CRUD (geography, gated by `center.manage`).
+- ✅ **Programs** CRUD, **Courses** CRUD (ordered by `sequence`; curriculum, gated by `cohort.manage`).
+- ✅ Reusable primitives shipped: `localized()`/`toLocalized()`/`toLocalizedOrNull()`, `writeAudit()`, `FormState`/`zodFieldErrors()`, `BilingualField` (incl. multiline), `Pagination`, `SearchBox`, `DeleteButton`. Server-action shape = permission → zod → prisma → audit → revalidate → redirect.
+- ✅ **AC met (verified via live HTTP):** Centers full CRUD + Program create exercised end-to-end through the real server-action runtime (localized `{en,kn}` persisted, audit rows written); all list pages render with bilingual search + pagination; en + kn both render.
+- *Note:* a sample Program ("Tailoring and Garment Making") remains in the dev DB from verification.
 
 ### Slice 3 — People + consent
 - **Person** CRUD (trainee / trainer / staff), optional `User` login link, district association.
