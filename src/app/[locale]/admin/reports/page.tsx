@@ -1,11 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requirePermission } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
-import { districtReport, orgSummary } from "@/lib/reports";
+import { formatINR } from "@/lib/money";
+import { districtReport, orgSummary, placementSummary } from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
-function Kpi({ label, value }: { label: string; value: number }) {
+function Kpi({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
       <div className="text-2xl font-bold">{value}</div>
@@ -13,6 +14,8 @@ function Kpi({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+const pct = (r: number | null) => (r == null ? "—" : `${Math.round(r * 100)}%`);
 
 export default async function ReportsPage({
   params,
@@ -23,7 +26,11 @@ export default async function ReportsPage({
   setRequestLocale(locale);
   await requirePermission("report.view");
 
-  const [summary, districts] = await Promise.all([orgSummary(), districtReport()]);
+  const [summary, districts, placements] = await Promise.all([
+    orgSummary(),
+    districtReport(),
+    placementSummary(),
+  ]);
   const t = await getTranslations("Reports");
 
   const th = "px-3 py-2 text-left font-medium text-gray-500";
@@ -59,6 +66,24 @@ export default async function ReportsPage({
           <Kpi label={t("districts")} value={summary.districts} />
           <Kpi label={t("centers")} value={summary.centers} />
           <Kpi label={t("programs")} value={summary.programs} />
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          {t("placementOutcomes")}
+        </h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Kpi label={t("placed")} value={placements.total} />
+          <Kpi label={t("placementRate")} value={pct(placements.placementRate)} />
+          <Kpi
+            label={t("avgSalary")}
+            value={placements.avgMonthlySalary != null ? formatINR(placements.avgMonthlySalary) : "—"}
+          />
+          <Kpi label={t("retention")} value={pct(placements.retention)} />
+          <Kpi label={t("status_PLACED")} value={placements.byStatus.PLACED} />
+          <Kpi label={t("status_ACTIVE")} value={placements.byStatus.ACTIVE} />
+          <Kpi label={t("status_EXITED")} value={placements.byStatus.EXITED} />
         </div>
       </section>
 

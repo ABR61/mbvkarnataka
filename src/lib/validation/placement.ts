@@ -35,5 +35,17 @@ export const placementInput = z.object({
   note: optionalStr,
 });
 
+export const followUpInput = z.object({
+  followUpOn: z.string().trim().min(1, "required"),
+  periodMonths: z
+    .union([z.literal(""), z.string().regex(/^\d{1,3}$/, "months")])
+    .optional()
+    .default(""),
+  stillEmployed: z.enum(["true", "false"]).default("true"),
+  monthlyIncome: z.union([z.literal(""), money]).optional().default(""),
+  note: optionalStr,
+});
+
 export type EmployerInput = z.infer<typeof employerInput>;
 export type PlacementInput = z.infer<typeof placementInput>;
+export type FollowUpInput = z.infer<typeof followUpInput>;

@@ -325,6 +325,7 @@ Tracks employment outcomes for trainees and measures impact for donors. New perm
 - `Employer` (name, sector, contact, district) — CRUD.
 - `Placement` (trainee → employer, job title, employment type, monthly salary, placed date, status PLACED/ACTIVE/EXITED, optional enrollment link) — CRUD with status filter.
 
-### Slice 5.2 — Impact follow-up + M&E dashboard *(later)*
-- `FollowUp` (periodic check-in: still employed?, current income) per placement.
-- Dashboard: placement rate (placed / completed), avg salary, retention — by program/district; donor-facing.
+### Slice 5.2 — Impact follow-up + M&E dashboard ✅ DONE (2026-06-11)
+- ✅ `FollowUp` (date, period, still-employed?, monthly income) per placement — add/delete on the placement edit page.
+- ✅ Reports "Placement outcomes": placed, placement rate (distinct placed / completed enrollments), avg salary, retention (from each placement's **latest** follow-up). Verified: retention — → 100% (employed) → 0% (later not-employed, latest wins); rate 100%, avg ₹15,000.
+- *Note:* the add-follow-up form is build/type-verified and pattern-identical to verified forms; headless multi-`useActionState` replay couldn't exercise it, so the retention SQL was verified by seeding follow-ups directly.

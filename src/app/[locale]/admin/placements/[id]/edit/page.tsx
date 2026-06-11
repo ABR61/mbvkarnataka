@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { personOptions, employerOptions } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { PlacementForm } from "../../placement-form";
+import { FollowUps } from "../../followups";
 import { updatePlacement, deletePlacement } from "../../actions";
 
 export default async function EditPlacementPage({
@@ -16,7 +17,10 @@ export default async function EditPlacementPage({
   setRequestLocale(locale);
   await requirePermission("placement.manage");
 
-  const placement = await prisma.placement.findUnique({ where: { id } });
+  const placement = await prisma.placement.findUnique({
+    where: { id },
+    include: { followUps: { orderBy: { followUpOn: "desc" } } },
+  });
   if (!placement) notFound();
 
   const [trainees, employers] = await Promise.all([
@@ -47,6 +51,21 @@ export default async function EditPlacementPage({
           note: placement.note ?? "",
         }}
       />
+
+      <div className="border-t border-gray-200 pt-4 dark:border-gray-800">
+        <FollowUps
+          locale={locale}
+          placementId={placement.id}
+          items={placement.followUps.map((f) => ({
+            id: f.id,
+            followUpOn: f.followUpOn.toISOString().slice(0, 10),
+            periodMonths: f.periodMonths,
+            stillEmployed: f.stillEmployed,
+            monthlyIncome: f.monthlyIncome?.toString() ?? null,
+            note: f.note,
+          }))}
+        />
+      </div>
 
       <div className="max-w-xl border-t border-gray-200 pt-4 dark:border-gray-800">
         <DeleteButton

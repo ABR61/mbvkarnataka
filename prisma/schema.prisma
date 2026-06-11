@@ -522,10 +522,27 @@ model Placement {
   person     Person      @relation(fields: [personId], references: [id], onDelete: Cascade)
   employer   Employer    @relation(fields: [employerId], references: [id], onDelete: Cascade)
   enrollment Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+  followUps  FollowUp[]
 
   @@index([personId])
   @@index([employerId])
   @@index([status])
+}
+
+model FollowUp {
+  id            String   @id @default(cuid())
+  placementId   String
+  followUpOn    DateTime
+  periodMonths  Int? // months since placement (3, 6, 12…)
+  stillEmployed Boolean  @default(true)
+  monthlyIncome Decimal? @db.Decimal(10, 2)
+  note          String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+
+  placement Placement @relation(fields: [placementId], references: [id], onDelete: Cascade)
+
+  @@index([placementId])
 }
 
 // ─────────────────────────────────────────────────────────────
