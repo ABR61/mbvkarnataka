@@ -1,5 +1,5 @@
 import "server-only";
-import { redirect } from "next/navigation";
+import { forbidden, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { hasPermission, type Permission } from "@/lib/rbac";
 
@@ -16,8 +16,8 @@ export async function requireAuth(redirectTo: string = SIGN_IN_PATH) {
 
 /**
  * Guards a Server Component or Server Action: the caller must be signed in AND hold
- * `permission`. Redirects anonymous users to sign-in; throws for signed-in users who
- * lack the permission (surfaces as a server error — a 403 page comes in a later slice).
+ * `permission`. Anonymous users are redirected to sign-in; signed-in users who lack
+ * the permission get the branded 403 (forbidden.tsx) via Next's forbidden().
  */
 export async function requirePermission(
   permission: Permission,
@@ -25,7 +25,7 @@ export async function requirePermission(
 ) {
   const session = await requireAuth(redirectTo);
   if (!hasPermission(session.user.permissions, permission)) {
-    throw new Error(`Forbidden: missing permission "${permission}"`);
+    forbidden();
   }
   return session;
 }
