@@ -1,0 +1,3 @@
+firstName,lastName,gender,dateOfBirth,phone,email,address,districtCode
+Asha,Rao,FEMALE,2003-02-14,9876500001,asha.rao@example.com,"MG Road, Mysuru",MYS
+Kiran,Kumar,MALE,2001-11-30,9876500002,,Bengaluru,BLR-U

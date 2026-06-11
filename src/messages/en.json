@@ -133,6 +133,7 @@
   "Trainees": {
     "title": "Trainees",
     "new": "New trainee",
+    "import": "Import CSV",
     "newTitle": "New trainee",
     "editTitle": "Edit trainee",
     "empty": "No trainees yet.",
@@ -188,6 +189,7 @@
     "assignError_invalid": "Invalid request.",
     "remove": "Remove",
     "attendance": "Attendance",
+    "importEnrollments": "Import enrollments",
     "deleteCohort": "Delete cohort",
     "confirmDelete": "Delete this cohort? Enrollments and sessions will be removed. This cannot be undone."
   },
@@ -221,5 +223,37 @@
     "status_ABSENT": "Absent",
     "status_LATE": "Late",
     "status_EXCUSED": "Excused"
+  },
+  "Import": {
+    "traineesTitle": "Import trainees",
+    "traineesIntro": "Paste CSV rows below, preview the validation, then import the valid rows. Each imported trainee gets a consent record.",
+    "enrollmentsTitle": "Import enrollments",
+    "enrollmentsIntro": "Enroll trainees into cohorts in bulk. Trainees are matched by phone number; capacity and duplicates are enforced.",
+    "downloadTemplate": "Download template",
+    "pastePlaceholder": "Paste CSV here (including the header row)…",
+    "preview": "Preview",
+    "import": "Import valid rows",
+    "row": "Row",
+    "result": "Result",
+    "ok": "OK",
+    "previewSummary": "{valid} of {total} rows are valid. Review below, then Import.",
+    "imported": "Imported {committed} of {total} rows."
+  },
+  "ImportErrors": {
+    "empty": "Paste some CSV first.",
+    "noRows": "No data rows found (only a header?).",
+    "firstName_required": "First name is required",
+    "gender_invalid": "Invalid gender",
+    "dob_invalid": "Invalid date of birth",
+    "dob_under18": "Must be 18 or older",
+    "email_invalid": "Invalid email",
+    "district_unknown": "Unknown district code",
+    "cohort_required": "Cohort code is required",
+    "cohort_unknown": "Unknown cohort code",
+    "phone_required": "Phone is required",
+    "trainee_notfound": "No trainee with that phone",
+    "trainee_ambiguous": "Multiple trainees with that phone",
+    "already_enrolled": "Already enrolled",
+    "cohort_full": "Cohort is at capacity"
   }
 }
