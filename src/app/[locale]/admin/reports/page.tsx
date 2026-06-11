@@ -33,9 +33,18 @@ export default async function ReportsPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <p className="mt-1 text-sm text-gray-500">{t("intro")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="mt-1 text-sm text-gray-500">{t("intro")}</p>
+        </div>
+        <a
+          href={`/${locale}/admin/reports/export`}
+          download
+          className="shrink-0 rounded-md border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+        >
+          {t("exportCsv")}
+        </a>
       </div>
 
       <section>

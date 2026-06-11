@@ -42,6 +42,13 @@ export function parseCsvRecords(text: string): string[][] {
   return records.filter((r) => !(r.length === 1 && r[0].trim() === ""));
 }
 
+/** Serialize rows to RFC4180 CSV (quote fields containing , " or newlines). */
+export function toCsv(rows: string[][]): string {
+  const esc = (v: string) =>
+    /[",\n\r]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v;
+  return rows.map((r) => r.map(esc).join(",")).join("\r\n");
+}
+
 /** Parse CSV into header + objects keyed by (trimmed) header name. */
 export function parseCsv(text: string): {
   headers: string[];

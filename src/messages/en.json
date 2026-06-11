@@ -133,6 +133,7 @@
   "Reports": {
     "title": "Reports",
     "intro": "Organisation-wide and district-wise training metrics.",
+    "exportCsv": "Export CSV",
     "summary": "Summary",
     "byDistrict": "By district",
     "districts": "Districts",

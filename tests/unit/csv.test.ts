@@ -1,5 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { parseCsv, parseCsvRecords } from "@/lib/csv";
+import { parseCsv, parseCsvRecords, toCsv } from "@/lib/csv";
+
+describe("toCsv", () => {
+  it("joins rows with CRLF and quotes fields needing it", () => {
+    expect(
+      toCsv([
+        ["name", "note"],
+        ["Asha", "plain"],
+        ["Kiran", "has, comma"],
+        ['She "said"', "line\nbreak"],
+      ]),
+    ).toBe(
+      'name,note\r\nAsha,plain\r\nKiran,"has, comma"\r\n"She ""said""","line\nbreak"',
+    );
+  });
+
+  it("round-trips through parseCsvRecords", () => {
+    const rows = [
+      ["a", "b"],
+      ["1", "x, y"],
+    ];
+    expect(parseCsvRecords(toCsv(rows))).toEqual(rows);
+  });
+});
 
 describe("parseCsvRecords", () => {
   it("parses simple rows", () => {
