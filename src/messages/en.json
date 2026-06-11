@@ -70,6 +70,25 @@
     "convertedTo": "This applicant has been converted to a trainee.",
     "viewTrainee": "View trainee"
   },
+  "Certificates": {
+    "certTitle": "Certificate of Completion",
+    "certifies": "This is to certify that",
+    "hasCompleted": "has successfully completed the program",
+    "serial": "Serial",
+    "issued": "Issued",
+    "verifyAt": "Verify at",
+    "print": "Print"
+  },
+  "Verify": {
+    "title": "Verify certificate",
+    "valid": "Certificate verified",
+    "invalid": "Certificate not found",
+    "invalidBody": "No certificate matches this code. Please check the link and try again.",
+    "name": "Name",
+    "program": "Program",
+    "serial": "Serial",
+    "issued": "Issued"
+  },
   "SignIn": {
     "title": "Sign in",
     "subtitle": "MBV staff portal",
@@ -253,6 +272,8 @@
     "assignError_invalid": "Invalid request.",
     "remove": "Remove",
     "attendance": "Attendance",
+    "issueCertificate": "Issue certificate",
+    "viewCertificate": "View certificate",
     "importEnrollments": "Import enrollments",
     "deleteCohort": "Delete cohort",
     "confirmDelete": "Delete this cohort? Enrollments and sessions will be removed. This cannot be undone."

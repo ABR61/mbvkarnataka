@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { cohortInput, cohortFromForm, parseDate } from "@/lib/validation/cohort";
+import { randomCode, certificateSerial } from "@/lib/certificate";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
 
 const PERMISSION = "cohort.manage" as const;
@@ -174,6 +175,62 @@ export async function unassignTrainer(formData: FormData): Promise<void> {
 
   await prisma.trainerAssignment.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "TrainerAssignment", id, { cohortId });
+
+  revalidatePath(`/${locale}/admin/cohorts/${cohortId}/edit`);
+}
+
+// ── Certificate ─────────────────────────────────────────────
+
+/**
+ * Issue a completion certificate for an enrollment (snapshotting names so the
+ * certificate stays valid even if records change later) and mark the enrollment
+ * COMPLETED. Idempotent: re-issuing returns the existing certificate.
+ */
+export async function issueCertificate(formData: FormData): Promise<void> {
+  const locale = localeOf(formData);
+  const session = await requirePermission(PERMISSION);
+  const enrollmentId = formData.get("id") as string;
+  const cohortId = formData.get("cohortId") as string;
+  if (!enrollmentId) return;
+
+  const existing = await prisma.certificate.findUnique({ where: { enrollmentId } });
+  if (existing) return; // already issued
+
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { id: enrollmentId },
+    include: {
+      person: true,
+      cohort: { include: { program: true, center: true } },
+    },
+  });
+  if (!enrollment) return;
+
+  const year = new Date().getUTCFullYear();
+  const personName = [enrollment.person.firstName, enrollment.person.lastName]
+    .filter(Boolean)
+    .join(" ");
+
+  await prisma.$transaction([
+    prisma.certificate.create({
+      data: {
+        enrollmentId,
+        personId: enrollment.personId,
+        serialNumber: certificateSerial(year, randomCode(6)),
+        verifyCode: randomCode(16),
+        personName,
+        programName: enrollment.cohort.program.name ?? { en: "" },
+        centerName: enrollment.cohort.center.name ?? undefined,
+        issuedById: session.user.id,
+      },
+    }),
+    prisma.enrollment.update({
+      where: { id: enrollmentId },
+      data: { status: "COMPLETED" },
+    }),
+  ]);
+  await writeAudit(session.user.id, "create", "Certificate", enrollmentId, {
+    cohortId,
+  });
 
   revalidatePath(`/${locale}/admin/cohorts/${cohortId}/edit`);
 }

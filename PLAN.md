@@ -279,4 +279,22 @@ Goal: let the public discover programs and **apply online without an account**, 
 ### Slice 2.3 — Applicant pipeline (back-office) ✅ DONE (2026-06-11)
 - ✅ Applications list (status-filter chips) + detail (gated `application.manage`): status transitions + review note; **convert** → `Person(TRAINEE)` + `ConsentRecord` (+ optional `Enrollment`, capacity-guarded), status CONVERTED, `personId` linked. Verified end-to-end on the production build.
 
-**Phase 2 complete.** Cross-cutting done: `Public`/`Apply`/`Applications` i18n (en + kn), audit on staff mutations, unit tests for application validation (45 unit total). *Optional follow-ups:* e2e smoke for the apply flow; richer marketing pages (impact stories, news).
+**Phase 2 complete.** Cross-cutting done: `Public`/`Apply`/`Applications` i18n (en + kn), audit on staff mutations, unit tests for application validation. *Optional follow-ups:* richer marketing pages (impact stories, news). *(Done in polish:* featured programs on home; public-pages e2e smoke — 8 e2e, 45 unit.*)*
+
+---
+
+## 16. Phase 3 — LMS (Moodle) + Certificates: Build Plan
+
+> **Verification caveat:** the Moodle pieces (SSO, course/enrolment sync) need a **live, configured Moodle** to test end-to-end — not available in this dev environment. So Phase 3 leads with **certificates** (fully buildable + verifiable here), then builds the Moodle client **config-gated** with unit-tested request shaping; live Moodle verification is deferred to a real instance.
+
+### Slice 3.1 — Certificates (NGO's own format) — *verifiable now*
+- `Certificate` model (one per enrollment): snapshot of person + program names, unique `serialNumber` + `verifyCode`, issuedAt/by.
+- **Issue** from the cohort manage page (gate `cohort.manage`): creates the certificate and marks the `Enrollment` COMPLETED. Printable certificate page.
+- **Public verification** page (`/[locale]/verify/[code]`): anyone (e.g. an employer) confirms a certificate is genuine.
+
+### Slice 3.2 — Moodle client + course mapping + enrolment provisioning — *config-gated*
+- Env config (`MOODLE_URL`, `MOODLE_TOKEN`); typed Moodle Web Services client (`src/lib/moodle.ts`) with **unit-tested URL/payload building**; graceful "not configured" state.
+- Attach points: `Course.moodleCourseId`, `Enrollment.moodleEnrolled`. Admin "sync enrolment to Moodle" action. (Live-verify on a real Moodle.)
+
+### Slice 3.3 — Progress sync + SSO — *needs live Moodle*
+- Pull completion/grades from Moodle into `Enrollment`; SSO (OIDC/SAML or token) so trainees log in once. Scaffold + document; verify against a real instance.

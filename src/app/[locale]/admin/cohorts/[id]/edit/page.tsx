@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
+import { Link } from "@/i18n/navigation";
 import {
   programOptions,
   centerOptions,
@@ -17,6 +18,7 @@ import {
   unenrollTrainee,
   assignTrainer,
   unassignTrainer,
+  issueCertificate,
 } from "../../actions";
 
 const personName = (p: { firstName: string; lastName: string | null }) =>
@@ -36,7 +38,10 @@ export default async function EditCohortPage({
   const cohort = await prisma.cohort.findUnique({
     where: { id },
     include: {
-      enrollments: { include: { person: true }, orderBy: { enrolledOn: "asc" } },
+      enrollments: {
+        include: { person: true, certificate: true },
+        orderBy: { enrolledOn: "asc" },
+      },
       trainerAssignments: { include: { person: true } },
     },
   });
@@ -132,6 +137,25 @@ export default async function EditCohortPage({
                   <td className={`${td} text-gray-500`}>{e.status}</td>
                   <td className={`${td} text-gray-500`}>
                     {t("attendance")}: {attendancePct(e.personId)}
+                  </td>
+                  <td className={td}>
+                    {e.certificate ? (
+                      <Link
+                        href={`/admin/certificates/${e.certificate.id}`}
+                        className="text-emerald-700 hover:underline"
+                      >
+                        {t("viewCertificate")}
+                      </Link>
+                    ) : (
+                      <form action={issueCertificate} className="inline">
+                        <input type="hidden" name="locale" value={locale} />
+                        <input type="hidden" name="id" value={e.id} />
+                        <input type="hidden" name="cohortId" value={cohort.id} />
+                        <button type="submit" className="text-gray-600 hover:underline dark:text-gray-300">
+                          {t("issueCertificate")}
+                        </button>
+                      </form>
+                    )}
                   </td>
                   <td className={`${td} text-right`}>
                     <form action={unenrollTrainee} className="inline">
