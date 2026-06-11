@@ -36,13 +36,40 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
-      if (user) token.uid = user.id;
+    // Runs on sign-in (when `user` is present) and on every subsequent request.
+    // We resolve roles + permissions once at sign-in and cache them on the token,
+    // so RBAC checks elsewhere read from the session without hitting the DB.
+    // Trade-off: a role change takes effect on the user's next sign-in.
+    async jwt({ token, user }) {
+      if (user?.id) {
+        token.uid = user.id;
+        const userRoles = await prisma.userRole.findMany({
+          where: { userId: user.id },
+          include: {
+            role: {
+              include: { rolePermissions: { include: { permission: true } } },
+            },
+          },
+        });
+        token.roles = userRoles.map((ur) => ur.role.name);
+        token.permissions = [
+          ...new Set(
+            userRoles.flatMap((ur) =>
+              ur.role.rolePermissions.map((rp) => rp.permission.key),
+            ),
+          ),
+        ];
+      }
       return token;
     },
     session({ session, token }) {
-      if (session.user && token.uid) {
-        (session.user as { id?: string }).id = token.uid as string;
+      // JWT extends Record<string, unknown> in Auth.js v5, so token fields read back
+      // as `unknown` — cast to the shapes we wrote in the jwt callback above.
+      if (session.user) {
+        session.user.id = (token.uid as string | undefined) ?? "";
+        session.user.roles = (token.roles as string[] | undefined) ?? [];
+        session.user.permissions =
+          (token.permissions as string[] | undefined) ?? [];
       }
       return session;
     },

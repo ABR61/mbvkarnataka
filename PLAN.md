@@ -1,7 +1,6 @@
 # MBV — Manava Bandhutva Vedike — Occupational Training Platform
 
-> Organization: **Manava Bandhutva Vedike (MBV)** · Living planning document. Status: **DRAFT v0.2** · Last updated during planning session (2026-06-04).
-> *Name spelling to confirm: "Manava Bandhutva Vedike" (ಮಾನವ ಬಂಧುತ್ವ ವೇದಿಕೆ).*
+> Organization: **Manava Bandhutva Vedike (MBV)** · Living planning document. Status: **DRAFT v0.3** · Phase 0 complete; Phase 1 build plan added (2026-06-11).
 > This is the shared spec we build from. Update it as decisions evolve.
 
 ---
@@ -113,7 +112,7 @@ All four share one codebase, one database, one auth system, gated by role.
 
 ## 9. Phased Roadmap
 
-- **Phase 0 — Foundations:** repo, environments, auth/RBAC, consent model, core data model, CI/CD, i18n scaffold.
+- **Phase 0 — Foundations:** ✅ **DONE** — repo, Next.js 16 + Tailwind 4, Docker Postgres, Auth.js v5 (Credentials), RBAC + full Phase 1 schema, i18n scaffold (en + kn), seed (admin user, sample districts). *Remaining hardening rolled into Phase 1 Slice 0 below.*
 - **Phase 1 — Training Operations Core** *(first build):* programs, courses, cohorts, session scheduling, trainer assignment, districts/centers/venues, **attendance**, trainee/trainer records, **bulk CSV import**, admin data-entry.
 - **Phase 2 — Public site + online admissions:** marketing pages, application form, applicant → trainee pipeline.
 - **Phase 3 — LMS:** Moodle integration, SSO, content, assessments, progress, **certificates (NGO format)**.
@@ -161,14 +160,83 @@ All four share one codebase, one database, one auth system, gated by role.
 - Trainees: **18+** (no minor / parental-consent flows).
 - Centers: **1–2 per district across Karnataka** (~30–60 centers; **District** is a first-class entity).
 
-**Still open:**
-1. **NGO / project name** — for repo, branding, and domain (folder is currently the placeholder `ngo-training-platform`).
+- **NGO / project name:** **Manava Bandhutva Vedike (MBV)** (was the last open item).
+- **Document upload / S3:** **Deferred** — keep the `Document` model; no upload UI in Phase 1 (add when admissions/LMS need it).
+- **Data layer:** **Server Components for reads + Server Actions for mutations** (permission + zod + audit baked into each action).
+- **UI components:** **Hand-rolled minimal Tailwind components** for Phase 1; revisit a library if the surface grows.
+
+**Still open:** *(none)*
 
 ---
 
-## 13. Next Steps
+## 13. Phase 1 — Training Operations Core: Detailed Build Plan
 
-1. Get the **NGO/project name** (last open item).
-2. Finalize Phase 1 scope and a detailed **entity-relationship diagram (ERD)**.
-3. Initialize the repo (Next.js + Prisma + Postgres + i18n + Auth.js).
-4. Build Phase 0 foundations, then Phase 1.
+The data model already exists in [`prisma/schema.prisma`](../prisma/schema.prisma), so Phase 1 is an **application-layer** build. Work is sliced **vertically** — each slice is independently shippable and demoable. Order is dependency-driven: each slice unblocks the next.
+
+### In scope
+Auth UI + RBAC enforcement · back-office app shell · master-data CRUD (districts, centers, venues, programs, courses) · people (trainees/trainers/staff) + consent · cohorts + enrollment · sessions + attendance · bulk CSV import · audit logging · baseline tests + CI.
+
+### Out of scope (later phases)
+Public marketing site & online admissions (P2) · Moodle/LMS & certificates (P3) · finance (P4) · placement & donor dashboards (P5) · email/SMS comms · S3 document upload *(model kept, UI deferred — see open item 1)*.
+
+### Conventions established in Phase 1 (reused everywhere after)
+- **Localized fields** are `{ en, kn }` JSON — one typed helper (`localized(field, locale)`) + one bilingual form input component.
+- **Validation**: `zod` (already a dependency) schemas shared by server actions and client forms.
+- **Mutations** go through server actions that (a) check permission, (b) validate, (c) write an `AuditLog` row.
+- **Lists**: server-paginated + searchable, one shared table pattern.
+
+---
+
+### Slice 0 — Harden the foundation *(prereq for all RBAC)* ✅ DONE (2026-06-11)
+Fixed gaps found in the current scaffold.
+- ✅ Roles + permissions now resolved at sign-in and cached on the JWT, exposed via `session.user.{id, roles, permissions}` ([`src/auth.ts`](../src/auth.ts)); `Session` type augmented in [`src/types/next-auth.d.ts`](../src/types/next-auth.d.ts).
+- ✅ Single source of truth for RBAC in [`src/lib/rbac.ts`](../src/lib/rbac.ts) (typed `PERMISSIONS`, `ROLES`, `ROLE_PERMISSIONS` matrix) — imported by both the seed and the auth layer. Seed now applies the matrix idempotently (Admin 8 · CenterManager 6 · Coordinator 4 · Trainer 2 · Finance 1 · Placement 1 · Trainee 0).
+- ✅ All **31 Karnataka districts** (en + kn) seeded from [`src/lib/karnataka-districts.ts`](../src/lib/karnataka-districts.ts).
+- ✅ `requirePermission(key)` / `requireAuth()` server guards in [`src/lib/auth-guards.ts`](../src/lib/auth-guards.ts) + `<Can permission>` UI gate in [`src/components/Can.tsx`](../src/components/Can.tsx).
+- ✅ **AC met:** migrate + seed run clean, build + `tsc` pass, DB matrix verified.
+- *Deferred to Slice 1:* `requirePermission` currently redirects anonymous users to the Auth.js default sign-in and throws on forbidden — Slice 1 swaps in a branded localized sign-in + a 403 page.
+
+### Slice 1 — Auth UI + app shell
+- Bilingual **sign-in / sign-out** pages with error states; middleware protects `/admin/**`.
+- Back-office layout: permission-gated sidebar nav, user menu, **locale switcher**, dashboard landing.
+- **AC:** admin logs in *through the browser*, lands on the dashboard, sees only nav items their role permits; unauthenticated users are redirected to sign-in.
+
+### Slice 2 — Master data: Geography + Curriculum
+- **Districts** (read/edit — seeded), **Centers** CRUD, **Venues** CRUD.
+- **Programs** CRUD, **Courses** CRUD (ordered by `sequence`).
+- Ships the reusable bilingual field component, zod schemas, and list/pagination/search pattern.
+- **AC:** create a center under a district, a program with 3 ordered courses — all bilingual, both locales rendering correctly.
+
+### Slice 3 — People + consent
+- **Person** CRUD (trainee / trainer / staff), optional `User` login link, district association.
+- **Consent capture** (`ConsentRecord`) on trainee creation — DPDP, adult.
+- **AC:** create a trainee with a recorded consent; create a trainer who also gets a login + role.
+
+### Slice 4 — Cohorts + Enrollment
+- **Cohort** CRUD (program + center + coordinator + dates + capacity + status).
+- **Trainer assignment** to cohorts.
+- **Enroll / unenroll** trainees with capacity and duplicate guards.
+- **AC:** open a cohort, assign a trainer, enroll 5 trainees; enrolling past capacity or twice is blocked.
+
+### Slice 5 — Sessions + Attendance *(the operational core)*
+- **Session** scheduling per cohort (course, venue, trainer, date, start/end time).
+- **Attendance** roster: bulk-mark present/absent/late/excused in one save, editable, records `markedBy`/`markedAt`.
+- **AC:** schedule sessions for a cohort, mark a full roster in a single save, view per-trainee attendance %.
+
+### Slice 6 — Bulk CSV import
+- Import **People** and **Enrollment** (downloadable template, row-level validation, **dry-run preview**, error report, then commit).
+- **AC:** import a 100-row CSV, see per-row validation results, commit only valid rows.
+
+### Cross-cutting (every slice)
+- `AuditLog` write on every create/update/delete.
+- en/kn UI strings kept in sync in [`src/messages`](../src/messages).
+- **Tests**: unit (zod schemas, RBAC helper), integration (server actions against a test DB), smoke e2e on sign-in + attendance.
+- **CI** (GitHub Actions): lint · typecheck · `prisma validate` · build · test.
+
+---
+
+## 14. Immediate next actions
+1. ✅ Refine Phase 1 plan (this section).
+2. Confirm the three open items in §12.
+3. **Slice 0** — verify build + `db:migrate`/`db:seed` run clean on the dev machine, then harden auth session, role→permission seed, and 31-district seed.
+4. Proceed slice-by-slice (1 → 6).
