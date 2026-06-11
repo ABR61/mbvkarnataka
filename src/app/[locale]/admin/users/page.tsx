@@ -53,12 +53,20 @@ export default async function UsersPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
-        <Link
-          href="/admin/users/new"
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
-        >
-          {t("new")}
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/admin/users/import"
+            className="rounded-md border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+          >
+            {t("import")}
+          </Link>
+          <Link
+            href="/admin/users/new"
+            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          >
+            {t("new")}
+          </Link>
+        </div>
       </div>
 
       <SearchBox placeholder={tc("search")} defaultValue={q} />

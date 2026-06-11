@@ -1,0 +1,3 @@
+name,email,password,roles,locale
+Asha Coordinator,asha.coord@mbv.local,ChangeMe123!,Coordinator,en
+Ravi Finance,ravi.fin@mbv.local,ChangeMe123!,Finance;Placement,en
