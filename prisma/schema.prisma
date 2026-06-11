@@ -142,6 +142,7 @@ model Person {
   consentRecords     ConsentRecord[]
   application        Application?
   certificates       Certificate[]
+  placements         Placement[]
 
   @@index([districtId])
   @@index([kind])
@@ -160,6 +161,7 @@ model District {
   centers      Center[]
   persons      Person[]
   applications Application[]
+  employers    Employer[]
 }
 
 model Center {
@@ -266,6 +268,7 @@ model Enrollment {
   person      Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
   cohort      Cohort       @relation(fields: [cohortId], references: [id], onDelete: Cascade)
   certificate Certificate?
+  placements  Placement[]
 
   @@unique([personId, cohortId])
   @@index([cohortId])
@@ -482,6 +485,50 @@ model Grant {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Placement & M&E (Phase 5)
+// ─────────────────────────────────────────────────────────────
+
+model Employer {
+  id            String   @id @default(cuid())
+  name          String
+  sector        String?
+  contactPerson String?
+  phone         String?
+  email         String?
+  districtId    String?
+  note          String?
+  createdAt     DateTime @default(now())
+
+  district   District?   @relation(fields: [districtId], references: [id])
+  placements Placement[]
+
+  @@index([districtId])
+}
+
+model Placement {
+  id             String          @id @default(cuid())
+  personId       String
+  employerId     String
+  enrollmentId   String?
+  jobTitle       String?
+  employmentType EmploymentType?
+  monthlySalary  Decimal?        @db.Decimal(10, 2)
+  placedOn       DateTime
+  status         PlacementStatus @default(PLACED)
+  note           String?
+  createdById    String?
+  createdAt      DateTime        @default(now())
+
+  person     Person      @relation(fields: [personId], references: [id], onDelete: Cascade)
+  employer   Employer    @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  enrollment Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+  @@index([personId])
+  @@index([employerId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────────────────────
 // Enums
 // ─────────────────────────────────────────────────────────────
 
@@ -516,6 +563,19 @@ enum ExpenseStatus {
   PENDING
   APPROVED
   PAID
+}
+
+enum PlacementStatus {
+  PLACED
+  ACTIVE
+  EXITED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  SELF_EMPLOYED
+  APPRENTICESHIP
 }
 
 enum CenterStatus {

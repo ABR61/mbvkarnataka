@@ -314,3 +314,17 @@ Reuses the established CRUD/RBAC/audit pattern. New permission `finance.manage` 
 - ✅ `Vendor` CRUD; expenses link to a managed vendor (`Expense.vendorId`, legacy free-text fallback).
 - ✅ `Grant` CRUD (funder accounting) with a total-received sum. Verified: grant ₹500,000 → total ₹5,00,000.00 (INR lakh formatting); vendor appears in the expense select.
 - *Deferred:* explicit vendor payments + finance lines in the district report.
+
+---
+
+## 18. Phase 5 — Placement & M&E: Build Plan
+
+Tracks employment outcomes for trainees and measures impact for donors. New permission `placement.manage` (Admin, Placement).
+
+### Slice 5.1 — Employers + placements
+- `Employer` (name, sector, contact, district) — CRUD.
+- `Placement` (trainee → employer, job title, employment type, monthly salary, placed date, status PLACED/ACTIVE/EXITED, optional enrollment link) — CRUD with status filter.
+
+### Slice 5.2 — Impact follow-up + M&E dashboard *(later)*
+- `FollowUp` (periodic check-in: still employed?, current income) per placement.
+- Dashboard: placement rate (placed / completed), avg salary, retention — by program/district; donor-facing.
