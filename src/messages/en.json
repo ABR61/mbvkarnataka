@@ -28,6 +28,7 @@
     "courses": "Courses",
     "cohorts": "Cohorts",
     "trainees": "Trainees",
+    "trainers": "Trainers",
     "attendance": "Attendance",
     "reports": "Reports",
     "users": "Users"
@@ -110,5 +111,43 @@
     "hours": "Hours",
     "empty": "No courses yet.",
     "confirmDelete": "Delete this course? This cannot be undone."
+  },
+  "People": {
+    "name": "Name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "gender": "Gender",
+    "dateOfBirth": "Date of birth",
+    "email": "Email",
+    "gender_MALE": "Male",
+    "gender_FEMALE": "Female",
+    "gender_OTHER": "Other",
+    "gender_UNDISCLOSED": "Prefer not to say",
+    "dobError_invalid": "Enter a valid date.",
+    "dobError_under18": "Trainees must be 18 or older.",
+    "emailError_invalid": "Enter a valid email.",
+    "emailError_taken": "That email already has a login.",
+    "consentLabel": "The trainee has given consent to process their personal data (DPDP Act, 2023).",
+    "consentRequired": "Consent is required to create a trainee."
+  },
+  "Trainees": {
+    "title": "Trainees",
+    "new": "New trainee",
+    "newTitle": "New trainee",
+    "editTitle": "Edit trainee",
+    "empty": "No trainees yet.",
+    "confirmDelete": "Delete this trainee? This cannot be undone."
+  },
+  "Trainers": {
+    "title": "Trainers",
+    "new": "New trainer",
+    "newTitle": "New trainer",
+    "editTitle": "Edit trainer",
+    "empty": "No trainers yet.",
+    "confirmDelete": "Delete this trainer and their login? This cannot be undone.",
+    "password": "Password",
+    "passwordMin": "Password must be at least 8 characters.",
+    "loginHint": "Creates a login with the Trainer role using the email above.",
+    "emailLocked": "Email (the login) cannot be changed here."
   }
 }
