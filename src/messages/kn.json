@@ -89,6 +89,23 @@
     "serial": "ಸರಣಿ",
     "issued": "ನೀಡಿದ ದಿನಾಂಕ"
   },
+  "Reports": {
+    "title": "ವರದಿಗಳು",
+    "intro": "ಸಂಸ್ಥೆ-ವ್ಯಾಪಿ ಮತ್ತು ಜಿಲ್ಲಾವಾರು ತರಬೇತಿ ಮಾಪನಗಳು.",
+    "summary": "ಸಾರಾಂಶ",
+    "byDistrict": "ಜಿಲ್ಲಾವಾರು",
+    "districts": "ಜಿಲ್ಲೆಗಳು",
+    "centers": "ಕೇಂದ್ರಗಳು",
+    "programs": "ಕಾರ್ಯಕ್ರಮಗಳು",
+    "activeCohorts": "ಸಕ್ರಿಯ ತಂಡಗಳು",
+    "trainees": "ಪ್ರಶಿಕ್ಷಣಾರ್ಥಿಗಳು",
+    "certificates": "ಪ್ರಮಾಣಪತ್ರಗಳು",
+    "pendingApplications": "ಬಾಕಿ ಅರ್ಜಿಗಳು",
+    "district": "ಜಿಲ್ಲೆ",
+    "cohorts": "ತಂಡಗಳು",
+    "enrolled": "ನೋಂದಾಯಿತ",
+    "completed": "ಪೂರ್ಣಗೊಂಡಿದೆ"
+  },
   "Moodle": {
     "title": "Moodle (LMS) ಸಂಯೋಜನೆ",
     "status": "ಸಂಪರ್ಕ",

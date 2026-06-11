@@ -89,6 +89,23 @@
     "serial": "Serial",
     "issued": "Issued"
   },
+  "Reports": {
+    "title": "Reports",
+    "intro": "Organisation-wide and district-wise training metrics.",
+    "summary": "Summary",
+    "byDistrict": "By district",
+    "districts": "Districts",
+    "centers": "Centers",
+    "programs": "Programs",
+    "activeCohorts": "Active cohorts",
+    "trainees": "Trainees",
+    "certificates": "Certificates",
+    "pendingApplications": "Pending applications",
+    "district": "District",
+    "cohorts": "Cohorts",
+    "enrolled": "Enrolled",
+    "completed": "Completed"
+  },
   "Moodle": {
     "title": "Moodle (LMS) integration",
     "status": "Connection",
