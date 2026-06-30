@@ -14,12 +14,14 @@ export const PERMISSIONS = [
   "finance.manage", // budgets & expenses
   "placement.manage", // employers & job placements
   "report.view", // dashboards & exports
+  "post.manage", // branch posts / announcements
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
 
 export const ROLES = [
   "Admin",
+  "BranchAdmin",
   "CenterManager",
   "Coordinator",
   "Trainer",
@@ -33,6 +35,10 @@ export type RoleName = (typeof ROLES)[number];
 // Permissions held by each non-Admin role. Admin implicitly holds ALL permissions
 // (see grantAll below), so it is intentionally omitted from this matrix.
 export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> = {
+  // Branch (district) admin: manages their own district. Permissions here are limited
+  // to the surfaces that are district-scoped (see lib/branch-scope.ts) so a branch
+  // admin can never reach an unscoped, cross-district page.
+  BranchAdmin: ["trainee.manage", "application.manage", "post.manage"],
   CenterManager: [
     "center.manage",
     "cohort.manage",

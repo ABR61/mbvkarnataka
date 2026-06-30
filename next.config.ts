@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // Enables forbidden()/unauthorized() + forbidden.tsx for branded 403/401 pages.
   experimental: {
     authInterrupts: true,
+    // Allow a post's inline photo (data URL) through Server Actions.
+    serverActions: { bodySizeLimit: "5mb" },
   },
 };
 

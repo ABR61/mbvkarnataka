@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
+import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { Pagination } from "@/components/admin/pagination";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
@@ -18,7 +19,7 @@ export default async function ApplicationsPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requirePermission("application.manage");
+  const session = await requirePermission("application.manage");
 
   const sp = await searchParams;
   const status = (APPLICATION_STATUSES as readonly string[]).includes(
@@ -28,7 +29,11 @@ export default async function ApplicationsPage({
     : undefined;
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1);
 
-  const where: Prisma.ApplicationWhereInput = status ? { status } : {};
+  // Branch admins only see applications in their own district; super admins see all.
+  const where: Prisma.ApplicationWhereInput = withDistrictScope(
+    status ? { status } : {},
+    scopedDistrictId(session),
+  );
 
   const [rows, total] = await Promise.all([
     prisma.application.findMany({

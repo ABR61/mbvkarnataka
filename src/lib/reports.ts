@@ -106,7 +106,9 @@ export async function placementSummary(): Promise<PlacementSummary> {
   };
 }
 
-export async function orgSummary() {
+export async function orgSummary(districtId?: string | null) {
+  // When districtId is set (branch admin), every count is scoped to that district;
+  // when null/undefined (super admin) the counts are platform-wide.
   const [
     districts,
     centers,
@@ -117,13 +119,25 @@ export async function orgSummary() {
     pendingApplications,
   ] = await Promise.all([
     prisma.district.count(),
-    prisma.center.count(),
+    prisma.center.count(districtId ? { where: { districtId } } : undefined),
     prisma.program.count({ where: { status: "active" } }),
-    prisma.cohort.count({ where: { status: "ACTIVE" } }),
-    prisma.person.count({ where: { kind: "TRAINEE" } }),
-    prisma.certificate.count(),
+    prisma.cohort.count({
+      where: {
+        status: "ACTIVE",
+        ...(districtId ? { center: { districtId } } : {}),
+      },
+    }),
+    prisma.person.count({
+      where: { kind: "TRAINEE", ...(districtId ? { districtId } : {}) },
+    }),
+    prisma.certificate.count(
+      districtId ? { where: { person: { districtId } } } : undefined,
+    ),
     prisma.application.count({
-      where: { status: { in: ["SUBMITTED", "UNDER_REVIEW"] } },
+      where: {
+        status: { in: ["SUBMITTED", "UNDER_REVIEW"] },
+        ...(districtId ? { districtId } : {}),
+      },
     }),
   ]);
   return {

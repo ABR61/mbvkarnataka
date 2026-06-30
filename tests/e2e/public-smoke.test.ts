@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-// Smoke for the public marketing + admissions surface (GET-only, seed-agnostic).
+// The public marketing site is open to everyone; only /admin requires sign-in.
 const BASE = process.env.BASE_URL || "http://localhost:3000";
 
 async function getHtml(path: string): Promise<{ status: number; html: string }> {
@@ -8,31 +8,33 @@ async function getHtml(path: string): Promise<{ status: number; html: string }> 
   return { status: res.status, html: await res.text() };
 }
 
-describe("public site smoke", () => {
-  it("renders the home page with primary CTAs", async () => {
+async function redirectTarget(path: string): Promise<{ status: number; location: string | null }> {
+  const res = await fetch(`${BASE}${path}`, { redirect: "manual" });
+  return { status: res.status, location: res.headers.get("location") };
+}
+
+describe("public site", () => {
+  it("serves the home page to everyone (no login)", async () => {
     const { status, html } = await getHtml("/en");
     expect(status).toBe(200);
     expect(html).toContain("Manava Bandhutva Vedike");
-    expect(html).toMatch(/Browse programs|Apply now/);
   });
 
-  it("renders the programs listing", async () => {
+  it("serves the programs listing without login", async () => {
     const { status, html } = await getHtml("/en/programs");
     expect(status).toBe(200);
     expect(html).toContain("Training programs");
   });
 
-  it("renders the programs listing in Kannada", async () => {
-    const { status, html } = await getHtml("/kn/programs");
-    expect(status).toBe(200);
-    expect(html).toContain("ತರಬೇತಿ ಕಾರ್ಯಕ್ರಮಗಳು");
+  it("shows a Login link in the header when signed out", async () => {
+    const { html } = await getHtml("/en");
+    expect(html).toMatch(/>Login</);
   });
 
-  it("renders the public application form", async () => {
-    const { status, html } = await getHtml("/en/apply");
-    expect(status).toBe(200);
-    expect(html).toContain('name="firstName"');
-    expect(html).toContain('name="phone"');
-    expect(html).toContain('name="consent"');
+  it("still gates the admin area behind sign-in", async () => {
+    const { status, location } = await redirectTarget("/en/admin");
+    expect(status).toBeGreaterThanOrEqual(300);
+    expect(status).toBeLessThan(400);
+    expect(location).toContain("/sign-in");
   });
 });

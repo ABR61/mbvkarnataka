@@ -10,6 +10,7 @@ declare module "next-auth" {
       id: string;
       roles: string[];
       permissions: string[];
+      districtId: string | null;
     } & DefaultSession["user"];
   }
 }

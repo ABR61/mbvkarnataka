@@ -25,6 +25,17 @@ async function validRoleIds(formData: FormData): Promise<string[]> {
   return submitted.filter((id) => known.has(id));
 }
 
+/** Resolve the chosen branch district id, or null — verifying it exists. */
+async function validDistrictId(formData: FormData): Promise<string | null> {
+  const submitted = (formData.get("districtId") as string | null)?.trim();
+  if (!submitted) return null;
+  const district = await prisma.district.findUnique({
+    where: { id: submitted },
+    select: { id: true },
+  });
+  return district?.id ?? null;
+}
+
 export async function createUser(
   _prev: FormState,
   formData: FormData,
@@ -45,11 +56,18 @@ export async function createUser(
   if (existing) return { fieldErrors: { email: "taken" } };
 
   const roleIds = await validRoleIds(formData);
+  const districtId = await validDistrictId(formData);
   const passwordHash = await bcrypt.hash(d.password, 10);
 
   const user = await prisma.$transaction(async (tx) => {
     const created = await tx.user.create({
-      data: { email: d.email, name: d.name, passwordHash, locale: d.locale },
+      data: {
+        email: d.email,
+        name: d.name,
+        passwordHash,
+        locale: d.locale,
+        districtId,
+      },
     });
     if (roleIds.length) {
       await tx.userRole.createMany({
@@ -81,11 +99,12 @@ export async function updateUser(
   if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
   const d = parsed.data;
   const roleIds = await validRoleIds(formData);
+  const districtId = await validDistrictId(formData);
 
   await prisma.$transaction(async (tx) => {
     await tx.user.update({
       where: { id },
-      data: { name: d.name, status: d.status, locale: d.locale },
+      data: { name: d.name, status: d.status, locale: d.locale, districtId },
     });
     await tx.userRole.deleteMany({ where: { userId: id } });
     if (roleIds.length) {

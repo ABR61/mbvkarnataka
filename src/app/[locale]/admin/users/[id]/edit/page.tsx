@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { requirePermission } from "@/lib/auth-guards";
+import { districtOptions } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { UserForm } from "../../user-form";
 import { ResetPasswordForm } from "../../reset-password-form";
@@ -23,7 +24,10 @@ export default async function EditUserPage({
   });
   if (!user) notFound();
 
-  const roles = await prisma.role.findMany({ orderBy: { name: "asc" } });
+  const [roles, districts] = await Promise.all([
+    prisma.role.findMany({ orderBy: { name: "asc" } }),
+    districtOptions(locale),
+  ]);
   const t = await getTranslations("Users");
   const tc = await getTranslations("Common");
   const isSelf = session.user.id === user.id;
@@ -36,6 +40,7 @@ export default async function EditUserPage({
         locale={locale}
         mode="edit"
         roles={roles}
+        districts={districts}
         action={updateUser}
         defaults={{
           id: user.id,
@@ -44,6 +49,7 @@ export default async function EditUserPage({
           status: user.status,
           userLocale: user.locale,
           roleIds: user.userRoles.map((ur) => ur.roleId),
+          districtId: user.districtId ?? "",
         }}
       />
 

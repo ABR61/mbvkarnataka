@@ -48,6 +48,14 @@ export default async function PortalPage({
     .map((e) => e.certificate)
     .filter((c): c is NonNullable<typeof c> => c != null);
 
+  // Recent MBV activity (approved posts from across districts).
+  const recentPosts = await prisma.post.findMany({
+    where: { approved: true },
+    include: { district: true },
+    orderBy: { createdAt: "desc" },
+    take: 4,
+  });
+
   const card = "rounded-lg border border-gray-200 p-4 dark:border-gray-800";
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
 
@@ -57,12 +65,20 @@ export default async function PortalPage({
         <h1 className="text-2xl font-bold">
           {t("greeting", { name: person.firstName })}
         </h1>
-        <Link
-          href="/portal/profile"
-          className="shrink-0 rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-        >
-          {t("editProfile")}
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/"
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+          >
+            {t("home")}
+          </Link>
+          <Link
+            href="/portal/profile"
+            className="rounded-md border border-gray-300 px-3 py-1.5 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+          >
+            {t("editProfile")}
+          </Link>
+        </div>
       </div>
 
       <section className="flex flex-col gap-3">
@@ -133,6 +149,41 @@ export default async function PortalPage({
                 >
                   {t("viewCertificate")}
                 </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">{t("recentActivity")}</h2>
+          <Link href="/reports" className="text-sm text-emerald-700 hover:underline">
+            {t("viewAll")} →
+          </Link>
+        </div>
+        {recentPosts.length === 0 ? (
+          <p className="text-sm text-gray-400">{t("noActivity")}</p>
+        ) : (
+          <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {recentPosts.map((p) => (
+              <li
+                key={p.id}
+                className="flex flex-col overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800"
+              >
+                {p.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.imageUrl} alt="" className="h-28 w-full object-cover" />
+                )}
+                <div className="flex flex-1 flex-col p-3">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                    {localized(p.district.name, locale)}
+                  </span>
+                  <div className="mt-1 text-sm font-medium">{p.title}</div>
+                  <time className="mt-2 text-xs text-gray-400">
+                    {p.createdAt.toISOString().slice(0, 10)}
+                  </time>
+                </div>
               </li>
             ))}
           </ul>

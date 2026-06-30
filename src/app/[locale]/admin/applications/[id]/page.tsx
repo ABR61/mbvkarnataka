@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { requirePermission } from "@/lib/auth-guards";
+import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { Link } from "@/i18n/navigation";
 import { cohortOptions } from "@/lib/options";
@@ -15,13 +15,15 @@ export default async function ApplicationDetailPage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  await requirePermission("application.manage");
+  const session = await requirePermission("application.manage");
 
   const app = await prisma.application.findUnique({
     where: { id },
     include: { program: true, district: true },
   });
   if (!app) notFound();
+  // Branch admins may only open applications in their own district.
+  assertDistrict(session, app.districtId);
 
   const t = await getTranslations("Applications");
   const tp = await getTranslations("People");

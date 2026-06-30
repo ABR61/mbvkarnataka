@@ -7,6 +7,7 @@ import { USER_STATUSES } from "@/lib/validation/user";
 import type { FormState } from "@/lib/forms";
 
 type Role = { id: string; name: string };
+type District = { id: string; name: string };
 
 const field =
   "rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 dark:border-gray-700 dark:bg-gray-900";
@@ -15,12 +16,14 @@ export function UserForm({
   locale,
   mode,
   roles,
+  districts,
   action,
   defaults = {},
 }: {
   locale: string;
   mode: "create" | "edit";
   roles: Role[];
+  districts: District[];
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaults?: {
     id?: string;
@@ -29,6 +32,7 @@ export function UserForm({
     status?: string;
     userLocale?: string;
     roleIds?: string[];
+    districtId?: string;
   };
 }) {
   const t = useTranslations("Users");
@@ -108,6 +112,23 @@ export function UserForm({
           ))}
         </div>
       </fieldset>
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">{t("branchDistrict")}</span>
+        <select
+          name="districtId"
+          defaultValue={defaults.districtId ?? ""}
+          className={field}
+        >
+          <option value="">{t("noBranchDistrict")}</option>
+          {districts.map((d) => (
+            <option key={d.id} value={d.id}>
+              {d.name}
+            </option>
+          ))}
+        </select>
+        <span className="text-xs text-gray-500">{t("branchDistrictHint")}</span>
+      </label>
 
       <div className="mt-2 flex items-center gap-3">
         <button

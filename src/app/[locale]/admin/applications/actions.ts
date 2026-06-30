@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requirePermission } from "@/lib/auth-guards";
+import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
 import type { FormState } from "@/lib/forms";
@@ -26,6 +26,14 @@ export async function updateApplication(
   if (!(APPLICATION_STATUSES as readonly string[]).includes(status)) {
     return { error: "invalid" };
   }
+
+  // Branch admins may only act on applications in their own district.
+  const target = await prisma.application.findUnique({
+    where: { id },
+    select: { districtId: true },
+  });
+  if (!target) return { error: "notFound" };
+  assertDistrict(session, target.districtId);
 
   await prisma.application.update({
     where: { id },
@@ -56,6 +64,8 @@ export async function convertApplication(
 
   const app = await prisma.application.findUnique({ where: { id } });
   if (!app) return { error: "notFound" };
+  // Branch admins may only convert applications in their own district.
+  assertDistrict(session, app.districtId);
   if (app.personId) return { error: "alreadyConverted" };
 
   // Capacity guard before we mutate, if a cohort was chosen.

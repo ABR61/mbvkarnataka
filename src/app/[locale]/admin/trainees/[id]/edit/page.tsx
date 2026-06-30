@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { requirePermission } from "@/lib/auth-guards";
+import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { districtOptions } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { TraineeForm } from "../../trainee-form";
@@ -15,13 +15,15 @@ export default async function EditTraineePage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  await requirePermission("trainee.manage");
+  const session = await requirePermission("trainee.manage");
 
   const person = await prisma.person.findUnique({
     where: { id },
     include: { user: true },
   });
   if (!person || person.kind !== "TRAINEE") notFound();
+  // Branch admins may only edit trainees in their own district.
+  assertDistrict(session, person.districtId);
 
   const districts = await districtOptions(locale);
   const t = await getTranslations("Trainees");

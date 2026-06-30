@@ -43,14 +43,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user?.id) {
         token.uid = user.id;
-        const userRoles = await prisma.userRole.findMany({
-          where: { userId: user.id },
-          include: {
-            role: {
-              include: { rolePermissions: { include: { permission: true } } },
+        const [userRoles, dbUser] = await Promise.all([
+          prisma.userRole.findMany({
+            where: { userId: user.id },
+            include: {
+              role: {
+                include: { rolePermissions: { include: { permission: true } } },
+              },
             },
-          },
-        });
+          }),
+          prisma.user.findUnique({
+            where: { id: user.id },
+            select: { districtId: true },
+          }),
+        ]);
         token.roles = userRoles.map((ur) => ur.role.name);
         token.permissions = [
           ...new Set(
@@ -59,6 +65,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ),
           ),
         ];
+        // Branch (district) scope — null for super admins (see lib/branch-scope.ts).
+        token.districtId = dbUser?.districtId ?? null;
       }
       return token;
     },
@@ -70,6 +78,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.roles = (token.roles as string[] | undefined) ?? [];
         session.user.permissions =
           (token.permissions as string[] | undefined) ?? [];
+        session.user.districtId =
+          (token.districtId as string | null | undefined) ?? null;
       }
       return session;
     },

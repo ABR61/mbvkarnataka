@@ -26,14 +26,19 @@ model User {
   passwordHash  String? // for Credentials sign-in (bcrypt)
   locale        String     @default("en") // "en" | "kn"
   status        UserStatus @default(ACTIVE)
+  districtId    String? // set for branch (district) admins; null = unrestricted (super admin)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
+  district          District?    @relation(fields: [districtId], references: [id])
   accounts          Account[]
   sessions          Session[]
   person            Person?
   userRoles         UserRole[]
   attendancesMarked Attendance[] @relation("AttendanceMarkedBy")
+  posts             Post[]
+
+  @@index([districtId])
 }
 
 model Account {
@@ -162,6 +167,29 @@ model District {
   persons      Person[]
   applications Application[]
   employers    Employer[]
+  admins       User[]
+  posts        Post[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// Branch posts (district announcements authored by branch admins)
+// ─────────────────────────────────────────────────────────────
+
+model Post {
+  id         String   @id @default(cuid())
+  districtId String
+  authorId   String?
+  title      String
+  body       String
+  imageUrl   String? // optional photo (data URL or external link)
+  approved   Boolean  @default(false) // super admin must approve before it's public
+  createdAt  DateTime @default(now())
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  author   User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([districtId])
+  @@index([createdAt])
 }
 
 model Center {

@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
+import { localized } from "@/lib/localized";
 import { SearchBox } from "@/components/admin/search-box";
 import { Pagination } from "@/components/admin/pagination";
 
@@ -35,7 +36,7 @@ export default async function UsersPage({
   const [rows, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      include: { userRoles: { include: { role: true } } },
+      include: { userRoles: { include: { role: true } }, district: true },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -77,6 +78,7 @@ export default async function UsersPage({
             <th className={th}>{t("name")}</th>
             <th className={th}>{t("email")}</th>
             <th className={th}>{t("roles")}</th>
+            <th className={th}>{t("branchDistrict")}</th>
             <th className={th}>{tc("status")}</th>
             <th className={th}>{tc("actions")}</th>
           </tr>
@@ -88,6 +90,9 @@ export default async function UsersPage({
               <td className={td}>{u.email}</td>
               <td className={td}>
                 {u.userRoles.map((ur) => ur.role.name).join(", ") || "—"}
+              </td>
+              <td className={td}>
+                {u.district ? localized(u.district.name, locale) : "—"}
               </td>
               <td className={td}>{t(`status_${u.status}`)}</td>
               <td className={td}>

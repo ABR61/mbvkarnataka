@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
+import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { SearchBox } from "@/components/admin/search-box";
 import { Pagination } from "@/components/admin/pagination";
@@ -18,24 +19,28 @@ export default async function TraineesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requirePermission("trainee.manage");
+  const session = await requirePermission("trainee.manage");
 
   const sp = await searchParams;
   const q = (sp.q ?? "").trim();
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1);
 
-  const where: Prisma.PersonWhereInput = {
-    kind: "TRAINEE",
-    ...(q
-      ? {
-          OR: [
-            { firstName: { contains: q, mode: "insensitive" } },
-            { lastName: { contains: q, mode: "insensitive" } },
-            { phone: { contains: q, mode: "insensitive" } },
-          ],
-        }
-      : {}),
-  };
+  // Branch admins only see trainees in their own district; super admins see all.
+  const where: Prisma.PersonWhereInput = withDistrictScope(
+    {
+      kind: "TRAINEE",
+      ...(q
+        ? {
+            OR: [
+              { firstName: { contains: q, mode: "insensitive" } },
+              { lastName: { contains: q, mode: "insensitive" } },
+              { phone: { contains: q, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
+    scopedDistrictId(session),
+  );
 
   const [rows, total] = await Promise.all([
     prisma.person.findMany({
