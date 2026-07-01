@@ -38,7 +38,7 @@ export default async function ApplicationsPage({
   const [rows, total] = await Promise.all([
     prisma.application.findMany({
       where,
-      include: { program: true },
+      include: { program: true, futureProgram: true },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -95,7 +95,11 @@ export default async function ApplicationsPage({
                 </td>
                 <td className={td}>{a.phone}</td>
                 <td className={td}>
-                  {a.program ? localized(a.program.name, locale) : "—"}
+                  {a.program
+                    ? localized(a.program.name, locale)
+                    : a.futureProgram
+                      ? a.futureProgram.title
+                      : "—"}
                 </td>
                 <td className={td}>{t(`status_${a.status}`)}</td>
                 <td className={td}>{a.createdAt.toISOString().slice(0, 10)}</td>

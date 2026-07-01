@@ -22,7 +22,7 @@ export default async function PortalFeedbackPage({
 
   const completions = await prisma.completion.findMany({
     where: { userId: session!.user.id },
-    include: { program: true, futureProgram: true, feedback: true },
+    include: { program: true, futureProgram: true, feedback: true, certificate: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -88,6 +88,23 @@ export default async function PortalFeedbackPage({
                       currentComment={fb?.comment ?? undefined}
                     />
                   </>
+                )}
+
+                {c.certificate && (
+                  <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm dark:border-emerald-900/50 dark:bg-emerald-950/30">
+                    <span className="font-medium text-emerald-800 dark:text-emerald-200">
+                      🎓 {t("certificateEarned")}
+                    </span>
+                    <span className="text-xs text-emerald-700 dark:text-emerald-300">
+                      {c.certificate.serialNumber}
+                    </span>
+                    <a
+                      href={`/${locale}/portal/certificate/${c.certificate.id}`}
+                      className="ml-auto rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700"
+                    >
+                      {t("viewCertificate")}
+                    </a>
+                  </div>
                 )}
               </li>
             );

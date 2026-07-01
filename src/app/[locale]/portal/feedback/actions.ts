@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { forbidden } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth-guards";
+import { issueCompletionCertificate } from "@/lib/issue-certificate";
 import { writeAudit } from "@/lib/audit";
 import type { FormState } from "@/lib/forms";
 
@@ -46,6 +47,11 @@ export async function submitFeedback(
   });
   await writeAudit(session.user.id, "update", "Feedback", completionId);
 
+  // Leaving feedback earns the participant their certificate immediately
+  // (idempotent — re-submitting feedback won't issue a second one).
+  await issueCompletionCertificate(completionId, session.user.id);
+
   revalidatePath(`/${locale}/portal/feedback`);
+  revalidatePath(`/${locale}/portal`);
   return { ok: true };
 }

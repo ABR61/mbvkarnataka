@@ -23,7 +23,7 @@ export default async function ApplyPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ program?: string }>;
+  searchParams: Promise<{ program?: string; future?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -36,6 +36,14 @@ export default async function ApplyPage({
   const programs = programsRaw
     .map((p) => ({ id: p.id, name: localized(p.name, locale) }))
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Applying to a specific announced future program (from its "Apply now" button).
+  const futureProgram = sp.future
+    ? await prisma.futureProgram.findFirst({
+        where: { id: sp.future, approved: true },
+        select: { id: true, title: true },
+      })
+    : null;
 
   const t = await getTranslations("Apply");
   const defaultProgramId = programs.some((p) => p.id === sp.program)
@@ -52,6 +60,7 @@ export default async function ApplyPage({
           programs={programs}
           districts={districts}
           defaultProgramId={defaultProgramId}
+          futureProgram={futureProgram ?? undefined}
         />
       </div>
     </main>

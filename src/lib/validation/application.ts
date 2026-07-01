@@ -26,6 +26,11 @@ export const applicationInput = z.object({
   dateOfBirth: optionalStr, // YYYY-MM-DD
   districtId: optionalStr,
   programId: optionalStr,
+  futureProgramId: optionalStr,
+  aadhaarNumber: z
+    .string()
+    .trim()
+    .regex(/^\d{12}$/, "invalidAadhaar"),
   message: optionalStr,
 });
 
@@ -41,6 +46,8 @@ export function applicationFromForm(formData: FormData) {
     dateOfBirth: formData.get("dateOfBirth") ?? "",
     districtId: formData.get("districtId") ?? "",
     programId: formData.get("programId") ?? "",
+    futureProgramId: formData.get("futureProgramId") ?? "",
+    aadhaarNumber: formData.get("aadhaarNumber") ?? "",
     message: formData.get("message") ?? "",
   };
 }

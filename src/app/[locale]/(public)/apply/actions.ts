@@ -28,6 +28,14 @@ export async function createApplication(
   if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
   const d = parsed.data;
 
+  // Applicant photo, captured on their phone — required, image data URL, ~2MB cap.
+  const rawPhoto = ((formData.get("photoUrl") as string) ?? "").trim();
+  const photoUrl =
+    rawPhoto.startsWith("data:image/") && rawPhoto.length < 2_200_000
+      ? rawPhoto
+      : null;
+  if (!photoUrl) return { fieldErrors: { photoUrl: "required" } };
+
   if (formData.get("consent") !== "on") {
     return { fieldErrors: { consent: "required" } };
   }
@@ -39,6 +47,21 @@ export async function createApplication(
   const ip =
     h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
 
+  // Applying to an announced future program: verify it and inherit its district
+  // so the branch admin who posted it sees the applicant in their pipeline.
+  let futureProgramId: string | null = null;
+  let districtFromFuture: string | null = null;
+  if (d.futureProgramId) {
+    const fp = await prisma.futureProgram.findUnique({
+      where: { id: d.futureProgramId },
+      select: { id: true, districtId: true, approved: true },
+    });
+    if (fp?.approved) {
+      futureProgramId = fp.id;
+      districtFromFuture = fp.districtId;
+    }
+  }
+
   const application = await prisma.application.create({
     data: {
       firstName: d.firstName,
@@ -47,8 +70,11 @@ export async function createApplication(
       email: d.email || null,
       gender: d.gender ? (d.gender as Gender) : null,
       dateOfBirth: dob.date,
-      districtId: d.districtId || null,
+      districtId: districtFromFuture ?? d.districtId ?? null,
       programId: d.programId || null,
+      futureProgramId,
+      aadhaarNumber: d.aadhaarNumber,
+      photoUrl,
       message: d.message || null,
       consentAt: new Date(),
       ipAddress: ip,

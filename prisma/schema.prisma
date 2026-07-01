@@ -196,9 +196,10 @@ model FutureProgram {
   approved      Boolean  @default(false) // super admin approves before it's public
   createdAt     DateTime @default(now())
 
-  district    District     @relation(fields: [districtId], references: [id], onDelete: Cascade)
-  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  completions Completion[]
+  district     District      @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  author       User?         @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  completions  Completion[]
+  applications Application[]
 
   @@index([districtId])
 }
@@ -224,6 +225,7 @@ model Completion {
   futureProgram FutureProgram? @relation(fields: [futureProgramId], references: [id], onDelete: Cascade)
   district      District?      @relation(fields: [districtId], references: [id])
   feedback      Feedback?
+  certificate   Certificate?
 
   @@index([userId])
   @@index([districtId])
@@ -482,7 +484,10 @@ model Application {
   dateOfBirth DateTime?
   gender      Gender?
   districtId  String?
-  programId   String? // program of interest
+  programId   String? // training program of interest
+  futureProgramId String? // set when applying to an announced future program
+  aadhaarNumber String? // 12-digit Aadhaar registration number
+  photoUrl    String? // applicant photo, captured on their phone (data URL)
   message     String? // free text from the applicant
   status      ApplicationStatus @default(SUBMITTED)
   reviewNote  String? // staff note
@@ -492,9 +497,10 @@ model Application {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  district District? @relation(fields: [districtId], references: [id])
-  program  Program?  @relation(fields: [programId], references: [id])
-  person   Person?   @relation(fields: [personId], references: [id], onDelete: SetNull)
+  district      District?      @relation(fields: [districtId], references: [id])
+  program       Program?       @relation(fields: [programId], references: [id])
+  futureProgram FutureProgram? @relation(fields: [futureProgramId], references: [id], onDelete: SetNull)
+  person        Person?        @relation(fields: [personId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([programId])
@@ -506,7 +512,8 @@ model Application {
 
 model Certificate {
   id           String   @id @default(cuid())
-  enrollmentId String   @unique
+  enrollmentId String?  @unique // set for enrollment-based certificates
+  completionId String?  @unique // set for feedback-earned completion certificates
   personId     String
   serialNumber String   @unique // human-readable, e.g. MBV-2026-AB12CD
   verifyCode   String   @unique // opaque token for the public /verify URL
@@ -516,8 +523,9 @@ model Certificate {
   issuedAt     DateTime @default(now())
   issuedById   String?
 
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  person     Person     @relation(fields: [personId], references: [id], onDelete: Cascade)
+  enrollment Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  completion Completion? @relation(fields: [completionId], references: [id], onDelete: Cascade)
+  person     Person      @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@index([personId])
 }

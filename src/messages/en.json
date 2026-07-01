@@ -111,7 +111,21 @@
     "submitting": "Submitting…",
     "thanksTitle": "Thank you for applying!",
     "thanksBody": "We've received your application and will contact you soon.",
-    "backToPrograms": "Back to programs"
+    "backToPrograms": "Back to programs",
+    "applyingFor": "Applying for",
+    "aadhaar": "Aadhaar number",
+    "aadhaarHint": "12-digit Aadhaar number",
+    "aadhaarInvalid": "Enter a valid 12-digit Aadhaar number.",
+    "photo": "Your photo",
+    "photoHint": "Take a live photo with your camera — no uploads (this photo is used for attendance).",
+    "photoRequired": "Please add your photo.",
+    "imageType": "Please choose an image file.",
+    "imageTooBig": "Image is too large (max 2 MB).",
+    "openCamera": "Open camera",
+    "takePhoto": "Take photo",
+    "retake": "Retake",
+    "cameraDenied": "Camera access was blocked. Please allow camera permission and try again.",
+    "cameraUnsupported": "Live camera is not available on this device or browser."
   },
   "Applications": {
     "title": "Applications",
@@ -455,7 +469,8 @@
     "loginToPlan": "Login to plan",
     "ratingCount": "{count, plural, one {# review} other {# reviews}}",
     "testimonialsTitle": "What participants say",
-    "testimonialsIntro": "Feedback from people who have completed our programs."
+    "testimonialsIntro": "Feedback from people who have completed our programs.",
+    "applyNow": "Apply now"
   },
   "Posts": {
     "title": "Posts",
@@ -779,6 +794,8 @@
     "pending": "Pending review",
     "published": "Published",
     "publishedNote": "Your feedback is live on the programs page.",
-    "invalid": "Sorry, that could not be submitted."
+    "invalid": "Sorry, that could not be submitted.",
+    "certificateEarned": "Certificate earned!",
+    "viewCertificate": "View certificate"
   }
 }

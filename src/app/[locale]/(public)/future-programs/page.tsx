@@ -171,6 +171,12 @@ export default async function FutureProgramsPage({
                   </div>
                 );
               })()}
+              <a
+                href={`/${locale}/apply?future=${p.id}`}
+                className="mt-5 inline-block self-start rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              >
+                {tf("applyNow")}
+              </a>
               </div>
             </li>
           ))}

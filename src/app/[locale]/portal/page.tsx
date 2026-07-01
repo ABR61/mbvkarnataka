@@ -44,9 +44,12 @@ export default async function PortalPage({
         orderBy: { sessionDate: "asc" },
       })
     : [];
-  const certificates = person.enrollments
-    .map((e) => e.certificate)
-    .filter((c): c is NonNullable<typeof c> => c != null);
+  // All of this person's certificates — both enrollment-based and the ones
+  // earned by leaving feedback on a completed program.
+  const certificates = await prisma.certificate.findMany({
+    where: { personId: person.id },
+    orderBy: { issuedAt: "desc" },
+  });
 
   // Recent MBV activity (approved posts from across districts).
   const recentPosts = await prisma.post.findMany({
@@ -150,7 +153,7 @@ export default async function PortalPage({
                   </div>
                 </div>
                 <a
-                  href={`/${locale}/verify/${c.verifyCode}`}
+                  href={`/${locale}/portal/certificate/${c.id}`}
                   className="text-sm font-medium text-emerald-700 hover:underline"
                 >
                   {t("viewCertificate")}

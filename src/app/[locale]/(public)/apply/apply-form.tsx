@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { GENDERS } from "@/lib/validation/person";
+import { CameraCapture } from "./camera-capture";
 import { createApplication, type ApplyState } from "./actions";
 
 type Option = { id: string; name: string };
@@ -15,10 +16,12 @@ export function ApplyForm({
   programs,
   districts,
   defaultProgramId = "",
+  futureProgram,
 }: {
   programs: Option[];
   districts: Option[];
   defaultProgramId?: string;
+  futureProgram?: { id: string; title: string };
 }) {
   const t = useTranslations("Apply");
   const tp = useTranslations("People");
@@ -27,6 +30,7 @@ export function ApplyForm({
     createApplication,
     {},
   );
+  const [photo, setPhoto] = useState("");
 
   if (state.ok) {
     return (
@@ -60,6 +64,18 @@ export function ApplyForm({
         className="absolute left-[-9999px] h-0 w-0"
         aria-hidden="true"
       />
+
+      {futureProgram && (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900/50 dark:bg-emerald-950/30">
+          <span className="text-emerald-700 dark:text-emerald-300">
+            {t("applyingFor")}:{" "}
+          </span>
+          <span className="font-semibold text-emerald-800 dark:text-emerald-200">
+            {futureProgram.title}
+          </span>
+          <input type="hidden" name="futureProgramId" value={futureProgram.id} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
@@ -100,6 +116,20 @@ export function ApplyForm({
           )}
         </label>
         <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">{t("aadhaar")} *</span>
+          <input
+            name="aadhaarNumber"
+            inputMode="numeric"
+            maxLength={12}
+            required
+            placeholder={t("aadhaarHint")}
+            className={field}
+          />
+          {state.fieldErrors?.aadhaarNumber && (
+            <span className="text-sm text-red-600">{t("aadhaarInvalid")}</span>
+          )}
+        </label>
+        <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tc("district")}</span>
           <select name="districtId" defaultValue="" className={field}>
             <option value="">—</option>
@@ -108,15 +138,29 @@ export function ApplyForm({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">{t("program")}</span>
-          <select name="programId" defaultValue={defaultProgramId} className={field}>
-            <option value="">—</option>
-            {programs.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </label>
+        {!futureProgram && (
+          <label className="flex flex-col gap-1 text-sm">
+            <span className="font-medium">{t("program")}</span>
+            <select name="programId" defaultValue={defaultProgramId} className={field}>
+              <option value="">—</option>
+              {programs.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">{t("photo")} *</span>
+        <span className="text-xs text-gray-500">{t("photoHint")}</span>
+        <div className="mt-1">
+          <CameraCapture onCapture={setPhoto} />
+        </div>
+        <input type="hidden" name="photoUrl" value={photo} />
+        {state.fieldErrors?.photoUrl && (
+          <span className="text-sm text-red-600">{t("photoRequired")}</span>
+        )}
       </div>
 
       <label className="flex flex-col gap-1 text-sm">
