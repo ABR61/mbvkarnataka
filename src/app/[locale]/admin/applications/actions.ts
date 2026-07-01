@@ -1,14 +1,19 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { forbidden, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
+import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
 import type { FormState } from "@/lib/forms";
 
 const PERMISSION = "application.manage" as const;
+
+// Statuses a branch admin may set — the first-stage approval and rejection only.
+// Final approval (ACCEPTED) and conversion stay with the super admin.
+const BRANCH_ALLOWED_STATUSES = ["UNDER_REVIEW", "BRANCH_APPROVED", "REJECTED"] as const;
 
 function localeOf(formData: FormData): string {
   return (formData.get("locale") as string) || "en";
@@ -34,6 +39,14 @@ export async function updateApplication(
   });
   if (!target) return { error: "notFound" };
   assertDistrict(session, target.districtId);
+
+  // Two-stage approval: a branch admin can only send an application up for
+  // final approval (BRANCH_APPROVED) or reject it — never grant final approval.
+  if (scopedDistrictId(session) !== null) {
+    if (!(BRANCH_ALLOWED_STATUSES as readonly string[]).includes(status)) {
+      forbidden();
+    }
+  }
 
   await prisma.application.update({
     where: { id },
@@ -62,10 +75,11 @@ export async function convertApplication(
   const cohortId = ((formData.get("cohortId") as string) ?? "").trim();
   if (!id) return { error: "notFound" };
 
+  // Converting to a trainee is the final step — super admin only.
+  if (scopedDistrictId(session) !== null) forbidden();
+
   const app = await prisma.application.findUnique({ where: { id } });
   if (!app) return { error: "notFound" };
-  // Branch admins may only convert applications in their own district.
-  assertDistrict(session, app.districtId);
   if (app.personId) return { error: "alreadyConverted" };
 
   // Capacity guard before we mutate, if a cohort was chosen.

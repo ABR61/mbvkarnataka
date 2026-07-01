@@ -4,6 +4,7 @@ import { GENDERS } from "@/lib/validation/person";
 export const APPLICATION_STATUSES = [
   "SUBMITTED",
   "UNDER_REVIEW",
+  "BRANCH_APPROVED",
   "ACCEPTED",
   "REJECTED",
   "CONVERTED",

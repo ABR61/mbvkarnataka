@@ -60,6 +60,100 @@ export function StatusForm({
   );
 }
 
+/**
+ * Two-stage approval controls. A branch admin can approve (send up) or reject;
+ * only the super admin can grant final approval. Buttons shown depend on the
+ * current stage and the viewer's role; the server action enforces the same rules.
+ */
+export function ApprovalPanel({
+  locale,
+  id,
+  status,
+  reviewNote,
+  isSuperAdmin,
+  action,
+}: {
+  locale: string;
+  id: string;
+  status: string;
+  reviewNote: string;
+  isSuperAdmin: boolean;
+  action: (prev: FormState, formData: FormData) => Promise<FormState>;
+}) {
+  const t = useTranslations("Applications");
+  const [state, formAction, pending] = useActionState(action, {});
+
+  const green =
+    "rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60";
+  const red =
+    "rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60";
+
+  const awaitingStage1 = status === "SUBMITTED" || status === "UNDER_REVIEW";
+  const note = (msg: string) => (
+    <p className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:bg-gray-900 dark:text-gray-300">
+      {msg}
+    </p>
+  );
+
+  return (
+    <form action={formAction} className="flex max-w-md flex-col gap-3">
+      <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="id" value={id} />
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">{t("reviewNote")}</span>
+        <textarea name="reviewNote" rows={3} defaultValue={reviewNote} className={field} />
+      </label>
+
+      {/* Stage 1 — branch admin */}
+      {!isSuperAdmin && awaitingStage1 && (
+        <div className="flex flex-wrap gap-3">
+          <button type="submit" name="status" value="BRANCH_APPROVED" disabled={pending} className={green}>
+            {t("approveSendToAdmin")}
+          </button>
+          <button type="submit" name="status" value="REJECTED" disabled={pending} className={red}>
+            {t("reject")}
+          </button>
+        </div>
+      )}
+      {!isSuperAdmin && status === "BRANCH_APPROVED" && note(t("awaitingFinal"))}
+
+      {/* Stage 1 (override) & Stage 2 — super admin */}
+      {isSuperAdmin && awaitingStage1 && (
+        <>
+          {note(t("awaitingBranch"))}
+          <div className="flex flex-wrap gap-3">
+            <button type="submit" name="status" value="BRANCH_APPROVED" disabled={pending} className={green}>
+              {t("approveBranchStep")}
+            </button>
+            <button type="submit" name="status" value="REJECTED" disabled={pending} className={red}>
+              {t("reject")}
+            </button>
+          </div>
+        </>
+      )}
+      {isSuperAdmin && status === "BRANCH_APPROVED" && (
+        <>
+          {note(t("branchApprovedBy"))}
+          <div className="flex flex-wrap gap-3">
+            <button type="submit" name="status" value="ACCEPTED" disabled={pending} className={green}>
+              {t("giveFinalApproval")}
+            </button>
+            <button type="submit" name="status" value="REJECTED" disabled={pending} className={red}>
+              {t("reject")}
+            </button>
+          </div>
+        </>
+      )}
+
+      {status === "ACCEPTED" && note(t("finalApproved"))}
+      {status === "REJECTED" && note(t("wasRejected"))}
+
+      {state.ok && <span className="text-sm text-emerald-700">{t("saved")}</span>}
+    </form>
+  );
+}
+
 export function ConvertForm({
   locale,
   id,

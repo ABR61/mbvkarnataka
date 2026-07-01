@@ -155,7 +155,17 @@
     "convertError_cohortNotFound": "Cohort not found.",
     "convertError_cohortFull": "That cohort is at capacity.",
     "convertedTo": "This applicant has been converted to a trainee.",
-    "viewTrainee": "View trainee"
+    "viewTrainee": "View trainee",
+    "status_BRANCH_APPROVED": "Branch approved",
+    "approveSendToAdmin": "Approve → send to admin",
+    "approveBranchStep": "Approve (branch step)",
+    "giveFinalApproval": "Give final approval",
+    "reject": "Reject",
+    "awaitingBranch": "Waiting for branch admin approval.",
+    "awaitingFinal": "You approved this. Waiting for the admin’s final approval.",
+    "branchApprovedBy": "Approved by the branch admin — ready for your final approval.",
+    "finalApproved": "Final approval granted. You can now convert this applicant to a trainee.",
+    "wasRejected": "This application was rejected."
   },
   "Certificates": {
     "certTitle": "Certificate of Completion",

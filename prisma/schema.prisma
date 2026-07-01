@@ -681,6 +681,7 @@ enum PersonKind {
 enum ApplicationStatus {
   SUBMITTED
   UNDER_REVIEW
+  BRANCH_APPROVED // branch admin approved; awaiting super admin's final approval
   ACCEPTED
   REJECTED
   CONVERTED

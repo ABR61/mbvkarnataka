@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
+import { scopedDistrictId } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { Link } from "@/i18n/navigation";
 import { cohortOptions } from "@/lib/options";
-import { StatusForm, ConvertForm } from "../application-forms";
+import { ApprovalPanel, ConvertForm } from "../application-forms";
 import { updateApplication, convertApplication } from "../actions";
 
 export default async function ApplicationDetailPage({
@@ -24,6 +25,7 @@ export default async function ApplicationDetailPage({
   if (!app) notFound();
   // Branch admins may only open applications in their own district.
   assertDistrict(session, app.districtId);
+  const isSuperAdmin = scopedDistrictId(session) === null;
 
   const t = await getTranslations("Applications");
   const tp = await getTranslations("People");
@@ -98,25 +100,30 @@ export default async function ApplicationDetailPage({
         <>
           <section className="flex flex-col gap-3">
             <h2 className="text-lg font-semibold">{t("review")}</h2>
-            <StatusForm
+            <ApprovalPanel
               locale={locale}
               id={app.id}
               status={app.status}
               reviewNote={app.reviewNote ?? ""}
+              isSuperAdmin={isSuperAdmin}
               action={updateApplication}
             />
           </section>
 
-          <section className="flex flex-col gap-3 border-t border-gray-200 pt-6 dark:border-gray-800">
-            <h2 className="text-lg font-semibold">{t("convertTitle")}</h2>
-            <p className="text-sm text-gray-500">{t("convertHint")}</p>
-            <ConvertForm
-              locale={locale}
-              id={app.id}
-              cohorts={cohorts}
-              action={convertApplication}
-            />
-          </section>
+          {/* Conversion to a trainee is the super admin's final step, after
+              the application has been given final approval. */}
+          {isSuperAdmin && app.status === "ACCEPTED" && (
+            <section className="flex flex-col gap-3 border-t border-gray-200 pt-6 dark:border-gray-800">
+              <h2 className="text-lg font-semibold">{t("convertTitle")}</h2>
+              <p className="text-sm text-gray-500">{t("convertHint")}</p>
+              <ConvertForm
+                locale={locale}
+                id={app.id}
+                cohorts={cohorts}
+                action={convertApplication}
+              />
+            </section>
+          )}
         </>
       )}
     </div>

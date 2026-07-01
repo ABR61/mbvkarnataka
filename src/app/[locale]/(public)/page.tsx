@@ -80,7 +80,7 @@ export default async function HomePage({
       </section>
 
       {/* Future programs CTA */}
-      <section className="flex w-full justify-center px-4 pb-16 pt-10">
+      <section className="flex w-full justify-center px-4 py-16">
         <Link
           href="/future-programs"
           className="rounded-md bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-emerald-700"
