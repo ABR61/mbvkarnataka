@@ -31,15 +31,22 @@ export async function PublicHeader() {
     { href: { pathname: "/", hash: "objectives" }, label: t("objectives") },
     { href: { pathname: "/", hash: "how" }, label: t("howItWorks") },
     { href: "/branches", label: t("branches") },
-    { href: "/programs", label: t("programs") },
   ];
 
-  // Flattened list for the mobile menu (About expands into its two links).
+  // Programs dropdown groups programs, future programs, and reports.
+  const programsItems = [
+    { href: "/programs", label: t("programs") },
+    { href: "/future-programs", label: tc("futureCta") },
+    { href: "/reports", label: tc("reportsCta") },
+  ];
+
+  // Flattened list for the mobile menu (dropdowns expand into their links).
   const mobileLinks = [
     { href: { pathname: "/", hash: "top" }, label: t("home") },
     { href: { pathname: "/", hash: "about" }, label: t("aboutUs") },
     { href: "/contact", label: tc("contactTitle") },
     ...rest,
+    ...programsItems,
   ];
 
   return (
@@ -66,6 +73,7 @@ export async function PublicHeader() {
               {l.label}
             </Link>
           ))}
+          <NavDropdown label={t("programs")} items={programsItems} />
           <Link
             href={apply.href}
             className="rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700"

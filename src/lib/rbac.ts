@@ -15,6 +15,8 @@ export const PERMISSIONS = [
   "placement.manage", // employers & job placements
   "report.view", // dashboards & exports
   "post.manage", // branch posts / announcements
+  "program.plan", // branch admins plan future programs
+  "feedback.manage", // mark completers & moderate participant feedback
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -38,7 +40,13 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
   // Branch (district) admin: manages their own district. Permissions here are limited
   // to the surfaces that are district-scoped (see lib/branch-scope.ts) so a branch
   // admin can never reach an unscoped, cross-district page.
-  BranchAdmin: ["trainee.manage", "application.manage", "post.manage"],
+  BranchAdmin: [
+    "trainee.manage",
+    "application.manage",
+    "post.manage",
+    "program.plan",
+    "feedback.manage",
+  ],
   CenterManager: [
     "center.manage",
     "cohort.manage",

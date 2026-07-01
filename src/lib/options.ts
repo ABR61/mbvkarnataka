@@ -41,6 +41,42 @@ export async function personOptions(kinds: PersonKind[]): Promise<Option[]> {
   return people.map((p) => ({ id: p.id, name: personName(p) })).sort(byName);
 }
 
+/**
+ * Programs a completion can point at — both main training Programs and announced
+ * FuturePrograms — as a single flat option list. Values are namespaced so the
+ * server action knows which table to write: `training:<id>` / `future:<id>`.
+ * A branch admin's districtId restricts the future programs to their district.
+ */
+export async function completableProgramOptions(
+  locale: string,
+  districtId?: string | null,
+): Promise<Option[]> {
+  const [programs, futures] = await Promise.all([
+    prisma.program.findMany({ select: { id: true, name: true } }),
+    prisma.futureProgram.findMany({
+      where: districtId ? { districtId } : undefined,
+      select: { id: true, title: true },
+    }),
+  ]);
+  const training = programs.map((p) => ({
+    id: `training:${p.id}`,
+    name: localized(p.name, locale),
+  }));
+  const future = futures.map((f) => ({ id: `future:${f.id}`, name: f.title }));
+  return [...training, ...future].sort(byName);
+}
+
+/** Student logins (trainees with a User account) as { id: userId, name } options. */
+export async function studentUserOptions(): Promise<Option[]> {
+  const people = await prisma.person.findMany({
+    where: { kind: "TRAINEE", userId: { not: null } },
+    select: { userId: true, firstName: true, lastName: true },
+  });
+  return people
+    .map((p) => ({ id: p.userId as string, name: personName(p) }))
+    .sort(byName);
+}
+
 export async function courseOptions(locale: string): Promise<Option[]> {
   const courses = await prisma.course.findMany({ include: { program: true } });
   return courses

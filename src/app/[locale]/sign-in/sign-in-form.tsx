@@ -6,13 +6,22 @@ import { authenticate, type SignInState } from "@/app/actions/auth";
 
 const initialState: SignInState = {};
 
-export function SignInForm({ locale }: { locale: string }) {
+export function SignInForm({
+  locale,
+  callbackUrl,
+}: {
+  locale: string;
+  callbackUrl?: string;
+}) {
   const t = useTranslations("SignIn");
   const [state, action, pending] = useActionState(authenticate, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <input type="hidden" name="locale" value={locale} />
+      {callbackUrl && (
+        <input type="hidden" name="callbackUrl" value={callbackUrl} />
+      )}
 
       <label className="flex flex-col gap-1 text-sm">
         {t("email")}

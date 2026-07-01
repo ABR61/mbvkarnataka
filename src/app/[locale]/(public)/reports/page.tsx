@@ -25,10 +25,19 @@ export default async function ReportsPage({
   setRequestLocale(locale);
   const t = await getTranslations("HomePage");
 
-  const reports = await prisma.post.findMany({
+  // Show only the 4 most recent reports per district — older ones stay saved
+  // but hidden so the gallery never grows unbounded for any one branch.
+  const all = await prisma.post.findMany({
     where: { imageUrl: { not: null }, approved: true },
     include: { district: true },
     orderBy: { createdAt: "desc" },
+  });
+  const perDistrict = new Map<string, number>();
+  const reports = all.filter((r) => {
+    const n = perDistrict.get(r.districtId) ?? 0;
+    if (n >= 4) return false;
+    perDistrict.set(r.districtId, n + 1);
+    return true;
   });
 
   return (

@@ -5,15 +5,22 @@ import { SignInForm } from "./sign-in-form";
 
 export default async function SignInPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  // Already signed in → go straight to the back-office.
+  // Optional return path (must be an internal path) to send the user back to
+  // where they came from (e.g. the "Login to plan" button on Future programs).
+  const { callbackUrl } = await searchParams;
+  const next = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : undefined;
+
+  // Already signed in → honour the return path, else go to the back-office.
   const session = await auth();
-  if (session?.user) redirect(`/${locale}/admin`);
+  if (session?.user) redirect(next ?? `/${locale}/admin`);
 
   const t = await getTranslations("SignIn");
 
@@ -24,7 +31,7 @@ export default async function SignInPage({
           <h1 className="text-2xl font-bold">{t("title")}</h1>
           <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
         </div>
-        <SignInForm locale={locale} />
+        <SignInForm locale={locale} callbackUrl={next} />
       </div>
     </main>
   );

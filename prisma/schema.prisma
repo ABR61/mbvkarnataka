@@ -37,6 +37,8 @@ model User {
   userRoles         UserRole[]
   attendancesMarked Attendance[] @relation("AttendanceMarkedBy")
   posts             Post[]
+  futurePrograms    FutureProgram[]
+  completions       Completion[] @relation("UserCompletions")
 
   @@index([districtId])
 }
@@ -163,12 +165,83 @@ model District {
   code  String? @unique
   state String  @default("Karnataka")
 
-  centers      Center[]
-  persons      Person[]
-  applications Application[]
-  employers    Employer[]
-  admins       User[]
-  posts        Post[]
+  centers        Center[]
+  persons        Person[]
+  applications   Application[]
+  employers      Employer[]
+  admins         User[]
+  posts          Post[]
+  futurePrograms FutureProgram[]
+  completions    Completion[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// Future programs (planned by branch admins for their district)
+// ─────────────────────────────────────────────────────────────
+
+model FutureProgram {
+  id            String   @id @default(cuid())
+  districtId    String
+  authorId      String?
+  title         String
+  description   String
+  imageUrl      String? // optional photo (data URL or external link)
+  objectives    String?
+  resources     String?
+  category      String?
+  plannedFor    String? // e.g. "March 2026" / a timeframe
+  durationWeeks Int? // numeric duration value
+  durationUnit  String? // "days" | "weeks" | "months"
+  seats         Int? // how many people can join
+  approved      Boolean  @default(false) // super admin approves before it's public
+  createdAt     DateTime @default(now())
+
+  district    District     @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  author      User?        @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  completions Completion[]
+
+  @@index([districtId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// Program completions & participant feedback
+// ─────────────────────────────────────────────────────────────
+
+// A participant an admin/branch admin has marked as having COMPLETED a program
+// (either a main training Program or an announced FutureProgram). Only people
+// with a completion may submit feedback for that program.
+model Completion {
+  id              String   @id @default(cuid())
+  userId          String // the participant (a student User)
+  programId       String? // set when the completed program is a training Program
+  futureProgramId String? // set when it is a FutureProgram
+  districtId      String? // for branch-admin scoping
+  markedById      String? // admin/branch admin who recorded it
+  createdAt       DateTime @default(now())
+
+  user          User           @relation("UserCompletions", fields: [userId], references: [id], onDelete: Cascade)
+  program       Program?       @relation(fields: [programId], references: [id], onDelete: Cascade)
+  futureProgram FutureProgram? @relation(fields: [futureProgramId], references: [id], onDelete: Cascade)
+  district      District?      @relation(fields: [districtId], references: [id])
+  feedback      Feedback?
+
+  @@index([userId])
+  @@index([districtId])
+}
+
+// Feedback a completer leaves for the program they finished. Hidden until a
+// super admin approves it, then shown publicly as a testimonial.
+model Feedback {
+  id           String   @id @default(cuid())
+  completionId String   @unique
+  rating       Int // 1..5 stars
+  comment      String?
+  approved     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  completion Completion @relation(fields: [completionId], references: [id], onDelete: Cascade)
+
+  @@index([approved])
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -239,6 +312,7 @@ model Program {
   applications Application[]
   budget       Budget?
   expenses     Expense[]
+  completions  Completion[]
 }
 
 model Course {

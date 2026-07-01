@@ -17,11 +17,14 @@ export async function authenticate(
   formData: FormData,
 ): Promise<SignInState> {
   const locale = (formData.get("locale") as string) || "en";
+  const callbackUrl = formData.get("callbackUrl") as string | null;
+  const redirectTo =
+    callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : `/${locale}/admin`;
   try {
     await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
-      redirectTo: `/${locale}/admin`,
+      redirectTo,
     });
     return {};
   } catch (error) {

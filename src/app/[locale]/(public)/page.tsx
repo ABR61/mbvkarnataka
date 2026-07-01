@@ -66,7 +66,7 @@ export default async function HomePage({
         id="top"
         className="relative overflow-hidden bg-gradient-to-b from-emerald-50 to-white dark:from-emerald-950/30 dark:to-transparent"
       >
-        <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-6 px-4 py-24 text-center">
+        <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-6 px-4 pb-10 pt-20 text-center">
           <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
             {t("tagline")}
           </span>
@@ -76,68 +76,62 @@ export default async function HomePage({
           <p className="max-w-xl text-lg text-gray-600 dark:text-gray-300">
             {t("subtitle")}
           </p>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/reports"
-              className="rounded-md bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-emerald-700"
-            >
-              {t("reportsCta")}
-            </Link>
-            <Link
-              href="/future-programs"
-              className="rounded-md border border-emerald-600 px-6 py-3 font-medium text-emerald-700 transition hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
-            >
-              {t("futureCta")}
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Impact stats */}
-      <section className="border-y border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40">
-        <div className="mx-auto w-full max-w-5xl px-4 py-14">
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold">{t("statsTitle")}</h2>
-            <p className="mt-1 text-sm text-gray-500">{t("statsSubtitle")}</p>
-          </div>
-          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <dt className="text-4xl font-extrabold tabular-nums text-emerald-700 dark:text-emerald-400">
-                  {s.value.toLocaleString(locale)}
-                </dt>
-                <dd className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                  {s.label}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+      {/* Future programs CTA */}
+      <section className="flex w-full justify-center px-4 pb-16 pt-10">
+        <Link
+          href="/future-programs"
+          className="rounded-md bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-emerald-700"
+        >
+          {t("futureCta")}
+        </Link>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-20">
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-bold">{t("howTitle")}</h2>
-          <p className="mt-1 text-sm text-gray-500">{t("howSubtitle")}</p>
-        </div>
-        <ol className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="rounded-xl border border-gray-200 p-6 dark:border-gray-800"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-lg font-bold text-white">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {step.body}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* Latest posts from branches */}
+      {posts.length > 0 && (
+        <section
+          id="news"
+          className="scroll-mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40"
+        >
+          <div className="mx-auto w-full max-w-5xl px-4 py-20">
+            <div className="mb-10 text-center">
+              <h2 className="text-2xl font-bold">{t("newsTitle")}</h2>
+              <p className="mt-1 text-sm text-gray-500">{t("newsSubtitle")}</p>
+            </div>
+            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((p) => (
+                <li
+                  key={p.id}
+                  className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
+                >
+                  {p.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={p.imageUrl}
+                      alt=""
+                      className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  )}
+                  <div className="flex flex-1 flex-col p-5">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                    {localized(p.district.name, locale)}
+                  </span>
+                  <h3 className="mt-2 font-semibold">{p.title}</h3>
+                  <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
+                    {p.body}
+                  </p>
+                  <time className="mt-3 text-xs text-gray-400">
+                    {p.createdAt.toISOString().slice(0, 10)}
+                  </time>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       {/* About MBV */}
       <section
@@ -185,7 +179,7 @@ export default async function HomePage({
           {objectives.map((obj, i) => (
             <li
               key={obj}
-              className="flex items-start gap-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800"
+              className="flex items-start gap-4 rounded-xl border border-gray-200 p-5 transition duration-300 hover:border-emerald-300 hover:shadow-sm dark:border-gray-800"
             >
               <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
                 {i + 1}
@@ -196,49 +190,51 @@ export default async function HomePage({
         </ul>
       </section>
 
-      {/* Latest posts from branches */}
-      {posts.length > 0 && (
-        <section
-          id="news"
-          className="scroll-mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40"
-        >
-          <div className="mx-auto w-full max-w-5xl px-4 py-20">
-            <div className="mb-10 text-center">
-              <h2 className="text-2xl font-bold">{t("newsTitle")}</h2>
-              <p className="mt-1 text-sm text-gray-500">{t("newsSubtitle")}</p>
-            </div>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((p) => (
-                <li
-                  key={p.id}
-                  className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950"
-                >
-                  {p.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.imageUrl}
-                      alt=""
-                      className="h-40 w-full object-cover"
-                    />
-                  )}
-                  <div className="flex flex-1 flex-col p-5">
-                  <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
-                    {localized(p.district.name, locale)}
-                  </span>
-                  <h3 className="mt-2 font-semibold">{p.title}</h3>
-                  <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
-                    {p.body}
-                  </p>
-                  <time className="mt-3 text-xs text-gray-400">
-                    {p.createdAt.toISOString().slice(0, 10)}
-                  </time>
-                  </div>
-                </li>
-              ))}
-            </ul>
+      {/* Impact stats */}
+      <section className="border-y border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40">
+        <div className="mx-auto w-full max-w-5xl px-4 py-14">
+          <div className="mb-8 text-center">
+            <h2 className="text-2xl font-bold">{t("statsTitle")}</h2>
+            <p className="mt-1 text-sm text-gray-500">{t("statsSubtitle")}</p>
           </div>
-        </section>
-      )}
+          <dl className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.label} className="text-center">
+                <dt className="text-4xl font-extrabold tabular-nums text-emerald-700 dark:text-emerald-400">
+                  {s.value.toLocaleString(locale)}
+                </dt>
+                <dd className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {s.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-20">
+        <div className="mb-10 text-center">
+          <h2 className="text-2xl font-bold">{t("howTitle")}</h2>
+          <p className="mt-1 text-sm text-gray-500">{t("howSubtitle")}</p>
+        </div>
+        <ol className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((step, i) => (
+            <li
+              key={step.title}
+              className="rounded-xl border border-gray-200 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md dark:border-gray-800"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-lg font-bold text-white">
+                {i + 1}
+              </span>
+              <h3 className="mt-4 font-semibold">{step.title}</h3>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                {step.body}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       {/* Featured programs */}
       {featured.length > 0 && (
