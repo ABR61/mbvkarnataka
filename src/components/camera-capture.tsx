@@ -5,9 +5,10 @@ import { useTranslations } from "next-intl";
 
 /**
  * Live camera capture — no file attachment. Streams the device camera via
- * getUserMedia and grabs a still frame on demand, so an applicant must take a
- * fresh photo (front camera by default) rather than upload an existing one.
- * Requires a secure context (https or localhost).
+ * getUserMedia and grabs a still frame on demand, so the user must take a fresh
+ * photo (front camera by default) rather than upload an existing one. Used for
+ * applicant photos and future-program photos. Requires a secure context
+ * (https or localhost).
  */
 export function CameraCapture({
   onCapture,

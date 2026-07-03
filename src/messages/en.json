@@ -480,7 +480,8 @@
     "ratingCount": "{count, plural, one {# review} other {# reviews}}",
     "testimonialsTitle": "What participants say",
     "testimonialsIntro": "Feedback from people who have completed our programs.",
-    "applyNow": "Apply now"
+    "applyNow": "Apply now",
+    "photoCameraHint": "Take a live photo with your camera — no file uploads."
   },
   "Posts": {
     "title": "Posts",

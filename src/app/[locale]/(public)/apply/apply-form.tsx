@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { GENDERS } from "@/lib/validation/person";
-import { CameraCapture } from "./camera-capture";
+import { CameraCapture } from "@/components/camera-capture";
 import { createApplication, type ApplyState } from "./actions";
 
 type Option = { id: string; name: string };
