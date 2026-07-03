@@ -436,7 +436,8 @@
     "users": "Users",
     "moodle": "Moodle (LMS)",
     "completions": "Completions",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "staff": "Staff"
   },
   "FuturePrograms": {
     "title": "Future programs",
@@ -809,5 +810,30 @@
     "invalid": "Sorry, that could not be submitted.",
     "certificateEarned": "Certificate earned!",
     "viewCertificate": "View certificate"
+  },
+  "Staff": {
+    "title": "Staff members",
+    "intro": "Manage staff and record their daily attendance. Admin-only.",
+    "addStaff": "Add staff",
+    "attendance": "Attendance",
+    "name": "Name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "role": "Role",
+    "roleHint": "e.g. Coordinator, Trainer, Accountant",
+    "empty": "No staff members yet.",
+    "confirmDelete": "Remove this staff member?",
+    "attendanceTitle": "Staff attendance",
+    "attendanceIntro": "Mark attendance for staff members for a day.",
+    "date": "Date",
+    "show": "Show",
+    "saved": "Attendance saved.",
+    "status": "Status",
+    "saveAttendance": "Save attendance",
+    "status_PRESENT": "Present",
+    "status_ABSENT": "Absent",
+    "status_LATE": "Late",
+    "status_EXCUSED": "Excused"
   }
 }

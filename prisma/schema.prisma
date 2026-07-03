@@ -142,6 +142,7 @@ model Person {
   district           District?           @relation(fields: [districtId], references: [id])
   enrollments        Enrollment[]
   attendances        Attendance[]
+  staffAttendances   StaffAttendance[]
   trainerSessions    TrainingSession[]   @relation("SessionTrainer")
   coordinatedCohorts Cohort[]            @relation("CohortCoordinator")
   trainerAssignments TrainerAssignment[]
@@ -415,6 +416,24 @@ model Attendance {
 
   @@unique([sessionId, personId])
   @@index([personId])
+}
+
+// Admin-only daily attendance for STAFF members (not tied to a training session).
+model StaffAttendance {
+  id         String           @id @default(cuid())
+  personId   String
+  date       DateTime         @db.Date // the calendar day, one row per staff per day
+  status     AttendanceStatus @default(PRESENT)
+  note       String?
+  districtId String? // snapshot of the staff member's district for scoping
+  markedById String?
+  createdAt  DateTime         @default(now())
+
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, date])
+  @@index([date])
+  @@index([districtId])
 }
 
 model TrainerAssignment {

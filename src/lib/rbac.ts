@@ -17,6 +17,7 @@ export const PERMISSIONS = [
   "post.manage", // branch posts / announcements
   "program.plan", // branch admins plan future programs
   "feedback.manage", // mark completers & moderate participant feedback
+  "staff.manage", // staff members & their daily attendance (admin-only)
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -46,6 +47,7 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
     "post.manage",
     "program.plan",
     "feedback.manage",
+    "staff.manage",
   ],
   CenterManager: [
     "center.manage",
