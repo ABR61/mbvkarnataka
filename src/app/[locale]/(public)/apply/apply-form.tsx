@@ -152,15 +152,12 @@ export function ApplyForm({
       </div>
 
       <div className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">{t("photo")} *</span>
-        <span className="text-xs text-gray-500">{t("photoHint")}</span>
+        <span className="font-medium">{t("photo")}</span>
+        <span className="text-xs text-gray-500">{t("photoOptionalHint")}</span>
         <div className="mt-1">
           <CameraCapture onCapture={setPhoto} />
         </div>
         <input type="hidden" name="photoUrl" value={photo} />
-        {state.fieldErrors?.photoUrl && (
-          <span className="text-sm text-red-600">{t("photoRequired")}</span>
-        )}
       </div>
 
       <label className="flex flex-col gap-1 text-sm">

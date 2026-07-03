@@ -125,7 +125,8 @@
     "takePhoto": "Take photo",
     "retake": "Retake",
     "cameraDenied": "Camera access was blocked. Please allow camera permission and try again.",
-    "cameraUnsupported": "Live camera is not available on this device or browser."
+    "cameraUnsupported": "Live camera is not available on this device or browser.",
+    "photoOptionalHint": "Optional — take a live photo with your camera (needed on mobile for attendance)."
   },
   "Applications": {
     "title": "Applications",

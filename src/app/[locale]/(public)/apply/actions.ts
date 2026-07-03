@@ -28,13 +28,14 @@ export async function createApplication(
   if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
   const d = parsed.data;
 
-  // Applicant photo, captured on their phone — required, image data URL, ~2MB cap.
+  // Applicant photo, captured live on the camera — OPTIONAL for now (so it can
+  // be submitted from a laptop without a camera). Stored if provided; to make it
+  // mandatory again, re-add: if (!photoUrl) return { fieldErrors: { photoUrl: "required" } };
   const rawPhoto = ((formData.get("photoUrl") as string) ?? "").trim();
   const photoUrl =
     rawPhoto.startsWith("data:image/") && rawPhoto.length < 2_200_000
       ? rawPhoto
       : null;
-  if (!photoUrl) return { fieldErrors: { photoUrl: "required" } };
 
   if (formData.get("consent") !== "on") {
     return { fieldErrors: { consent: "required" } };

@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
+import { BranchCarousel } from "@/components/public/branch-carousel";
 
 // Pulls live counts + featured programs from the DB → render per-request.
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ export default async function HomePage({
       prisma.post.findMany({
         where: { approved: true },
         orderBy: { createdAt: "desc" },
-        take: 6,
+        take: 12,
         include: { district: true },
       }),
     ]);
@@ -100,35 +101,44 @@ export default async function HomePage({
               <h2 className="text-2xl font-bold">{t("newsTitle")}</h2>
               <p className="mt-1 text-sm text-gray-500">{t("newsSubtitle")}</p>
             </div>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((p) => (
-                <li
-                  key={p.id}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-gray-800 dark:bg-gray-950"
-                >
-                  {p.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={p.imageUrl}
-                      alt=""
-                      className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  )}
-                  <div className="flex flex-1 flex-col p-5">
-                  <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
-                    {localized(p.district.name, locale)}
-                  </span>
-                  <h3 className="mt-2 font-semibold">{p.title}</h3>
-                  <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
-                    {p.body}
-                  </p>
-                  <time className="mt-3 text-xs text-gray-400">
-                    {p.createdAt.toISOString().slice(0, 10)}
-                  </time>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {(() => {
+              const slides = posts
+                .filter((p) => p.imageUrl)
+                .slice(0, 3) // carousel shows the 3 most recent branch pictures
+                .map((p) => ({
+                  id: p.id,
+                  imageUrl: p.imageUrl as string,
+                  title: p.title,
+                  body: p.body,
+                  district: localized(p.district.name, locale),
+                  date: p.createdAt.toISOString().slice(0, 10),
+                }));
+              // Rotating full-picture carousel when branches have photos; a text
+              // grid as a fallback if none of the posts carry an image.
+              return slides.length > 0 ? (
+                <BranchCarousel slides={slides} />
+              ) : (
+                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {posts.map((p) => (
+                    <li
+                      key={p.id}
+                      className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-950"
+                    >
+                      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                        {localized(p.district.name, locale)}
+                      </span>
+                      <h3 className="mt-2 font-semibold">{p.title}</h3>
+                      <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
+                        {p.body}
+                      </p>
+                      <time className="mt-3 text-xs text-gray-400">
+                        {p.createdAt.toISOString().slice(0, 10)}
+                      </time>
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
           </div>
         </section>
       )}
