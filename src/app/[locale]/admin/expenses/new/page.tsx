@@ -1,10 +1,14 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requirePermission } from "@/lib/auth-guards";
+import { scopedDistrictId } from "@/lib/branch-scope";
+import { prisma } from "@/lib/prisma";
+import { localized } from "@/lib/localized";
 import {
   programOptions,
   cohortOptions,
   centerOptions,
   vendorOptions,
+  districtOptions,
 } from "@/lib/options";
 import { ExpenseForm } from "../expense-form";
 import { createExpense } from "../actions";
@@ -16,14 +20,20 @@ export default async function NewExpensePage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requirePermission("finance.manage");
+  const session = await requirePermission("expense.record");
 
-  const [programs, cohorts, centers, vendors] = await Promise.all([
-    programOptions(locale),
-    cohortOptions(locale),
-    centerOptions(locale),
-    vendorOptions(),
-  ]);
+  const scope = scopedDistrictId(session);
+  const [programs, cohorts, centers, vendors, districts, fixed] =
+    await Promise.all([
+      programOptions(locale),
+      cohortOptions(locale),
+      centerOptions(locale),
+      vendorOptions(),
+      scope ? Promise.resolve(undefined) : districtOptions(locale),
+      scope
+        ? prisma.district.findUnique({ where: { id: scope } })
+        : Promise.resolve(null),
+    ]);
   const t = await getTranslations("Expenses");
 
   return (
@@ -35,6 +45,8 @@ export default async function NewExpensePage({
         cohorts={cohorts}
         centers={centers}
         vendors={vendors}
+        districts={districts}
+        fixedDistrictName={fixed ? localized(fixed.name, locale) : undefined}
         action={createExpense}
       />
     </div>

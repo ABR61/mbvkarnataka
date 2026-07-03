@@ -18,6 +18,7 @@ export const PERMISSIONS = [
   "program.plan", // branch admins plan future programs
   "feedback.manage", // mark completers & moderate participant feedback
   "staff.manage", // staff members & their daily attendance (admin-only)
+  "expense.record", // record & view expenses (branch admins: own district only)
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -48,6 +49,7 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
     "program.plan",
     "feedback.manage",
     "staff.manage",
+    "expense.record",
   ],
   CenterManager: [
     "center.manage",
@@ -66,7 +68,7 @@ export const ROLE_PERMISSIONS: Record<Exclude<RoleName, "Admin">, Permission[]> 
     "report.view",
   ],
   Trainer: ["session.manage", "attendance.mark"],
-  Finance: ["finance.manage", "report.view"],
+  Finance: ["finance.manage", "report.view", "expense.record"],
   Placement: ["placement.manage", "report.view"],
   Trainee: [],
 };

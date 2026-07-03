@@ -14,6 +14,8 @@ export function ExpenseForm({
   cohorts,
   centers,
   vendors,
+  districts,
+  fixedDistrictName,
   action,
   defaults = {},
 }: {
@@ -22,6 +24,8 @@ export function ExpenseForm({
   cohorts: Option[];
   centers: Option[];
   vendors: Option[];
+  districts?: Option[];
+  fixedDistrictName?: string;
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   defaults?: {
     id?: string;
@@ -33,6 +37,7 @@ export function ExpenseForm({
     programId?: string;
     cohortId?: string;
     centerId?: string;
+    districtId?: string;
     status?: string;
   };
 }) {
@@ -112,6 +117,15 @@ export function ExpenseForm({
         </label>
         {select("vendorId", t("vendor"), vendors, defaults.vendorId)}
       </div>
+
+      {/* District: a branch admin's is fixed to theirs; a super admin picks one. */}
+      {fixedDistrictName ? (
+        <p className="text-sm text-gray-500">
+          {tc("district")}: <span className="font-medium">{fixedDistrictName}</span>
+        </p>
+      ) : (
+        districts && select("districtId", tc("district"), districts, defaults.districtId)
+      )}
 
       {select("programId", t("program"), programs, defaults.programId)}
       <div className="grid grid-cols-2 gap-3">

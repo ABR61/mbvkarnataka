@@ -14,7 +14,7 @@ export default async function FinanceStatusPage({
   const { locale } = await params;
   setRequestLocale(locale);
   await requirePermission("finance.manage");
-  const f = await financialStatus();
+  const f = await financialStatus(locale);
   const t = await getTranslations("Finance");
 
   const card =
@@ -138,6 +138,42 @@ export default async function FinanceStatusPage({
           </table>
         )}
       </section>
+
+      {/* Spend by branch (district) — what each branch admin reported */}
+      {f.byDistrict.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("byDistrict")}
+          </h2>
+          <table className="w-full text-sm">
+            <thead>
+              <tr>
+                <th className={th}>{t("branch")}</th>
+                <th className={thNum}>{t("amount")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {f.byDistrict.map((d) => (
+                <tr key={d.district}>
+                  <td className={td}>
+                    {d.districtId ? (
+                      <Link
+                        href={`/admin/expenses?district=${d.districtId}`}
+                        className="text-emerald-700 hover:underline"
+                      >
+                        {d.district}
+                      </Link>
+                    ) : (
+                      d.district
+                    )}
+                  </td>
+                  <td className={tdNum}>{formatINR(d.total)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      )}
 
       {/* Recent expenses */}
       <section>

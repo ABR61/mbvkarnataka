@@ -175,6 +175,7 @@ model District {
   posts          Post[]
   futurePrograms FutureProgram[]
   completions    Completion[]
+  expenses       Expense[]
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -595,17 +596,20 @@ model Expense {
   cohortId    String?
   centerId    String?
   vendorId    String?
+  districtId  String? // the branch (district) this spend belongs to
   createdById String?
   createdAt   DateTime      @default(now())
 
-  program       Program? @relation(fields: [programId], references: [id], onDelete: SetNull)
-  cohort        Cohort?  @relation(fields: [cohortId], references: [id], onDelete: SetNull)
-  center        Center?  @relation(fields: [centerId], references: [id], onDelete: SetNull)
-  vendorRecord  Vendor?  @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  program       Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
+  cohort        Cohort?   @relation(fields: [cohortId], references: [id], onDelete: SetNull)
+  center        Center?   @relation(fields: [centerId], references: [id], onDelete: SetNull)
+  vendorRecord  Vendor?   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  district      District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
 
   @@index([programId])
   @@index([status])
   @@index([incurredOn])
+  @@index([districtId])
 }
 
 model Vendor {

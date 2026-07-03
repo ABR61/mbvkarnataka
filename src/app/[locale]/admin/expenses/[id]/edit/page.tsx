@@ -1,12 +1,15 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { requirePermission } from "@/lib/auth-guards";
+import { requirePermission, assertDistrict } from "@/lib/auth-guards";
+import { scopedDistrictId } from "@/lib/branch-scope";
+import { localized } from "@/lib/localized";
 import {
   programOptions,
   cohortOptions,
   centerOptions,
   vendorOptions,
+  districtOptions,
 } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ExpenseForm } from "../../expense-form";
@@ -19,17 +22,24 @@ export default async function EditExpensePage({
 }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  await requirePermission("finance.manage");
+  const session = await requirePermission("expense.record");
 
   const expense = await prisma.expense.findUnique({ where: { id } });
   if (!expense) notFound();
+  assertDistrict(session, expense.districtId); // branch admins: own district only
 
-  const [programs, cohorts, centers, vendors] = await Promise.all([
-    programOptions(locale),
-    cohortOptions(locale),
-    centerOptions(locale),
-    vendorOptions(),
-  ]);
+  const scope = scopedDistrictId(session);
+  const [programs, cohorts, centers, vendors, districts, fixed] =
+    await Promise.all([
+      programOptions(locale),
+      cohortOptions(locale),
+      centerOptions(locale),
+      vendorOptions(),
+      scope ? Promise.resolve(undefined) : districtOptions(locale),
+      expense.districtId
+        ? prisma.district.findUnique({ where: { id: expense.districtId } })
+        : Promise.resolve(null),
+    ]);
   const t = await getTranslations("Expenses");
   const tc = await getTranslations("Common");
 
@@ -43,6 +53,8 @@ export default async function EditExpensePage({
         cohorts={cohorts}
         centers={centers}
         vendors={vendors}
+        districts={districts}
+        fixedDistrictName={scope && fixed ? localized(fixed.name, locale) : undefined}
         action={updateExpense}
         defaults={{
           id: expense.id,
@@ -54,6 +66,7 @@ export default async function EditExpensePage({
           programId: expense.programId ?? "",
           cohortId: expense.cohortId ?? "",
           centerId: expense.centerId ?? "",
+          districtId: expense.districtId ?? "",
           status: expense.status,
         }}
       />

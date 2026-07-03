@@ -266,7 +266,9 @@
     "status_APPROVED": "Approved",
     "status_PAID": "Paid",
     "empty": "No expenses yet.",
-    "confirmDelete": "Delete this expense? This cannot be undone."
+    "confirmDelete": "Delete this expense? This cannot be undone.",
+    "allBranches": "All branches",
+    "filter": "Filter"
   },
   "Budgets": {
     "title": "Budgets",
@@ -876,7 +878,9 @@
     "noExpenses": "No expenses recorded yet.",
     "status_PAID": "Paid",
     "status_APPROVED": "Approved",
-    "status_PENDING": "Pending"
+    "status_PENDING": "Pending",
+    "byDistrict": "Spend by branch",
+    "branch": "Branch"
   },
   "Clock": {
     "title": "Staff clock in / out",
