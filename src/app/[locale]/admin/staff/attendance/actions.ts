@@ -9,13 +9,19 @@ import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 
 const PERMISSION = "staff.manage" as const;
-const STATUSES = ["PRESENT", "ABSENT", "LATE", "EXCUSED"] as const;
+const STATUSES = ["PRESENT", "ABSENT", "LATE", "EXCUSED", "HOLIDAY"] as const;
 
 /** Parse a YYYY-MM-DD string to a UTC-midnight Date (matches @db.Date storage). */
 function parseDay(raw: string): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
   const d = new Date(`${raw}T00:00:00.000Z`);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** Accept a valid "HH:MM" time, else null. */
+function parseTime(raw: FormDataEntryValue | null): string | null {
+  const v = String(raw ?? "").trim();
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(v) ? v : null;
 }
 
 /** Save the whole day's staff attendance in one submit (one row per staff/day). */
@@ -28,7 +34,10 @@ export async function saveStaffAttendance(formData: FormData): Promise<void> {
   if (!date) return;
 
   // Only staff within the admin's scope can be marked.
-  const where: Prisma.PersonWhereInput = withDistrictScope({ kind: "STAFF" }, scope);
+  const where: Prisma.PersonWhereInput = withDistrictScope(
+    { kind: { in: ["STAFF", "TRAINER"] } },
+    scope,
+  );
   const staff = await prisma.person.findMany({
     where,
     select: { id: true, districtId: true },
@@ -38,16 +47,20 @@ export async function saveStaffAttendance(formData: FormData): Promise<void> {
     const raw = String(formData.get(`status_${s.id}`) ?? "");
     if (!(STATUSES as readonly string[]).includes(raw)) continue;
     const status = raw as AttendanceStatus;
+    const checkIn = parseTime(formData.get(`in_${s.id}`));
+    const checkOut = parseTime(formData.get(`out_${s.id}`));
     await prisma.staffAttendance.upsert({
       where: { personId_date: { personId: s.id, date } },
       create: {
         personId: s.id,
         date,
         status,
+        checkIn,
+        checkOut,
         districtId: s.districtId,
         markedById: session.user.id,
       },
-      update: { status, markedById: session.user.id },
+      update: { status, checkIn, checkOut, markedById: session.user.id },
     });
   }
   await writeAudit(session.user.id, "update", "StaffAttendance", date.toISOString().slice(0, 10));

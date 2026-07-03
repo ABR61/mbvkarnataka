@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +29,9 @@ export default async function PortalPage({
       },
     },
   });
+
+  // Trainers have their own home (self clock-in + attendance).
+  if (person?.kind === "TRAINER") redirect(`/${locale}/trainer`);
 
   if (!person) {
     return <p className="text-gray-500">{t("noProfile")}</p>;
@@ -119,6 +123,8 @@ export default async function PortalPage({
         ) : (
           <table className="w-full text-sm">
             <tbody>
+              {/* Attendance status is intentionally not shown to students —
+                  only admins/trainers can see attendance. */}
               {sessions.map((s) => (
                 <tr key={s.id}>
                   <td className={td}>
@@ -126,11 +132,6 @@ export default async function PortalPage({
                     {s.startTime ? ` ${s.startTime}` : ""}
                   </td>
                   <td className={td}>{localized(s.course.name, locale)}</td>
-                  <td className={`${td} text-gray-500`}>
-                    {s.attendances[0]
-                      ? t(`attendance_${s.attendances[0].status}`)
-                      : "—"}
-                  </td>
                 </tr>
               ))}
             </tbody>

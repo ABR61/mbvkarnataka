@@ -62,7 +62,7 @@ export async function deleteStaff(formData: FormData): Promise<void> {
     where: { id },
     select: { districtId: true, kind: true },
   });
-  if (!person || person.kind !== "STAFF") return;
+  if (!person || (person.kind !== "STAFF" && person.kind !== "TRAINER")) return;
   assertDistrict(session, person.districtId);
 
   await prisma.person.delete({ where: { id } });

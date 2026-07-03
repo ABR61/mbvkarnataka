@@ -9,7 +9,7 @@ import { saveStaffAttendance } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-const STATUSES = ["PRESENT", "ABSENT", "LATE", "EXCUSED"] as const;
+const STATUSES = ["PRESENT", "ABSENT", "LATE", "EXCUSED", "HOLIDAY"] as const;
 
 export default async function StaffAttendancePage({
   params,
@@ -28,7 +28,7 @@ export default async function StaffAttendancePage({
   const date = new Date(`${day}T00:00:00.000Z`);
 
   const where: Prisma.PersonWhereInput = withDistrictScope(
-    { kind: "STAFF" },
+    { kind: { in: ["STAFF", "TRAINER"] } },
     scopedDistrictId(session),
   );
   const staff = await prisma.person.findMany({
@@ -87,17 +87,21 @@ export default async function StaffAttendancePage({
         <form action={saveStaffAttendance} className="flex flex-col gap-4">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="date" value={day} />
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr>
                 <th className={th}>{t("name")}</th>
                 <th className={th}>{tc("district")}</th>
                 <th className={th}>{t("status")}</th>
+                <th className={th}>{t("checkIn")}</th>
+                <th className={th}>{t("checkOut")}</th>
               </tr>
             </thead>
             <tbody>
               {staff.map((s) => {
-                const current = s.staffAttendances[0]?.status ?? "PRESENT";
+                const rec = s.staffAttendances[0];
+                const current = rec?.status ?? "PRESENT";
                 return (
                   <tr key={s.id}>
                     <td className={td}>
@@ -119,11 +123,28 @@ export default async function StaffAttendancePage({
                         ))}
                       </select>
                     </td>
+                    <td className={td}>
+                      <input
+                        type="time"
+                        name={`in_${s.id}`}
+                        defaultValue={rec?.checkIn ?? ""}
+                        className={field}
+                      />
+                    </td>
+                    <td className={td}>
+                      <input
+                        type="time"
+                        name={`out_${s.id}`}
+                        defaultValue={rec?.checkOut ?? ""}
+                        className={field}
+                      />
+                    </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
+          </div>
           <div>
             <button
               type="submit"

@@ -21,7 +21,7 @@ export default async function StaffPage({
 
   // Branch admins see only their district's staff; super admins see all.
   const where: Prisma.PersonWhereInput = withDistrictScope(
-    { kind: "STAFF" },
+    { kind: { in: ["STAFF", "TRAINER"] } },
     scopedDistrictId(session),
   );
   const staff = await prisma.person.findMany({
@@ -44,6 +44,14 @@ export default async function StaffPage({
           <p className="mt-1 text-sm text-gray-500">{t("intro")}</p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <a
+            href={`/${locale}/clock`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+          >
+            {t("clockKiosk")}
+          </a>
           <Link
             href="/admin/staff/attendance"
             className="rounded-md border border-emerald-600 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
@@ -76,7 +84,12 @@ export default async function StaffPage({
             {staff.map((s) => (
               <tr key={s.id}>
                 <td className={td}>
-                  {[s.firstName, s.lastName].filter(Boolean).join(" ")}
+                  <Link
+                    href={`/admin/staff/${s.id}`}
+                    className="font-medium text-emerald-700 hover:underline"
+                  >
+                    {[s.firstName, s.lastName].filter(Boolean).join(" ")}
+                  </Link>
                 </td>
                 <td className={td}>{s.address ?? "—"}</td>
                 <td className={td}>{s.phone ?? "—"}</td>

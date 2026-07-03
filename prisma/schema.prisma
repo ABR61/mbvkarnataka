@@ -143,6 +143,7 @@ model Person {
   enrollments        Enrollment[]
   attendances        Attendance[]
   staffAttendances   StaffAttendance[]
+  credentials        StaffCredential[]
   trainerSessions    TrainingSession[]   @relation("SessionTrainer")
   coordinatedCohorts Cohort[]            @relation("CohortCoordinator")
   trainerAssignments TrainerAssignment[]
@@ -424,6 +425,8 @@ model StaffAttendance {
   personId   String
   date       DateTime         @db.Date // the calendar day, one row per staff per day
   status     AttendanceStatus @default(PRESENT)
+  checkIn    String? // login time "HH:MM"
+  checkOut   String? // logout time "HH:MM"
   note       String?
   districtId String? // snapshot of the staff member's district for scoping
   markedById String?
@@ -434,6 +437,23 @@ model StaffAttendance {
   @@unique([personId, date])
   @@index([date])
   @@index([districtId])
+}
+
+// A registered device biometric (fingerprint / Face ID via WebAuthn) that lets a
+// staff member clock in/out. One row per enrolled device per staff member.
+model StaffCredential {
+  id           String   @id @default(cuid())
+  personId     String
+  credentialId String   @unique // base64url of the WebAuthn credential id
+  publicKey    String // base64url of the COSE public key
+  counter      Int      @default(0)
+  transports   String? // csv of authenticator transports
+  deviceLabel  String?
+  createdAt    DateTime @default(now())
+
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId])
 }
 
 model TrainerAssignment {
@@ -754,4 +774,5 @@ enum AttendanceStatus {
   ABSENT
   LATE
   EXCUSED
+  HOLIDAY
 }

@@ -93,7 +93,22 @@ export function ExpenseForm({
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{t("category")}</span>
-          <input name="category" defaultValue={defaults.category} className={field} />
+          <input
+            name="category"
+            defaultValue={defaults.category}
+            list="expense-categories"
+            className={field}
+          />
+          <datalist id="expense-categories">
+            <option value="Salary" />
+            <option value="Event" />
+            <option value="Travel" />
+            <option value="Materials" />
+            <option value="Venue" />
+            <option value="Utilities" />
+            <option value="Training" />
+            <option value="Other" />
+          </datalist>
         </label>
         {select("vendorId", t("vendor"), vendors, defaults.vendorId)}
       </div>
