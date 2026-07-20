@@ -26,24 +26,25 @@ export async function PublicHeader() {
 
   const apply = { href: "/apply", label: t("apply") };
 
-  // Plain links shown after the About dropdown on desktop.
+  // Plain links shown after the About dropdown on desktop. Objectives and
+  // how-it-works are sections of /about now, not anchors on the home page.
   const rest = [
-    { href: { pathname: "/", hash: "objectives" }, label: t("objectives") },
-    { href: { pathname: "/", hash: "how" }, label: t("howItWorks") },
+    { href: { pathname: "/about", hash: "objectives" }, label: t("objectives") },
+    { href: { pathname: "/about", hash: "how" }, label: t("howItWorks") },
     { href: "/branches", label: t("branches") },
   ];
 
-  // Programs dropdown groups programs, future programs, and reports.
+  // Programs dropdown groups programs and future programs. Activities aren't
+  // here — they're the home page.
   const programsItems = [
     { href: "/programs", label: t("programs") },
     { href: "/future-programs", label: tc("futureCta") },
-    { href: "/reports", label: tc("reportsCta") },
   ];
 
   // Flattened list for the mobile menu (dropdowns expand into their links).
   const mobileLinks = [
     { href: { pathname: "/", hash: "top" }, label: t("home") },
-    { href: { pathname: "/", hash: "about" }, label: t("aboutUs") },
+    { href: "/about", label: t("aboutUs") },
     { href: "/contact", label: tc("contactTitle") },
     ...rest,
     ...programsItems,
@@ -64,7 +65,7 @@ export async function PublicHeader() {
           <NavDropdown
             label={t("about")}
             items={[
-              { href: { pathname: "/", hash: "about" }, label: t("aboutUs") },
+              { href: "/about", label: t("aboutUs") },
               { href: "/contact", label: tc("contactTitle") },
             ]}
           />

@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { CameraCapture } from "@/components/camera-capture";
+import { ImagePicker } from "@/components/image-picker";
 import type { FormState } from "@/lib/forms";
 
 type District = { id: string; name: string };
@@ -72,9 +72,9 @@ export function FutureProgramForm({
 
       <div className="flex flex-col gap-1 text-sm">
         <span className="font-medium">{t("photo")}</span>
-        <span className="text-xs text-gray-500">{t("photoCameraHint")}</span>
+        <span className="text-xs text-gray-500">{t("photoUploadHint")}</span>
         <div className="mt-1">
-          <CameraCapture onCapture={setImage} />
+          <ImagePicker kind="future-program" value={image} onChange={setImage} />
         </div>
       </div>
 

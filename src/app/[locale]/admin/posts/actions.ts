@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
+import { sanitizeImageUrl } from "@/lib/storage";
 import type { FormState } from "@/lib/forms";
 
 const PERMISSION = "post.manage" as const;
@@ -26,12 +27,8 @@ export async function createPost(
   if (!title) return { fieldErrors: { title: "required" } };
   if (!body) return { fieldErrors: { body: "required" } };
 
-  // Optional inline photo: only accept a reasonably-sized image data URL.
-  const rawImage = ((formData.get("imageUrl") as string) ?? "").trim();
-  const imageUrl =
-    rawImage.startsWith("data:image/") && rawImage.length < 2_200_000
-      ? rawImage
-      : null;
+  // Optional photo: an R2 public URL (real upload) or a data URL (dev fallback).
+  const imageUrl = sanitizeImageUrl((formData.get("imageUrl") as string) ?? "");
 
   // Branch admins post to their own district; a super admin picks one.
   const scope = scopedDistrictId(session);

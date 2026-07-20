@@ -37,12 +37,6 @@
     "branchesTitle": "Our branches",
     "branchesSubtitle": "Find an MBV branch near you.",
     "branchesPlaceholder": "Branch details coming soon.",
-    "newsTitle": "Updates from our branches",
-    "newsSubtitle": "Latest news and announcements from MBV districts.",
-    "reportsCta": "Reports",
-    "reportsTitle": "Activity reports",
-    "reportsSubtitle": "Recent activity photos and updates from across MBV.",
-    "reportsEmpty": "No activity reports yet. Branch admins can post photos with a description.",
     "futureCta": "Future programs",
     "futureTitle": "Future programs",
     "futureSubtitle": "Upcoming training programs and activities at MBV.",
@@ -70,7 +64,10 @@
     "contactPhone": "+91 80 0000 0000",
     "contactAddress": "Bengaluru, Karnataka, India",
     "footerLinks": "Quick links",
-    "footerRights": "All rights reserved."
+    "footerRights": "All rights reserved.",
+    "activitiesTitle": "Our activities",
+    "activitiesSubtitle": "Recent activity photos and updates from across MBV.",
+    "activitiesEmpty": "No activity reports yet. Branch admins can post photos with a description."
   },
   "Public": {
     "home": "Home",
@@ -486,7 +483,8 @@
     "testimonialsTitle": "What participants say",
     "testimonialsIntro": "Feedback from people who have completed our programs.",
     "applyNow": "Apply now",
-    "photoCameraHint": "Take a live photo with your camera — no file uploads."
+    "photoCameraHint": "Take a live photo with your camera — no file uploads.",
+    "photoUploadHint": "Upload a photo, or take one with your camera."
   },
   "Posts": {
     "title": "Posts",
@@ -495,7 +493,7 @@
     "titleField": "Title",
     "description": "Description",
     "photo": "Photo",
-    "photoHint": "Optional. JPG/PNG, up to ~1.5 MB.",
+    "photoHint": "Optional. Upload a photo or use your camera.",
     "imageType": "Please choose an image file.",
     "imageTooBig": "Image is too large (max ~1.5 MB).",
     "district": "District",
@@ -917,5 +915,17 @@
     "err_alreadyIn": "You have already logged in today.",
     "err_notInYet": "Please log in first.",
     "err_notTrainer": "Not a trainer account."
+  },
+  "ImageUpload": {
+    "choosePhoto": "Choose photo",
+    "useCamera": "Use camera",
+    "takePhoto": "Take photo",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "uploading": "Uploading…",
+    "uploadFailed": "Upload failed. Please try again.",
+    "notAnImage": "Please choose an image file.",
+    "cameraUnsupported": "Camera is not available on this device.",
+    "cameraDenied": "Camera access was blocked."
   }
 }

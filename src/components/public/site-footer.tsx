@@ -9,9 +9,9 @@ export async function SiteFooter() {
 
   const links = [
     { href: "/", label: t("home") },
+    { href: "/about", label: t("aboutUs") },
     { href: "/programs", label: t("programs") },
     { href: "/branches", label: t("branches") },
-    { href: "/reports", label: tc("reportsCta") },
     { href: "/future-programs", label: tc("futureCta") },
     { href: "/contact", label: tc("contactTitle") },
     { href: "/apply", label: t("apply") },

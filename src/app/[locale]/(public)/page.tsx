@@ -7,6 +7,13 @@ import { BranchCarousel } from "@/components/public/branch-carousel";
 // Pulls live counts + featured programs from the DB → render per-request.
 export const dynamic = "force-dynamic";
 
+// How many recent photo posts to consider, and how many survive to the grid.
+// Bounded so the page cost stays flat as branches keep posting. Per-district
+// capping happens in JS, so the pool is deliberately larger than the grid.
+const HOME_PHOTO_POOL = 60;
+const HOME_PHOTO_GRID = 24;
+const PER_DISTRICT_CAP = 4;
+
 export default async function HomePage({
   params,
 }: {
@@ -16,7 +23,9 @@ export default async function HomePage({
   setRequestLocale(locale);
   const t = await getTranslations("HomePage");
 
-  // Live impact numbers, featured programs, and latest branch posts in one round-trip.
+  // Live impact numbers, featured programs, and recent activity photos in one
+  // round-trip. The photo query is bounded: without a take, an image-heavy site
+  // would pull every approved post (and its inline image payload) per request.
   const [trainees, programs, districts, placements, featured, posts] =
     await Promise.all([
       prisma.person.count({ where: { kind: "TRAINEE" } }),
@@ -29,12 +38,34 @@ export default async function HomePage({
         take: 3,
       }),
       prisma.post.findMany({
-        where: { approved: true },
+        where: { imageUrl: { not: null }, approved: true },
         orderBy: { createdAt: "desc" },
-        take: 12,
+        take: HOME_PHOTO_POOL,
         include: { district: true },
       }),
     ]);
+
+  // The 3 newest photos headline the carousel; the gallery below shows the rest,
+  // capped at 4 per district so no single branch floods the page.
+  const slides = posts.slice(0, 3).map((p) => ({
+    id: p.id,
+    imageUrl: p.imageUrl as string,
+    title: p.title,
+    body: p.body,
+    district: localized(p.district.name, locale),
+    date: p.createdAt.toISOString().slice(0, 10),
+  }));
+  const headlined = new Set(slides.map((s) => s.id));
+  const perDistrict = new Map<string, number>();
+  const activities = posts
+    .filter((p) => {
+      if (headlined.has(p.id)) return false;
+      const n = perDistrict.get(p.districtId) ?? 0;
+      if (n >= PER_DISTRICT_CAP) return false;
+      perDistrict.set(p.districtId, n + 1);
+      return true;
+    })
+    .slice(0, HOME_PHOTO_GRID);
 
   const stats = [
     { value: trainees, label: t("statTrainees") },
@@ -42,23 +73,6 @@ export default async function HomePage({
     { value: districts, label: t("statDistricts") },
     { value: placements, label: t("statPlacements") },
   ];
-
-  const steps = [
-    { title: t("step1Title"), body: t("step1Body") },
-    { title: t("step2Title"), body: t("step2Body") },
-    { title: t("step3Title"), body: t("step3Body") },
-    { title: t("step4Title"), body: t("step4Body") },
-  ];
-
-  const aboutPoints = [t("aboutPoint1"), t("aboutPoint2"), t("aboutPoint3")];
-
-  const objectives = [
-    t("objective1"),
-    t("objective2"),
-    t("objective3"),
-    t("objective4"),
-  ];
-
 
   return (
     <main className="flex flex-1 flex-col">
@@ -90,114 +104,59 @@ export default async function HomePage({
         </Link>
       </section>
 
-      {/* Latest posts from branches */}
-      {posts.length > 0 && (
-        <section
-          id="news"
-          className="scroll-mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40"
-        >
-          <div className="mx-auto w-full max-w-5xl px-4 py-20">
-            <div className="mb-10 text-center">
-              <h2 className="text-2xl font-bold">{t("newsTitle")}</h2>
-              <p className="mt-1 text-sm text-gray-500">{t("newsSubtitle")}</p>
-            </div>
-            {(() => {
-              const slides = posts
-                .filter((p) => p.imageUrl)
-                .slice(0, 3) // carousel shows the 3 most recent branch pictures
-                .map((p) => ({
-                  id: p.id,
-                  imageUrl: p.imageUrl as string,
-                  title: p.title,
-                  body: p.body,
-                  district: localized(p.district.name, locale),
-                  date: p.createdAt.toISOString().slice(0, 10),
-                }));
-              // Rotating full-picture carousel when branches have photos; a text
-              // grid as a fallback if none of the posts carry an image.
-              return slides.length > 0 ? (
-                <BranchCarousel slides={slides} />
-              ) : (
-                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {posts.map((p) => (
-                    <li
-                      key={p.id}
-                      className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-950"
-                    >
-                      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
-                        {localized(p.district.name, locale)}
-                      </span>
-                      <h3 className="mt-2 font-semibold">{p.title}</h3>
-                      <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
-                        {p.body}
-                      </p>
-                      <time className="mt-3 text-xs text-gray-400">
-                        {p.createdAt.toISOString().slice(0, 10)}
-                      </time>
-                    </li>
-                  ))}
-                </ul>
-              );
-            })()}
-          </div>
-        </section>
-      )}
-
-      {/* About MBV */}
+      {/* Our activities — the showcase this page is built around */}
       <section
-        id="about"
+        id="activities"
         className="scroll-mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40"
       >
-        <div className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-20 lg:grid-cols-2 lg:items-center">
-          <div>
-            <h2 className="text-2xl font-bold">{t("aboutTitle")}</h2>
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
-              {t("aboutBody")}
+        <div className="mx-auto w-full max-w-6xl px-4 py-20">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold">{t("activitiesTitle")}</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              {t("activitiesSubtitle")}
             </p>
           </div>
-          <ul className="space-y-4">
-            {aboutPoints.map((point) => (
-              <li key={point} className="flex items-start gap-3">
-                <svg
-                  className="mt-0.5 h-6 w-6 flex-shrink-0 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-                <span className="text-gray-700 dark:text-gray-200">{point}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
 
-      {/* Objectives */}
-      <section id="objectives" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-20">
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-bold">{t("objectivesTitle")}</h2>
-          <p className="mt-1 text-sm text-gray-500">{t("objectivesSubtitle")}</p>
+          {slides.length > 0 && <BranchCarousel slides={slides} />}
+
+          {slides.length === 0 ? (
+            <p className="py-12 text-center text-gray-400">
+              {t("activitiesEmpty")}
+            </p>
+          ) : (
+            activities.length > 0 && (
+              <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                {activities.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={r.imageUrl as string}
+                      alt={r.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-32 w-full object-cover"
+                    />
+                    <div className="flex flex-1 flex-col p-4">
+                      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                        {localized(r.district.name, locale)}
+                      </span>
+                      <h3 className="mt-1.5 text-sm font-semibold">{r.title}</h3>
+                      <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
+                        {r.body}
+                      </p>
+                      <time className="mt-3 text-xs text-gray-400">
+                        {r.createdAt.toISOString().slice(0, 10)}
+                      </time>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )
+          )}
         </div>
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {objectives.map((obj, i) => (
-            <li
-              key={obj}
-              className="flex items-start gap-4 rounded-xl border border-gray-200 p-5 transition duration-300 hover:border-emerald-300 hover:shadow-sm dark:border-gray-800"
-            >
-              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                {i + 1}
-              </span>
-              <span className="text-gray-700 dark:text-gray-200">{obj}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       {/* Impact stats */}
@@ -220,30 +179,6 @@ export default async function HomePage({
             ))}
           </dl>
         </div>
-      </section>
-
-      {/* How it works */}
-      <section id="how" className="mx-auto w-full max-w-5xl scroll-mt-20 px-4 py-20">
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-bold">{t("howTitle")}</h2>
-          <p className="mt-1 text-sm text-gray-500">{t("howSubtitle")}</p>
-        </div>
-        <ol className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="rounded-xl border border-gray-200 p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md dark:border-gray-800"
-            >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-lg font-bold text-white">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 font-semibold">{step.title}</h3>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {step.body}
-              </p>
-            </li>
-          ))}
-        </ol>
       </section>
 
       {/* Featured programs */}

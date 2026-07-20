@@ -1,13 +1,8 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
-import { districtOptions } from "@/lib/options";
 import { completionProgramName } from "@/lib/program-ref";
-import { FutureProgramForm } from "@/app/[locale]/admin/future-programs/future-program-form";
-import { createFutureProgram } from "@/app/[locale]/admin/future-programs/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -31,38 +26,8 @@ export default async function FutureProgramsPage({
   const t = await getTranslations("HomePage");
   const tf = await getTranslations("FuturePrograms");
 
-  const session = await auth();
-  const canPlan = session?.user?.permissions?.includes("program.plan") ?? false;
-  const scope = session?.user?.districtId ?? null;
-
-  // Planners (super/branch admin) get the form; branch admins are fixed to
-  // their district, a super admin picks one.
-  let planForm: ReactNode = null;
-  if (canPlan) {
-    const fixed = scope
-      ? await prisma.district.findUnique({ where: { id: scope } })
-      : null;
-    const districts = scope ? undefined : await districtOptions(locale);
-    planForm = (
-      <section className="mb-16 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-6 dark:border-emerald-900/50 dark:bg-emerald-950/20 sm:p-8">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold">{tf("newTitle")}</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-300">{tf("newIntro")}</p>
-        </div>
-        <div className="mx-auto max-w-xl">
-          <FutureProgramForm
-            locale={locale}
-            action={createFutureProgram}
-            districts={districts}
-            fixedDistrictName={fixed ? localized(fixed.name, locale) : undefined}
-          />
-        </div>
-      </section>
-    );
-  }
-
-  // Everyone sees the list of approved future programs — the same photos &
-  // descriptions the public sees — so planners preview the live view too.
+  // Purely public marketing. Planning/creating future programs lives in the
+  // back-office at /admin/future-programs.
   const programs = await prisma.futureProgram.findMany({
     where: { approved: true },
     include: { district: true },
@@ -104,8 +69,6 @@ export default async function FutureProgramsPage({
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-16">
-      {planForm}
-
       <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold">{t("futureTitle")}</h1>
         <p className="mt-2 text-gray-600 dark:text-gray-300">{t("futureSubtitle")}</p>

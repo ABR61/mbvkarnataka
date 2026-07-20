@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
+import { sanitizeImageUrl } from "@/lib/storage";
 import type { FormState } from "@/lib/forms";
 
 const PERMISSION = "program.plan" as const;
@@ -43,11 +44,7 @@ export async function createFutureProgram(
     districtId = d.id;
   }
 
-  const rawImage = ((formData.get("imageUrl") as string) ?? "").trim();
-  const imageUrl =
-    rawImage.startsWith("data:image/") && rawImage.length < 2_200_000
-      ? rawImage
-      : null;
+  const imageUrl = sanitizeImageUrl((formData.get("imageUrl") as string) ?? "");
 
   const fp = await prisma.futureProgram.create({
     data: {
