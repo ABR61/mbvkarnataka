@@ -37,7 +37,7 @@
     "branchesTitle": "Our branches",
     "branchesSubtitle": "Find an MBV branch near you.",
     "branchesPlaceholder": "Branch details coming soon.",
-    "futureCta": "Future programs",
+    "futureCta": "Future Programs",
     "futureTitle": "Future programs",
     "futureSubtitle": "Upcoming training programs and activities at MBV.",
     "futureApply": "Apply now",
@@ -67,7 +67,8 @@
     "footerRights": "All rights reserved.",
     "activitiesTitle": "Our activities",
     "activitiesSubtitle": "Recent activity photos and updates from across MBV.",
-    "activitiesEmpty": "No activity reports yet. Branch admins can post photos with a description."
+    "activitiesEmpty": "No activity reports yet. Branch admins can post photos with a description.",
+    "featuredBadge": "Featured"
   },
   "Public": {
     "home": "Home",
@@ -95,7 +96,9 @@
     "coursesIncluded": "Courses included",
     "learnMore": "Learn more",
     "backToPrograms": "Back to programs",
-    "applyToProgram": "Apply for this program"
+    "applyToProgram": "Apply for this program",
+    "pastEvents": "Past Events",
+    "trainingPrograms": "Training Programs"
   },
   "Apply": {
     "title": "Apply for training",

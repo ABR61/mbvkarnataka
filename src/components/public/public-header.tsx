@@ -26,72 +26,79 @@ export async function PublicHeader() {
 
   const apply = { href: "/apply", label: t("apply") };
 
-  // Plain links shown after the About dropdown on desktop. Objectives and
-  // how-it-works are sections of /about now, not anchors on the home page.
-  const rest = [
-    { href: { pathname: "/about", hash: "objectives" }, label: t("objectives") },
-    { href: { pathname: "/about", hash: "how" }, label: t("howItWorks") },
-    { href: "/branches", label: t("branches") },
+  // About dropdown. Objectives and how-it-works are sections of /about, so they
+  // live here rather than competing as top-level links.
+  // Hashes go in the path string — next-intl derives the fragment by splitting
+  // the pathname on '#', so the {pathname, hash} object form doesn't localize.
+  const aboutItems = [
+    { href: "/about", label: t("aboutUs") },
+    { href: "/about#objectives", label: t("objectives") },
+    { href: "/about#how", label: t("howItWorks") },
+    { href: "/contact", label: tc("contactTitle") },
   ];
 
-  // Programs dropdown groups programs and future programs. Activities aren't
-  // here — they're the home page.
+  // Past events go via the branches list: visitors pick a branch and browse that
+  // branch's photos on its page. Branches also stays as a top-level link, for
+  // visitors heading straight there rather than looking for past events.
   const programsItems = [
-    { href: "/programs", label: t("programs") },
+    { href: "/branches", label: t("pastEvents") },
     { href: "/future-programs", label: tc("futureCta") },
+    { href: "/programs", label: t("trainingPrograms") },
   ];
 
   // Flattened list for the mobile menu (dropdowns expand into their links).
   const mobileLinks = [
-    { href: { pathname: "/", hash: "top" }, label: t("home") },
-    { href: "/about", label: t("aboutUs") },
-    { href: "/contact", label: tc("contactTitle") },
-    ...rest,
+    { href: "/", label: t("home") },
+    ...aboutItems,
     ...programsItems,
+    { href: "/branches", label: t("branches") },
   ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/90">
       <div className="flex items-center gap-4 px-6 py-3">
-        <Link href="/" className="shrink-0 text-lg font-bold text-emerald-700">
-          MBV
+        {/* Organisation name over its tagline, both localized. No logo artwork
+            exists yet; if one arrives it goes to the left of this block. */}
+        <Link href="/" className="flex shrink-0 flex-col leading-tight">
+          <span className="text-base font-bold text-emerald-700">
+            {tc("title")}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {tc("tagline")}
+          </span>
         </Link>
 
-        {/* Desktop: full inline row, right-aligned, with spacing */}
-        <nav className="ml-auto hidden items-center gap-x-5 text-sm lg:flex">
-          <Link href={{ pathname: "/", hash: "top" }} className="hover:text-emerald-700">
+        {/* Desktop: single inline row, right-aligned. Every item is shrink-0 and
+            nowrap — otherwise a tight row compresses the links until they read
+            as one run-on line, which looks like the gap has vanished. */}
+        <nav className="ml-auto hidden items-center gap-x-6 text-sm whitespace-nowrap lg:flex xl:gap-x-7">
+          <Link href="/" className="shrink-0 hover:text-emerald-700">
             {t("home")}
           </Link>
-          <NavDropdown
-            label={t("about")}
-            items={[
-              { href: "/about", label: t("aboutUs") },
-              { href: "/contact", label: tc("contactTitle") },
-            ]}
-          />
-          {rest.map((l) => (
-            <Link key={l.label} href={l.href} className="hover:text-emerald-700">
-              {l.label}
-            </Link>
-          ))}
+          <NavDropdown label={t("about")} items={aboutItems} />
           <NavDropdown label={t("programs")} items={programsItems} />
+          <Link href="/branches" className="shrink-0 hover:text-emerald-700">
+            {t("branches")}
+          </Link>
           <Link
             href={apply.href}
-            className="rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700"
+            className="shrink-0 rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700"
           >
             {apply.label}
           </Link>
           {area && (
             <Link
               href={area.href}
-              className="font-medium text-emerald-700 hover:underline"
+              className="shrink-0 font-medium text-emerald-700 hover:underline"
             >
               {area.label}
             </Link>
           )}
-          <LocaleSwitcher />
+          <div className="shrink-0">
+            <LocaleSwitcher />
+          </div>
           {loggedIn ? (
-            <form action={signOutAction}>
+            <form action={signOutAction} className="shrink-0">
               <input type="hidden" name="locale" value={locale} />
               <button
                 type="submit"
@@ -103,7 +110,7 @@ export async function PublicHeader() {
           ) : (
             <Link
               href="/sign-in"
-              className="rounded-md border border-emerald-600 px-3 py-1.5 font-medium text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+              className="shrink-0 rounded-md border border-emerald-600 px-3 py-1.5 font-medium text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
             >
               {t("login")}
             </Link>

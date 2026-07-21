@@ -71,8 +71,12 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
   const go = (d: number) => setI((p) => (p + d + n) % n);
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl border border-gray-200 bg-black shadow-sm dark:border-gray-800">
-      <div className="relative h-80 w-full sm:h-[520px] lg:h-[620px]">
+    // shrink-0: this renders as a flex item in the page's column layout, and
+    // without it the item collapses to zero height and the hero vanishes.
+    <div className="relative w-full shrink-0 overflow-hidden bg-black">
+      {/* Full-bleed hero: sized off the viewport so the picture leads the page,
+          with a floor for short windows and a ceiling for very tall ones. */}
+      <div className="relative h-[62vh] max-h-[760px] min-h-[360px] w-full sm:h-[70vh] lg:h-[78vh]">
         {list.map((s, idx) => (
           <figure
             key={`${phase}-${s.id}`}
@@ -82,15 +86,19 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={s.imageUrl} alt={s.title} className="h-full w-full object-cover" />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-5 text-left text-white sm:p-7">
-              <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
-                {s.district}
-              </span>
-              <h3 className="mt-1 text-lg font-bold sm:text-2xl">{s.title}</h3>
-              <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-gray-200">
-                {s.body}
-              </p>
-              <time className="mt-2 block text-xs text-gray-300">{s.date}</time>
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-5 pb-14 pt-20 text-left text-white sm:px-10 sm:pb-16">
+              <div className="mx-auto w-full max-w-6xl">
+                <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">
+                  {s.district}
+                </span>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+                  {s.title}
+                </h2>
+                <p className="mt-3 line-clamp-2 max-w-2xl text-sm text-gray-200 sm:text-base">
+                  {s.body}
+                </p>
+                <time className="mt-3 block text-xs text-gray-300">{s.date}</time>
+              </div>
             </figcaption>
           </figure>
         ))}

@@ -7,12 +7,20 @@ import { BranchCarousel } from "@/components/public/branch-carousel";
 // Pulls live counts + featured programs from the DB → render per-request.
 export const dynamic = "force-dynamic";
 
-// How many recent photo posts to consider, and how many survive to the grid.
-// Bounded so the page cost stays flat as branches keep posting. Per-district
-// capping happens in JS, so the pool is deliberately larger than the grid.
-const HOME_PHOTO_POOL = 60;
-const HOME_PHOTO_GRID = 24;
-const PER_DISTRICT_CAP = 4;
+// The hero promotes one branch card at a time, advancing every hour so each
+// branch takes a turn. Server-side and clock-derived, so everyone visiting in
+// the same hour sees the same feature (the page is already force-dynamic).
+const HOUR_MS = 60 * 60 * 1000;
+
+// Upcoming programmes teased on the home page; the full list lives at
+// /future-programs, linked from the section footer.
+const HOME_FUTURE_LIMIT = 6;
+
+/** Index of the branch featured in the current hour, cycling through `count`. */
+async function featuredIndexForNow(count: number): Promise<number> {
+  if (count <= 0) return 0;
+  return Math.floor(Date.now() / HOUR_MS) % count;
+}
 
 export default async function HomePage({
   params,
@@ -22,12 +30,20 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("HomePage");
+  const tf = await getTranslations("FuturePrograms");
 
-  // Live impact numbers, featured programs, and recent activity photos in one
-  // round-trip. The photo query is bounded: without a take, an image-heavy site
-  // would pull every approved post (and its inline image payload) per request.
-  const [trainees, programs, districts, placements, featured, posts] =
-    await Promise.all([
+  // Live impact numbers, featured programs, and one activity photo per branch in
+  // one round-trip. The photo query is bounded to a row per district, so page
+  // cost stays flat however much branches post.
+  const [
+    trainees,
+    programs,
+    districts,
+    placements,
+    featuredPrograms,
+    branchPosts,
+    futurePrograms,
+  ] = await Promise.all([
       prisma.person.count({ where: { kind: "TRAINEE" } }),
       prisma.program.count({ where: { status: "active" } }),
       prisma.district.count(),
@@ -37,35 +53,39 @@ export default async function HomePage({
         orderBy: { createdAt: "desc" },
         take: 3,
       }),
+      // One card per branch: `distinct` on districtId with a newest-first order
+      // returns each district's most recent photo post.
       prisma.post.findMany({
         where: { imageUrl: { not: null }, approved: true },
         orderBy: { createdAt: "desc" },
-        take: HOME_PHOTO_POOL,
+        distinct: ["districtId"],
+        include: { district: true },
+      }),
+      // Upcoming programmes from every branch, newest first.
+      prisma.futureProgram.findMany({
+        where: { approved: true },
+        orderBy: { createdAt: "desc" },
+        take: HOME_FUTURE_LIMIT,
         include: { district: true },
       }),
     ]);
 
-  // The 3 newest photos headline the carousel; the gallery below shows the rest,
-  // capped at 4 per district so no single branch floods the page.
-  const slides = posts.slice(0, 3).map((p) => ({
-    id: p.id,
-    imageUrl: p.imageUrl as string,
-    title: p.title,
-    body: p.body,
-    district: localized(p.district.name, locale),
-    date: p.createdAt.toISOString().slice(0, 10),
-  }));
-  const headlined = new Set(slides.map((s) => s.id));
-  const perDistrict = new Map<string, number>();
-  const activities = posts
-    .filter((p) => {
-      if (headlined.has(p.id)) return false;
-      const n = perDistrict.get(p.districtId) ?? 0;
-      if (n >= PER_DISTRICT_CAP) return false;
-      perDistrict.set(p.districtId, n + 1);
-      return true;
-    })
-    .slice(0, HOME_PHOTO_GRID);
+  // Which branch is in the hero this hour. Ordering is stable (newest-first),
+  // so the feature cycles through every branch an hour at a time.
+  const featured = branchPosts[await featuredIndexForNow(branchPosts.length)];
+
+  const slides = featured
+    ? [
+        {
+          id: featured.id,
+          imageUrl: featured.imageUrl as string,
+          title: featured.title,
+          body: featured.body,
+          district: localized(featured.district.name, locale),
+          date: featured.createdAt.toISOString().slice(0, 10),
+        },
+      ]
+    : [];
 
   const stats = [
     { value: trainees, label: t("statTrainees") },
@@ -76,60 +96,38 @@ export default async function HomePage({
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero */}
-      <section
-        id="top"
-        className="relative overflow-hidden bg-gradient-to-b from-emerald-50 to-white dark:from-emerald-950/30 dark:to-transparent"
-      >
-        <div className="mx-auto flex max-w-3xl flex-col items-center justify-center gap-6 px-4 pb-10 pt-20 text-center">
-          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-            {t("tagline")}
-          </span>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            {t("title")}
-          </h1>
-          <p className="max-w-xl text-lg text-gray-600 dark:text-gray-300">
-            {t("subtitle")}
-          </p>
-        </div>
-      </section>
+      {/* Hero: this hour's featured branch, full-bleed under the nav bar. */}
+      {slides.length > 0 && <BranchCarousel slides={slides} />}
 
-      {/* Future programs CTA */}
-      <section className="flex w-full justify-center px-4 py-16">
-        <Link
-          href="/future-programs"
-          className="rounded-md bg-emerald-600 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-emerald-700"
-        >
-          {t("futureCta")}
-        </Link>
-      </section>
-
-      {/* Our activities — the showcase this page is built around */}
+      {/* Our activities — the gallery behind the hero. */}
       <section
         id="activities"
-        className="scroll-mt-20 border-t border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/40"
+        className="scroll-mt-20 bg-gray-50 dark:bg-gray-900/40"
       >
         <div className="mx-auto w-full max-w-6xl px-4 py-20">
           <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold">{t("activitiesTitle")}</h2>
+            {/* Page h1: the hero carries pictures, not the document heading. */}
+            <h1 className="text-3xl font-bold">{t("activitiesTitle")}</h1>
             <p className="mt-1 text-sm text-gray-500">
               {t("activitiesSubtitle")}
             </p>
           </div>
 
-          {slides.length > 0 && <BranchCarousel slides={slides} />}
-
-          {slides.length === 0 ? (
+          {branchPosts.length === 0 ? (
             <p className="py-12 text-center text-gray-400">
               {t("activitiesEmpty")}
             </p>
           ) : (
-            activities.length > 0 && (
-              <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {activities.map((r) => (
-                  <li
-                    key={r.id}
-                    className="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950"
+            <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {branchPosts.map((r) => (
+                <li key={r.id}>
+                  <Link
+                    href={`/branches/${r.districtId}`}
+                    className={`group flex h-full flex-col overflow-hidden rounded-xl border bg-white transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md dark:bg-gray-950 ${
+                      r.id === featured?.id
+                        ? "border-emerald-400 ring-2 ring-emerald-400/40"
+                        : "border-gray-200 dark:border-gray-800"
+                    }`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -137,24 +135,113 @@ export default async function HomePage({
                       alt={r.title}
                       loading="lazy"
                       decoding="async"
-                      className="h-32 w-full object-cover"
+                      className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="flex flex-1 flex-col p-4">
-                      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
-                        {localized(r.district.name, locale)}
-                      </span>
-                      <h3 className="mt-1.5 text-sm font-semibold">{r.title}</h3>
-                      <p className="mt-1 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
+                    <div className="flex flex-1 flex-col p-5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                          {localized(r.district.name, locale)}
+                        </span>
+                        {r.id === featured?.id && (
+                          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                            {t("featuredBadge")}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mt-1.5 font-semibold">{r.title}</h3>
+                      <p className="mt-1.5 line-clamp-3 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
                         {r.body}
                       </p>
-                      <time className="mt-3 text-xs text-gray-400">
+                      <time className="mt-4 text-xs text-gray-400">
                         {r.createdAt.toISOString().slice(0, 10)}
                       </time>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {/* Our future programs — upcoming across every branch */}
+      <section id="future-programs" className="scroll-mt-20">
+        <div className="mx-auto w-full max-w-6xl px-4 py-20">
+          <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold">{t("futureTitle")}</h2>
+            <p className="mt-1 text-sm text-gray-500">{t("futureSubtitle")}</p>
+          </div>
+
+          {futurePrograms.length === 0 ? (
+            <p className="py-12 text-center text-gray-400">{t("futureEmpty")}</p>
+          ) : (
+            <>
+              <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {futurePrograms.map((p) => (
+                  <li
+                    key={p.id}
+                    className="group flex flex-col overflow-hidden rounded-xl border border-gray-200 transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-md dark:border-gray-800"
+                  >
+                    {/* Photos are optional here, so cards without one get a
+                        tinted band to keep the grid's rhythm. */}
+                    {p.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={p.imageUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-40 w-full bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-950/20" />
+                    )}
+
+                    <div className="flex flex-1 flex-col p-5">
+                      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">
+                        {localized(p.district.name, locale)}
+                      </span>
+                      <h3 className="mt-1.5 font-semibold">{p.title}</h3>
+                      <p className="mt-1.5 line-clamp-3 flex-1 whitespace-pre-line text-sm text-gray-600 dark:text-gray-300">
+                        {p.description}
+                      </p>
+
+                      {(p.durationWeeks != null || p.seats != null) && (
+                        <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                          {p.durationWeeks != null && (
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                              {tf("duration")}: {p.durationWeeks}{" "}
+                              {tf(p.durationUnit ?? "weeks")}
+                            </span>
+                          )}
+                          {p.seats != null && (
+                            <span className="rounded-full bg-emerald-50 px-2.5 py-1 font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                              {tf("capacity")}: {p.seats}
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <Link
+                        href={`/apply?future=${p.id}`}
+                        className="mt-4 inline-block self-start rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                      >
+                        {tf("applyNow")}
+                      </Link>
                     </div>
                   </li>
                 ))}
               </ul>
-            )
+
+              <div className="mt-10 text-center">
+                <Link
+                  href="/future-programs"
+                  className="text-sm font-medium text-emerald-700 hover:underline"
+                >
+                  {t("viewAll")} →
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>
@@ -182,7 +269,7 @@ export default async function HomePage({
       </section>
 
       {/* Featured programs */}
-      {featured.length > 0 && (
+      {featuredPrograms.length > 0 && (
         <section className="mx-auto w-full max-w-5xl px-4 py-20">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">{t("featured")}</h2>
@@ -194,7 +281,7 @@ export default async function HomePage({
             </Link>
           </div>
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {featured.map((p) => (
+            {featuredPrograms.map((p) => (
               <li
                 key={p.id}
                 className="rounded-xl border border-gray-200 p-5 transition hover:border-emerald-300 hover:shadow-sm dark:border-gray-800"
