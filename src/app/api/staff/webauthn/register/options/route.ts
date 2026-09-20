@@ -12,8 +12,17 @@ import {
   REG_CHALLENGE_COOKIE,
   REG_PERSON_COOKIE,
 } from "@/lib/webauthn";
+import { rateLimitApiRoute } from "@/lib/rate-limit-api";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
 
 export async function POST(req: Request) {
+  const limited = await rateLimitApiRoute(req, {
+    bucket: "webauthn",
+    limit: RATE_LIMITS.webauthn.limit,
+    windowSec: RATE_LIMITS.webauthn.windowSec,
+  });
+  if (limited) return limited;
+
   const session = await auth();
   if (!session?.user || !hasPermission(session.user.permissions, "staff.manage")) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });

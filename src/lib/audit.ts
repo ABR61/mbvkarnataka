@@ -8,7 +8,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function writeAudit(
   userId: string | undefined,
-  action: "create" | "update" | "delete",
+  action: "create" | "update" | "delete" | "blocked",
   entity: string,
   entityId?: string,
   metadata?: Prisma.InputJsonValue,

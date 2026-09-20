@@ -511,6 +511,21 @@ model AuditLog {
   @@index([userId])
 }
 
+// Fixed-window rate-limit counters (brute-force / spam protection).
+// One row per (bucket, key), e.g. bucket "login" + key "<email>|<ip>".
+// `expiresAt` marks the end of the current window; a request in a fresh
+// window resets count. Rows are disposable — safe to prune when expired.
+// See src/lib/rate-limit.ts.
+model RateLimit {
+  bucket    String
+  key       String
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@id([bucket, key])
+  @@index([expiresAt])
+}
+
 // ─────────────────────────────────────────────────────────────
 // Admissions (Phase 2)
 // ─────────────────────────────────────────────────────────────

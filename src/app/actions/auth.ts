@@ -1,9 +1,18 @@
 "use server";
 
 import { AuthError } from "next-auth";
+import { headers } from "next/headers";
 import { signIn, signOut } from "@/auth";
+import { checkRateLimit, recordFailure } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
+import { getClientIp } from "@/lib/client-ip";
+import { writeAudit } from "@/lib/audit";
 
-export type SignInState = { error?: "invalid" | "unknown" };
+export type SignInState = {
+  error?: "invalid" | "unknown" | "rate_limited";
+  /** Seconds to wait before retrying — set only when error is "rate_limited". */
+  retryAfter?: number;
+};
 
 /**
  * Credentials sign-in, invoked from the sign-in form via useActionState.
@@ -20,6 +29,28 @@ export async function authenticate(
   const callbackUrl = formData.get("callbackUrl") as string | null;
   const redirectTo =
     callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : `/${locale}/admin`;
+
+  // Throttle credential guessing per email+IP. Combining the two means one
+  // attacker IP can't spray many accounts, and one shared office IP can't lock
+  // a whole branch out of a single account. Only failed attempts are counted
+  // (below), so a successful login or an honest typo followed by success is fine.
+  const email = ((formData.get("email") as string) ?? "").trim().toLowerCase();
+  const ip = getClientIp(await headers());
+  const rlKey = `${email}|${ip}`;
+  const gate = await checkRateLimit({
+    bucket: "login",
+    key: rlKey,
+    limit: RATE_LIMITS.login.limit,
+    windowSec: RATE_LIMITS.login.windowSec,
+  });
+  if (!gate.ok) {
+    await writeAudit(undefined, "blocked", "auth.login", email || undefined, {
+      ip,
+      reason: "rate_limited",
+    });
+    return { error: "rate_limited", retryAfter: gate.retryAfter };
+  }
+
   try {
     await signIn("credentials", {
       email: formData.get("email"),
@@ -29,7 +60,16 @@ export async function authenticate(
     return {};
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: error.type === "CredentialsSignin" ? "invalid" : "unknown" };
+      // Count only genuine bad-credential failures toward the limit.
+      if (error.type === "CredentialsSignin") {
+        await recordFailure({
+          bucket: "login",
+          key: rlKey,
+          windowSec: RATE_LIMITS.login.windowSec,
+        });
+        return { error: "invalid" };
+      }
+      return { error: "unknown" };
     }
     throw error; // re-throw the redirect (and anything else)
   }

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
+import { consumeRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
+import { getClientIp } from "@/lib/client-ip";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +26,34 @@ export default async function VerifyCertificatePage({
 }) {
   const { locale, code } = await params;
   setRequestLocale(locale);
-
-  const cert = await prisma.certificate.findUnique({
-    where: { verifyCode: code },
-  });
   const t = await getTranslations("Verify");
+
+  // Per-IP throttle so the public code lookup can't be used to enumerate valid
+  // certificate codes at scale.
+  const gate = await consumeRateLimit({
+    bucket: "verify",
+    key: getClientIp(await headers()),
+    limit: RATE_LIMITS.verify.limit,
+    windowSec: RATE_LIMITS.verify.windowSec,
+  });
+
+  const cert = gate.ok
+    ? await prisma.certificate.findUnique({ where: { verifyCode: code } })
+    : null;
 
   return (
     <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center">
-      {cert ? (
+      {!gate.ok ? (
+        <div className="w-full rounded-xl border border-amber-200 bg-amber-50 p-8 dark:border-amber-900 dark:bg-amber-950">
+          <div className="text-3xl">⏳</div>
+          <h1 className="mt-2 text-xl font-bold text-amber-800 dark:text-amber-200">
+            {t("rateLimited")}
+          </h1>
+          <p className="mt-2 text-sm text-amber-700 dark:text-amber-400">
+            {t("rateLimitedBody")}
+          </p>
+        </div>
+      ) : cert ? (
         <div className="w-full rounded-xl border border-emerald-200 bg-emerald-50 p-8 dark:border-emerald-900 dark:bg-emerald-950">
           <div className="text-3xl">✓</div>
           <h1 className="mt-2 text-xl font-bold text-emerald-800 dark:text-emerald-200">

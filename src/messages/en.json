@@ -109,6 +109,7 @@
     "consentRequired": "Consent is required to apply.",
     "submit": "Submit application",
     "submitting": "Submitting…",
+    "rateLimited": "Too many submissions from this connection. Please try again later.",
     "thanksTitle": "Thank you for applying!",
     "thanksBody": "We've received your application and will contact you soon.",
     "backToPrograms": "Back to programs",
@@ -182,6 +183,8 @@
     "valid": "Certificate verified",
     "invalid": "Certificate not found",
     "invalidBody": "No certificate matches this code. Please check the link and try again.",
+    "rateLimited": "Too many attempts",
+    "rateLimitedBody": "Too many verification attempts from this connection. Please wait a moment and try again.",
     "name": "Name",
     "program": "Program",
     "serial": "Serial",
@@ -411,7 +414,8 @@
     "signingIn": "Signing in…",
     "error": {
       "invalid": "Invalid email or password.",
-      "unknown": "Something went wrong. Please try again."
+      "unknown": "Something went wrong. Please try again.",
+      "rate_limited": "Too many sign-in attempts. Please try again in {minutes, plural, one {# minute} other {# minutes}}."
     }
   },
   "Nav": {

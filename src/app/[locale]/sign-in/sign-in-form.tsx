@@ -47,7 +47,11 @@ export function SignInForm({
 
       {state.error && (
         <p role="alert" className="text-sm text-red-600">
-          {t(`error.${state.error}`)}
+          {state.error === "rate_limited"
+            ? t("error.rate_limited", {
+                minutes: Math.max(1, Math.ceil((state.retryAfter ?? 0) / 60)),
+              })
+            : t(`error.${state.error}`)}
         </p>
       )}
 

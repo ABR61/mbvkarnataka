@@ -175,6 +175,12 @@ export function ApplyForm({
         </span>
       </label>
 
+      {state.error === "rate_limited" && (
+        <p role="alert" className="text-sm text-red-600">
+          {t("rateLimited")}
+        </p>
+      )}
+
       <button
         type="submit"
         disabled={pending}

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 // Order matters less with CASCADE, but list every table we touch so each test
 // starts from a clean slate.
 const TABLES = [
+  '"RateLimit"',
   '"Attendance"',
   '"Enrollment"',
   '"TrainerAssignment"',

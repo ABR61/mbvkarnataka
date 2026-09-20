@@ -10,12 +10,15 @@ import {
 } from "@/lib/validation/application";
 import { parseDateOfBirth } from "@/lib/validation/person";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { consumeRateLimit } from "@/lib/rate-limit";
+import { RATE_LIMITS } from "@/lib/rate-limit-config";
+import { getClientIp } from "@/lib/client-ip";
 
 export type ApplyState = FormState & { ok?: boolean };
 
 /**
  * Public, unauthenticated application submission. Defenses: a hidden honeypot
- * field, zod validation, required DPDP consent. (Rate-limiting is a future add.)
+ * field, zod validation, required DPDP consent, and per-IP rate limiting.
  */
 export async function createApplication(
   _prev: ApplyState,
@@ -23,6 +26,16 @@ export async function createApplication(
 ): Promise<ApplyState> {
   // Honeypot: real users never fill this; bots do. Pretend success, write nothing.
   if (((formData.get("website") as string) ?? "").trim()) return { ok: true };
+
+  // Per-IP throttle so the public form can't be flooded with spam submissions.
+  const ip = getClientIp(await headers());
+  const gate = await consumeRateLimit({
+    bucket: "apply",
+    key: ip,
+    limit: RATE_LIMITS.apply.limit,
+    windowSec: RATE_LIMITS.apply.windowSec,
+  });
+  if (!gate.ok) return { error: "rate_limited" };
 
   const parsed = applicationInput.safeParse(applicationFromForm(formData));
   if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
@@ -43,10 +56,6 @@ export async function createApplication(
 
   const dob = parseDateOfBirth(d.dateOfBirth);
   if (dob.error) return { fieldErrors: { dateOfBirth: dob.error } };
-
-  const h = await headers();
-  const ip =
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
 
   // Applying to an announced future program: verify it and inherit its district
   // so the branch admin who posted it sees the applicant in their pipeline.
