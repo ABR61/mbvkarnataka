@@ -6,6 +6,25 @@ import { financialStatus } from "@/lib/finance";
 
 export const dynamic = "force-dynamic";
 
+const card = "rounded-xl border border-gray-200 p-5 dark:border-gray-800";
+
+function Kpi({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: string;
+}) {
+  return (
+    <div className={card}>
+      <div className={`text-2xl font-bold ${accent ?? ""}`}>{value}</div>
+      <div className="mt-1 text-xs text-gray-500">{label}</div>
+    </div>
+  );
+}
+
 export default async function FinanceStatusPage({
   params,
 }: {
@@ -17,8 +36,6 @@ export default async function FinanceStatusPage({
   const f = await financialStatus(locale);
   const t = await getTranslations("Finance");
 
-  const card =
-    "rounded-xl border border-gray-200 p-5 dark:border-gray-800";
   const th = "px-3 py-2 text-left font-medium text-gray-500";
   const thNum = "px-3 py-2 text-right font-medium text-gray-500";
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
@@ -29,21 +46,6 @@ export default async function FinanceStatusPage({
     APPROVED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
     PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
   };
-
-  const Kpi = ({
-    label,
-    value,
-    accent,
-  }: {
-    label: string;
-    value: string;
-    accent?: string;
-  }) => (
-    <div className={card}>
-      <div className={`text-2xl font-bold ${accent ?? ""}`}>{value}</div>
-      <div className="mt-1 text-xs text-gray-500">{label}</div>
-    </div>
-  );
 
   return (
     <div className="flex flex-col gap-8">

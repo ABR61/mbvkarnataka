@@ -44,7 +44,6 @@ export default async function StaffDetailPage({
   assertDistrict(session, person.districtId); // branch admins: own district only
 
   const t = await getTranslations("Staff");
-  const tc = await getTranslations("Common");
 
   const recs = person.staffAttendances;
   const count = (s: string) => recs.filter((r) => r.status === s).length;

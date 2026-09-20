@@ -18,7 +18,7 @@ export type BranchSlide = {
 // Both rotate one picture every 5 seconds.
 const ROTATE_START_HOUR = 9; // 9 AM
 const ROTATE_END_HOUR = 15; // 3 PM
-const ROTATE_MS = 3000;
+const ROTATE_MS = 5000;
 
 function isDayWindow(): boolean {
   const hour = new Date().getHours();
@@ -43,6 +43,15 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
   const [phase, setPhase] = useState<"day" | "off">("day");
   const [i, setI] = useState(0);
 
+  // Restart at the first picture whenever the active set switches. Done during
+  // render (React's recommended pattern) instead of an effect, so the reset
+  // happens in the same commit as the phase change — no cascading re-render.
+  const [shownPhase, setShownPhase] = useState<"day" | "off">("day");
+  if (phase !== shownPhase) {
+    setShownPhase(phase);
+    setI(0);
+  }
+
   const active = phase === "day" ? daySet : offSet;
   const list = active.length > 0 ? active : slides; // fallback if a half is empty
   const n = list.length;
@@ -55,9 +64,6 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
     const timer = setInterval(evaluate, 60_000);
     return () => clearInterval(timer);
   }, []);
-
-  // Restart at the first picture whenever the active set switches.
-  useEffect(() => setI(0), [phase]);
 
   // Advance one picture every 5s within the active set — always automatic.
   useEffect(() => {

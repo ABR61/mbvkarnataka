@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/auth";
 import { requirePermission } from "@/lib/auth-guards";
 import { districtOptions } from "@/lib/options";
 import { DeleteButton } from "@/components/admin/delete-button";
