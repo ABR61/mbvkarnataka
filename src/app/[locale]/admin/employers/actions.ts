@@ -7,6 +7,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { employerInput } from "@/lib/validation/placement";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "placement.manage" as const;
 
@@ -51,7 +52,7 @@ export async function createEmployer(
   await writeAudit(session.user.id, "create", "Employer", employer.id);
 
   revalidatePath(`/${locale}/admin/employers`);
-  redirect(`/${locale}/admin/employers`);
+  redirect(withFlash(`/${locale}/admin/employers`, "saved"));
 }
 
 export async function updateEmployer(
@@ -69,7 +70,7 @@ export async function updateEmployer(
   await writeAudit(session.user.id, "update", "Employer", id);
 
   revalidatePath(`/${locale}/admin/employers`);
-  redirect(`/${locale}/admin/employers`);
+  redirect(withFlash(`/${locale}/admin/employers`, "saved"));
 }
 
 export async function deleteEmployer(formData: FormData): Promise<void> {
@@ -82,5 +83,5 @@ export async function deleteEmployer(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Employer", id);
 
   revalidatePath(`/${locale}/admin/employers`);
-  redirect(`/${locale}/admin/employers`);
+  redirect(withFlash(`/${locale}/admin/employers`, "deleted"));
 }

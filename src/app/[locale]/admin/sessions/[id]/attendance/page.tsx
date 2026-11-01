@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { AttendanceForm } from "./attendance-form";
 import { markAttendance } from "../../actions";
+import { formatDateWithWeekday } from "@/lib/dates";
 
 const personName = (p: { firstName: string; lastName: string | null }) =>
   [p.firstName, p.lastName].filter(Boolean).join(" ");
@@ -49,7 +50,7 @@ export default async function AttendancePage({
         <p className="text-sm text-gray-500">
           {localized(ts.course.name, locale)}
           {ts.cohort.code ? ` · ${ts.cohort.code}` : ""} ·{" "}
-          {ts.sessionDate.toISOString().slice(0, 10)}
+          {formatDateWithWeekday(ts.sessionDate, locale)}
         </p>
       </div>
 

@@ -14,6 +14,7 @@ import {
   parseDateOfBirth,
 } from "@/lib/validation/person";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "trainer.manage" as const;
 
@@ -64,7 +65,7 @@ export async function createTrainer(
   });
 
   revalidatePath(`/${locale}/admin/trainers`);
-  redirect(`/${locale}/admin/trainers`);
+  redirect(withFlash(`/${locale}/admin/trainers`, "saved"));
 }
 
 export async function updateTrainer(
@@ -101,7 +102,7 @@ export async function updateTrainer(
   await writeAudit(session.user.id, "update", "Person", id, { kind: "TRAINER" });
 
   revalidatePath(`/${locale}/admin/trainers`);
-  redirect(`/${locale}/admin/trainers`);
+  redirect(withFlash(`/${locale}/admin/trainers`, "saved"));
 }
 
 export async function deleteTrainer(formData: FormData): Promise<void> {
@@ -121,5 +122,5 @@ export async function deleteTrainer(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Person", id, { kind: "TRAINER" });
 
   revalidatePath(`/${locale}/admin/trainers`);
-  redirect(`/${locale}/admin/trainers`);
+  redirect(withFlash(`/${locale}/admin/trainers`, "deleted"));
 }

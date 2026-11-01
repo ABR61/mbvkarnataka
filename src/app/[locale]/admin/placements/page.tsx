@@ -6,6 +6,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { formatINR } from "@/lib/money";
 import { Pagination } from "@/components/admin/pagination";
 import { PLACEMENT_STATUSES } from "@/lib/validation/placement";
+import { formatDate } from "@/lib/dates";
 
 const PAGE_SIZE = 20;
 
@@ -75,6 +76,7 @@ export default async function PlacementsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -96,7 +98,7 @@ export default async function PlacementsPage({
                 <td className={`${td} tabular-nums`}>
                   {p.monthlySalary != null ? formatINR(p.monthlySalary.toString()) : "—"}
                 </td>
-                <td className={td}>{p.placedOn.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(p.placedOn, locale)}</td>
                 <td className={td}>{t(`status_${p.status}`)}</td>
                 <td className={td}>
                   <Link href={`/admin/placements/${p.id}/edit`} className="text-emerald-700 hover:underline">
@@ -107,6 +109,7 @@ export default async function PlacementsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination basePath="/admin/placements" page={page} pageSize={PAGE_SIZE} total={total} query="" />

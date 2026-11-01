@@ -17,6 +17,7 @@ import {
 } from "@/lib/validation/expense";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
 import { sanitizeImageUrl } from "@/lib/storage";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "expense.record" as const;
 
@@ -75,7 +76,7 @@ export async function createExpense(
   await writeAudit(session.user.id, "create", "Expense", expense.id);
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "saved"));
 }
 
 export async function updateExpense(
@@ -113,7 +114,7 @@ export async function updateExpense(
   await writeAudit(session.user.id, "update", "Expense", id);
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "saved"));
 }
 
 export async function deleteExpense(formData: FormData): Promise<void> {
@@ -137,7 +138,7 @@ export async function deleteExpense(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Expense", id);
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "deleted"));
 }
 
 /** Approve a pending expense. Enforces separation of duties: the approver must
@@ -169,7 +170,7 @@ export async function approveExpense(
   await writeAudit(session.user.id, "update", "Expense", id, { transition: "approve" });
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "saved"));
 }
 
 /** Mark an approved expense as paid, recording payment details. Blocks payment
@@ -234,7 +235,7 @@ export async function markPaidExpense(
   });
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "saved"));
 }
 
 /** Void (reverse) an expense in any non-void state, keeping it with a reason. */
@@ -273,5 +274,5 @@ export async function voidExpense(
   });
 
   revalidatePath(`/${locale}/admin/expenses`);
-  redirect(`/${locale}/admin/expenses`);
+  redirect(withFlash(`/${locale}/admin/expenses`, "saved"));
 }

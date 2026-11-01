@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { BilingualField } from "@/components/forms/bilingual-field";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 export function ProgramForm({
   locale,
@@ -81,6 +82,7 @@ export function ProgramForm({
         </select>
       </label>
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

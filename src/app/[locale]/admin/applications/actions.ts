@@ -8,6 +8,7 @@ import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
 import type { FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "application.manage" as const;
 
@@ -132,5 +133,5 @@ export async function convertApplication(
   });
 
   revalidatePath(`/${locale}/admin/applications`);
-  redirect(`/${locale}/admin/trainees/${person.id}/edit`);
+  redirect(withFlash(`/${locale}/admin/trainees/${person.id}/edit`, "saved"));
 }

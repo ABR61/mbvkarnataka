@@ -55,6 +55,7 @@ export default async function DistrictsPage({
       <h1 className="text-2xl font-bold">{t("title")}</h1>
       <SearchBox placeholder={tc("search")} defaultValue={q} />
 
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr>
@@ -82,6 +83,7 @@ export default async function DistrictsPage({
           ))}
         </tbody>
       </table>
+      </div>
 
       <Pagination
         basePath="/admin/districts"

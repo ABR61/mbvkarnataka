@@ -1,11 +1,11 @@
 import type { Prisma } from "@prisma/client";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { saveStaffAttendance } from "./actions";
+import { todayISO } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export default async function StaffAttendancePage({
   const session = await requirePermission("staff.manage");
   const sp = await searchParams;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO(); // India date
   const day = /^\d{4}-\d{2}-\d{2}$/.test(sp.date ?? "") ? (sp.date as string) : today;
   const date = new Date(`${day}T00:00:00.000Z`);
 
@@ -55,9 +55,6 @@ export default async function StaffAttendancePage({
           <h1 className="text-2xl font-bold">{t("attendanceTitle")}</h1>
           <p className="mt-1 text-sm text-gray-500">{t("attendanceIntro")}</p>
         </div>
-        <Link href="/admin/staff" className="text-sm text-gray-500 hover:underline">
-          ← {t("title")}
-        </Link>
       </div>
 
       {/* Pick a day (GET) */}

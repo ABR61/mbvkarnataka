@@ -4,6 +4,7 @@ import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import { prisma } from "@/lib/prisma";
 import { rpInfo, fromB64url, AUTH_CHALLENGE_COOKIE } from "@/lib/webauthn";
 import { rateLimitApiRoute } from "@/lib/rate-limit-api";
+import { nowHHMM, todayISO } from "@/lib/dates";
 import { RATE_LIMITS } from "@/lib/rate-limit-config";
 
 export async function POST(req: Request) {
@@ -59,8 +60,9 @@ export async function POST(req: Request) {
 
   // Record the clock-in / clock-out for today (local wall-clock time).
   const now = new Date();
-  const dayStr = now.toLocaleDateString("en-CA"); // YYYY-MM-DD, local tz
-  const time = now.toLocaleTimeString("en-GB", { hour12: false }).slice(0, 5); // HH:MM
+  // India date and time explicitly — the server's own clock is usually UTC.
+  const dayStr = todayISO(now); // YYYY-MM-DD
+  const time = nowHHMM(now); // HH:MM
   const date = new Date(`${dayStr}T00:00:00.000Z`);
 
   const existing = await prisma.staffAttendance.findUnique({

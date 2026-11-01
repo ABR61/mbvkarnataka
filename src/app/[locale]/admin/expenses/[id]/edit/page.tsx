@@ -25,6 +25,7 @@ import {
   markPaidExpense,
   voidExpense,
 } from "../../actions";
+import { formatDate } from "@/lib/dates";
 
 export default async function EditExpensePage({
   params,
@@ -91,12 +92,12 @@ export default async function EditExpensePage({
         {expense.approvedAt &&
           dl(
             t("approvedBy"),
-            `${actorName(expense.approvedById)} · ${expense.approvedAt.toISOString().slice(0, 10)}`,
+            `${actorName(expense.approvedById)} · ${formatDate(expense.approvedAt, locale)}`,
           )}
         {expense.paidAt &&
           dl(
             t("paidBy"),
-            `${actorName(expense.paidById)} · ${expense.paidAt.toISOString().slice(0, 10)}`,
+            `${actorName(expense.paidById)} · ${formatDate(expense.paidAt, locale)}`,
           )}
         {expense.paymentMethod && dl(t("paymentMethod"), t(`method_${expense.paymentMethod}`))}
         {expense.paymentReference && dl(t("paymentReference"), expense.paymentReference)}

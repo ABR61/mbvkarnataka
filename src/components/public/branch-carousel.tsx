@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export type BranchSlide = {
   id: string;
@@ -32,6 +33,7 @@ function isDayWindow(): boolean {
  * every 5s, with prev/next arrows and clickable dots.
  */
 export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
+  const t = useTranslations("Public");
   // With enough pictures, split them: newer half rotates during the day window,
   // the rest after. With just a few, rotate all of them together in both windows.
   const mid = Math.ceil(slides.length / 2);
@@ -128,7 +130,7 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
           <button
             type="button"
             onClick={() => go(-1)}
-            aria-label="Previous"
+            aria-label={t("carouselPrev")}
             className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur transition hover:bg-black/70"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -138,7 +140,7 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
           <button
             type="button"
             onClick={() => go(1)}
-            aria-label="Next"
+            aria-label={t("carouselNext")}
             className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur transition hover:bg-black/70"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -152,7 +154,7 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
                 key={`${phase}-dot-${s.id}`}
                 type="button"
                 onClick={() => setI(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
+                aria-label={t("carouselGoTo", { n: idx + 1 })}
                 className={`h-2 rounded-full transition-all ${
                   idx === safeI ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"
                 }`}

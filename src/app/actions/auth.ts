@@ -7,6 +7,7 @@ import { checkRateLimit, recordFailure } from "@/lib/rate-limit";
 import { RATE_LIMITS } from "@/lib/rate-limit-config";
 import { getClientIp } from "@/lib/client-ip";
 import { writeAudit } from "@/lib/audit";
+import { homeForEmail, homePath } from "@/lib/home";
 
 export type SignInState = {
   error?: "invalid" | "unknown" | "rate_limited";
@@ -27,8 +28,6 @@ export async function authenticate(
 ): Promise<SignInState> {
   const locale = (formData.get("locale") as string) || "en";
   const callbackUrl = formData.get("callbackUrl") as string | null;
-  const redirectTo =
-    callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : `/${locale}/admin`;
 
   // Throttle credential guessing per email+IP. Combining the two means one
   // attacker IP can't spray many accounts, and one shared office IP can't lock
@@ -50,6 +49,13 @@ export async function authenticate(
     });
     return { error: "rate_limited", retryAfter: gate.retryAfter };
   }
+
+  // Land each person in their own area (trainer / admin / portal) instead of
+  // bouncing everyone through /admin. Only used if the password is correct.
+  const redirectTo =
+    callbackUrl && callbackUrl.startsWith("/")
+      ? callbackUrl
+      : homePath(await homeForEmail(((formData.get("email") as string) ?? "").trim()), locale);
 
   try {
     await signIn("credentials", {

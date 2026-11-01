@@ -4,13 +4,13 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/auth-guards";
 import type { FormState } from "@/lib/forms";
+import { nowHHMM, todayISO } from "@/lib/dates";
 
-/** Today's date (local) as a UTC-midnight Date + "HH:MM" local time. */
+/** Today's date in India as a UTC-midnight Date + India time "HH:MM".
+ *  Uses IST explicitly — the server's own clock zone is usually UTC. */
 function nowParts() {
   const now = new Date();
-  const dayStr = now.toLocaleDateString("en-CA"); // YYYY-MM-DD, local tz
-  const time = now.toLocaleTimeString("en-GB", { hour12: false }).slice(0, 5); // HH:MM
-  return { date: new Date(`${dayStr}T00:00:00.000Z`), time };
+  return { date: new Date(`${todayISO(now)}T00:00:00.000Z`), time: nowHHMM(now) };
 }
 
 async function ownTrainer(userId: string) {

@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
-import { Can } from "@/components/Can";
-import type { Permission } from "@/lib/rbac";
+import { hasPermission, type Permission } from "@/lib/rbac";
+import { SidebarLinks, type NavItem } from "@/components/admin/sidebar-links";
 
 // Nav items gated by permission. `permission: null` means always visible.
 // Routes beyond /admin are built in later slices; links are wired ahead of them.
@@ -32,32 +31,21 @@ const NAV: { href: string; key: string; permission: Permission | null }[] = [
   { href: "/admin/help", key: "help", permission: null },
 ];
 
-export async function Sidebar() {
+/** The nav links this user may see, labelled in their language. Computed once
+ *  on the server and shared by the desktop sidebar and the mobile drawer. */
+export async function adminNavItems(permissions: readonly string[]): Promise<NavItem[]> {
   const t = await getTranslations("Nav");
-
-  const link = (href: string, key: string) => (
-    <Link
-      href={href}
-      className="block rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 dark:text-gray-200 dark:hover:bg-gray-800"
-    >
-      {t(key)}
-    </Link>
+  return NAV.filter((item) => item.permission === null || hasPermission(permissions, item.permission)).map(
+    (item) => ({ href: item.href, label: t(item.key) }),
   );
+}
 
+/** Desktop sidebar (md and up). Phones use MobileNav in the topbar instead. */
+export function Sidebar({ items, brand }: { items: NavItem[]; brand: string }) {
   return (
-    <aside className="w-56 shrink-0 border-r border-gray-200 p-3 dark:border-gray-800 print:hidden">
-      <div className="mb-4 px-3 py-2 text-lg font-bold text-emerald-700">MBV</div>
-      <nav className="flex flex-col gap-1">
-        {NAV.map((item) =>
-          item.permission === null ? (
-            <div key={item.href}>{link(item.href, item.key)}</div>
-          ) : (
-            <Can key={item.href} permission={item.permission}>
-              {link(item.href, item.key)}
-            </Can>
-          ),
-        )}
-      </nav>
+    <aside className="hidden w-56 shrink-0 border-r border-gray-200 p-3 md:block dark:border-gray-800 print:hidden">
+      <div className="mb-4 px-3 py-2 text-lg font-bold text-emerald-700">{brand}</div>
+      <SidebarLinks items={items} />
     </aside>
   );
 }

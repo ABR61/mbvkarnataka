@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { setBudget } from "./actions";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 export function BudgetRowForm({
   locale,
@@ -15,7 +16,7 @@ export function BudgetRowForm({
   amount: string;
 }) {
   const t = useTranslations("Budgets");
-  const [, formAction, pending] = useActionState<FormState, FormData>(setBudget, {});
+  const [state, formAction, pending] = useActionState<FormState, FormData>(setBudget, {});
 
   return (
     <form action={formAction} className="flex items-center gap-1">
@@ -29,6 +30,7 @@ export function BudgetRowForm({
         placeholder="0.00"
         className="w-28 rounded-md border border-gray-300 px-2 py-1 text-sm tabular-nums outline-none focus:border-emerald-500 dark:border-gray-700 dark:bg-gray-900"
       />
+      <FormError state={state} />
       <button
         type="submit"
         disabled={pending}

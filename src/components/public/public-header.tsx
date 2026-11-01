@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
+import { homeFor } from "@/lib/home";
 import { signOutAction } from "@/app/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -16,14 +17,13 @@ export async function PublicHeader() {
   const locale = await getLocale();
   const session = await auth();
   const loggedIn = !!session?.user;
-  // Staff (have permissions) go to /admin; trainees to their /portal.
-  const isStaff = (session?.user?.permissions?.length ?? 0) > 0;
-  const area = loggedIn
-    ? {
-        href: isStaff ? "/admin" : "/portal",
-        label: isStaff ? t("dashboard") : t("myPortal"),
-      }
+  // Link each signed-in person to their own area: trainers → trainer area,
+  // other staff → admin dashboard, trainees → portal (same rule as sign-in).
+  const home = session?.user
+    ? await homeFor(session.user.id, session.user.permissions ?? [])
     : null;
+  const AREA_LABEL = { admin: "dashboard", trainer: "trainerArea", portal: "myPortal" } as const;
+  const area = home ? { href: `/${home}`, label: t(AREA_LABEL[home]) } : null;
 
   const apply = { href: "/apply", label: t("apply") };
 

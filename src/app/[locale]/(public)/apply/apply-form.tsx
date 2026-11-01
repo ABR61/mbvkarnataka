@@ -6,6 +6,8 @@ import { Link } from "@/i18n/navigation";
 import { GENDERS } from "@/lib/validation/person";
 import { CameraCapture } from "@/components/camera-capture";
 import { Button } from "@/components/ui/button";
+import { FormError } from "@/components/ui/form-error";
+import { todayISO } from "@/lib/dates";
 import { createApplication, type ApplyState } from "./actions";
 
 type Option = { id: string; name: string };
@@ -49,6 +51,12 @@ export function ApplyForm({
     );
   }
 
+  // Refill from what was typed if the server rejected the submission.
+  const v = (k: string) => state.values?.[k] ?? "";
+  // Applicants must be 18+: the date picker can't go past this day.
+  const [y, m, d] = todayISO().split("-").map(Number);
+  const maxDob = `${y - 18}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
   const err = (key: string, msgKey?: string) =>
     state.fieldErrors?.[key] ? (
       <span className="text-sm text-red-600">{tc(msgKey ?? "required")}</span>
@@ -81,26 +89,39 @@ export function ApplyForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tp("firstName")} *</span>
-          <input name="firstName" required className={field} />
+          <input name="firstName" required autoComplete="given-name" defaultValue={v("firstName")} className={field} />
           {err("firstName")}
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tp("lastName")}</span>
-          <input name="lastName" className={field} />
+          <input name="lastName" autoComplete="family-name" defaultValue={v("lastName")} className={field} />
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tc("phone")} *</span>
-          <input name="phone" required className={field} />
+          <input
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            required
+            pattern="(\+91 ?)?[6-9][0-9]{9}"
+            title={t("phoneHint")}
+            placeholder={t("phoneHint")}
+            defaultValue={v("phone")}
+            className={field}
+          />
           {err("phone")}
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tp("email")}</span>
-          <input name="email" type="email" className={field} />
-          {err("email", "required")}
+          <input name="email" type="email" autoComplete="email" defaultValue={v("email")} className={field} />
+          {state.fieldErrors?.email && (
+            <span className="text-sm text-red-600">{tp("emailError_invalid")}</span>
+          )}
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tp("gender")}</span>
-          <select name="gender" defaultValue="" className={field}>
+          <select name="gender" defaultValue={v("gender")} className={field}>
             <option value="">—</option>
             {GENDERS.map((g) => (
               <option key={g} value={g}>{tp(`gender_${g}`)}</option>
@@ -109,7 +130,7 @@ export function ApplyForm({
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tp("dateOfBirth")}</span>
-          <input name="dateOfBirth" type="date" className={field} />
+          <input name="dateOfBirth" type="date" max={maxDob} defaultValue={v("dateOfBirth")} className={field} />
           {state.fieldErrors?.dateOfBirth && (
             <span className="text-sm text-red-600">
               {tp(`dobError_${state.fieldErrors.dateOfBirth}`)}
@@ -121,9 +142,13 @@ export function ApplyForm({
           <input
             name="aadhaarNumber"
             inputMode="numeric"
+            autoComplete="off"
             maxLength={12}
             required
+            pattern="[0-9]{12}"
+            title={t("aadhaarHint")}
             placeholder={t("aadhaarHint")}
+            defaultValue={v("aadhaarNumber")}
             className={field}
           />
           {state.fieldErrors?.aadhaarNumber && (
@@ -132,7 +157,7 @@ export function ApplyForm({
         </label>
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">{tc("district")}</span>
-          <select name="districtId" defaultValue="" className={field}>
+          <select name="districtId" defaultValue={v("districtId")} className={field}>
             <option value="">—</option>
             {districts.map((d) => (
               <option key={d.id} value={d.id}>{d.name}</option>
@@ -142,7 +167,7 @@ export function ApplyForm({
         {!futureProgram && (
           <label className="flex flex-col gap-1 text-sm">
             <span className="font-medium">{t("program")}</span>
-            <select name="programId" defaultValue={defaultProgramId} className={field}>
+            <select name="programId" defaultValue={v("programId") || defaultProgramId} className={field}>
               <option value="">—</option>
               {programs.map((p) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -163,11 +188,11 @@ export function ApplyForm({
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">{t("message")}</span>
-        <textarea name="message" rows={3} className={field} />
+        <textarea name="message" rows={3} defaultValue={v("message")} className={field} />
       </label>
 
       <label className="flex items-start gap-2 rounded-md border border-gray-200 p-3 text-sm dark:border-gray-800">
-        <input type="checkbox" name="consent" className="mt-1" />
+        <input type="checkbox" name="consent" required defaultChecked={v("consent") === "on"} className="mt-1 h-5 w-5" />
         <span>
           {t("consentLabel")}
           {state.fieldErrors?.consent && (
@@ -181,6 +206,8 @@ export function ApplyForm({
           {t("rateLimited")}
         </p>
       )}
+
+      <FormError state={state.error === "rate_limited" ? undefined : state} />
 
       <Button type="submit" disabled={pending} className="self-start">
         {pending ? t("submitting") : t("submit")}

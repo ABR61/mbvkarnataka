@@ -7,6 +7,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { venueInput, venueFromForm } from "@/lib/validation/venue";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "center.manage" as const;
 
@@ -31,7 +32,7 @@ export async function createVenue(
   await writeAudit(session.user.id, "create", "Venue", venue.id);
 
   revalidatePath(`/${locale}/admin/venues`);
-  redirect(`/${locale}/admin/venues`);
+  redirect(withFlash(`/${locale}/admin/venues`, "saved"));
 }
 
 export async function updateVenue(
@@ -54,7 +55,7 @@ export async function updateVenue(
   await writeAudit(session.user.id, "update", "Venue", id);
 
   revalidatePath(`/${locale}/admin/venues`);
-  redirect(`/${locale}/admin/venues`);
+  redirect(withFlash(`/${locale}/admin/venues`, "saved"));
 }
 
 export async function deleteVenue(formData: FormData): Promise<void> {
@@ -67,5 +68,5 @@ export async function deleteVenue(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Venue", id);
 
   revalidatePath(`/${locale}/admin/venues`);
-  redirect(`/${locale}/admin/venues`);
+  redirect(withFlash(`/${locale}/admin/venues`, "deleted"));
 }

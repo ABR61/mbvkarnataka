@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { formatINR } from "@/lib/money";
 import { addFollowUp, deleteFollowUp } from "./actions";
 import type { FormState } from "@/lib/forms";
+import { formatDate } from "@/lib/dates";
+import { FormError } from "@/components/ui/form-error";
 
 export type FollowUpRow = {
   id: string;
@@ -39,6 +41,7 @@ export function FollowUps({
       <h2 className="text-lg font-semibold">{t("title")}</h2>
 
       {items.length > 0 && (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -52,7 +55,7 @@ export function FollowUps({
           <tbody>
             {items.map((f) => (
               <tr key={f.id}>
-                <td className={td}>{f.followUpOn}</td>
+                <td className={td}>{formatDate(f.followUpOn, locale)}</td>
                 <td className={td}>{f.periodMonths != null ? t("months", { n: f.periodMonths }) : "—"}</td>
                 <td className={td}>{f.stillEmployed ? t("yes") : t("no")}</td>
                 <td className={`${td} tabular-nums`}>
@@ -63,7 +66,13 @@ export function FollowUps({
                     <input type="hidden" name="id" value={f.id} />
                     <input type="hidden" name="placementId" value={placementId} />
                     <input type="hidden" name="locale" value={locale} />
-                    <button type="submit" className="text-xs text-red-600 hover:underline">
+                    <button
+                      type="submit"
+                      onClick={(e) => {
+                        if (!window.confirm(tc("confirmDelete"))) e.preventDefault();
+                      }}
+                      className="text-xs text-red-600 hover:underline"
+                    >
                       {tc("delete")}
                     </button>
                   </form>
@@ -72,6 +81,7 @@ export function FollowUps({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <form action={formAction} className="flex flex-wrap items-end gap-2">
@@ -96,6 +106,7 @@ export function FollowUps({
           <span className="font-medium">{t("income")} (₹)</span>
           <input name="monthlyIncome" inputMode="decimal" placeholder="0.00" className={`${field} w-28`} />
         </label>
+        <FormError state={state} />
         <button
           type="submit"
           disabled={pending}

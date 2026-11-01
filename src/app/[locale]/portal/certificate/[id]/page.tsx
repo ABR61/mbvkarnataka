@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { PrintButton } from "@/components/admin/print-button";
 import { qrSvg } from "@/lib/qr";
 import { SITE_URL } from "@/lib/site";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function PortalCertificatePage({
 
   const t = await getTranslations("Certificates");
   const tp = await getTranslations("PortalFeedback");
-  const issued = cert.issuedAt.toISOString().slice(0, 10);
+  const issued = formatDate(cert.issuedAt, locale);
 
   // A scannable link to the public verification page, embedded on the cert so a
   // printed copy can be verified by anyone (employer, funder) with a phone.

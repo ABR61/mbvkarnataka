@@ -8,6 +8,7 @@ import { writeAudit } from "@/lib/audit";
 import { toLocalized } from "@/lib/localized";
 import { centerInput, centerFromForm } from "@/lib/validation/center";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "center.manage" as const;
 
@@ -38,7 +39,7 @@ export async function createCenter(
   await writeAudit(session.user.id, "create", "Center", center.id);
 
   revalidatePath(`/${locale}/admin/centers`);
-  redirect(`/${locale}/admin/centers`);
+  redirect(withFlash(`/${locale}/admin/centers`, "saved"));
 }
 
 export async function updateCenter(
@@ -67,7 +68,7 @@ export async function updateCenter(
   await writeAudit(session.user.id, "update", "Center", id);
 
   revalidatePath(`/${locale}/admin/centers`);
-  redirect(`/${locale}/admin/centers`);
+  redirect(withFlash(`/${locale}/admin/centers`, "saved"));
 }
 
 export async function deleteCenter(formData: FormData): Promise<void> {
@@ -91,5 +92,5 @@ export async function deleteCenter(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Center", id);
 
   revalidatePath(`/${locale}/admin/centers`);
-  redirect(`/${locale}/admin/centers`);
+  redirect(withFlash(`/${locale}/admin/centers`, "deleted"));
 }

@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
 import { BranchCarousel } from "@/components/public/branch-carousel";
+import { formatDate } from "@/lib/dates";
 
 // Pulls live counts + featured programs from the DB → render per-request.
 export const dynamic = "force-dynamic";
@@ -82,7 +83,7 @@ export default async function HomePage({
           title: featured.title,
           body: featured.body,
           district: localized(featured.district.name, locale),
-          date: featured.createdAt.toISOString().slice(0, 10),
+          date: formatDate(featured.createdAt, locale),
         },
       ]
     : [];
@@ -153,7 +154,7 @@ export default async function HomePage({
                         {r.body}
                       </p>
                       <time className="mt-4 text-xs text-gray-400">
-                        {r.createdAt.toISOString().slice(0, 10)}
+                        {formatDate(r.createdAt, locale)}
                       </time>
                     </div>
                   </Link>

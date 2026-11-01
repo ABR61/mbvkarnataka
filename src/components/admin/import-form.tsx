@@ -80,6 +80,7 @@ export function ImportForm({
       )}
 
       {state.rows && state.rows.length > 0 && (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -110,6 +111,7 @@ export function ImportForm({
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </form>
   );

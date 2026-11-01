@@ -9,6 +9,7 @@ import { writeAudit } from "@/lib/audit";
 import { toLocalized, toLocalizedOrNull } from "@/lib/localized";
 import { programInput, programFromForm, type ProgramInput } from "@/lib/validation/program";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "cohort.manage" as const;
 
@@ -45,7 +46,7 @@ export async function createProgram(
   await writeAudit(session.user.id, "create", "Program", program.id);
 
   revalidatePath(`/${locale}/admin/programs`);
-  redirect(`/${locale}/admin/programs`);
+  redirect(withFlash(`/${locale}/admin/programs`, "saved"));
 }
 
 export async function updateProgram(
@@ -69,7 +70,7 @@ export async function updateProgram(
   await writeAudit(session.user.id, "update", "Program", id);
 
   revalidatePath(`/${locale}/admin/programs`);
-  redirect(`/${locale}/admin/programs`);
+  redirect(withFlash(`/${locale}/admin/programs`, "saved"));
 }
 
 export async function deleteProgram(formData: FormData): Promise<void> {
@@ -96,5 +97,5 @@ export async function deleteProgram(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Program", id);
 
   revalidatePath(`/${locale}/admin/programs`);
-  redirect(`/${locale}/admin/programs`);
+  redirect(withFlash(`/${locale}/admin/programs`, "deleted"));
 }

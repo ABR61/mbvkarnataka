@@ -9,6 +9,7 @@ import { formatINR } from "@/lib/money";
 import { districtOptions } from "@/lib/options";
 import { Pagination } from "@/components/admin/pagination";
 import { EXPENSE_STATUSES } from "@/lib/validation/expense";
+import { formatDate } from "@/lib/dates";
 
 const PAGE_SIZE = 20;
 
@@ -127,6 +128,7 @@ export default async function ExpensesPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -143,7 +145,7 @@ export default async function ExpensesPage({
           <tbody>
             {rows.map((e) => (
               <tr key={e.id}>
-                <td className={td}>{e.incurredOn.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(e.incurredOn, locale)}</td>
                 <td className={`${td} tabular-nums`}>{formatINR(e.amount.toString())}</td>
                 <td className={td}>{e.category ?? "—"}</td>
                 <td className={td}>{e.district ? localized(e.district.name, locale) : "—"}</td>
@@ -159,6 +161,7 @@ export default async function ExpensesPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination basePath="/admin/expenses" page={page} pageSize={PAGE_SIZE} total={total} query="" />

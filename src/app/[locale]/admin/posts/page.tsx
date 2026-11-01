@@ -7,6 +7,7 @@ import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { deletePost, setPostApproval } from "./actions";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export default async function PostsPage({
       {posts.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -93,7 +95,7 @@ export default async function PostsPage({
                     {p.approved ? t("approved") : t("pending")}
                   </span>
                 </td>
-                <td className={td}>{p.createdAt.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(p.createdAt, locale)}</td>
                 <td className={td}>
                   <div className="flex items-center gap-3">
                     {isSuperAdmin && (
@@ -130,6 +132,7 @@ export default async function PostsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );

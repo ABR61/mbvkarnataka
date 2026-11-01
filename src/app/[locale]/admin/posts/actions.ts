@@ -8,6 +8,7 @@ import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import { sanitizeImageUrl } from "@/lib/storage";
 import type { FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "post.manage" as const;
 
@@ -62,7 +63,7 @@ export async function createPost(
 
   revalidatePath(`/${locale}/admin/posts`);
   revalidatePath(`/${locale}`);
-  redirect(`/${locale}/admin/posts`);
+  redirect(withFlash(`/${locale}/admin/posts`, "saved"));
 }
 
 /** Approve or unapprove a post — super admin (no district scope) only. */
@@ -83,7 +84,7 @@ export async function setPostApproval(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/posts`);
   revalidatePath(`/${locale}`);
-  redirect(`/${locale}/admin/posts`);
+  redirect(withFlash(`/${locale}/admin/posts`, "saved"));
 }
 
 export async function deletePost(formData: FormData): Promise<void> {
@@ -105,5 +106,5 @@ export async function deletePost(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/posts`);
   revalidatePath(`/${locale}`);
-  redirect(`/${locale}/admin/posts`);
+  redirect(withFlash(`/${locale}/admin/posts`, "deleted"));
 }

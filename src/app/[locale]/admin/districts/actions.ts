@@ -8,6 +8,7 @@ import { writeAudit } from "@/lib/audit";
 import { toLocalized } from "@/lib/localized";
 import { districtInput, districtFromForm } from "@/lib/validation/district";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 // Districts are seeded (the 31 Karnataka districts); only edit is exposed.
 export async function updateDistrict(
@@ -34,5 +35,5 @@ export async function updateDistrict(
   await writeAudit(session.user.id, "update", "District", id);
 
   revalidatePath(`/${locale}/admin/districts`);
-  redirect(`/${locale}/admin/districts`);
+  redirect(withFlash(`/${locale}/admin/districts`, "saved"));
 }

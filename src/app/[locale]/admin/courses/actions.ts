@@ -9,6 +9,7 @@ import { writeAudit } from "@/lib/audit";
 import { toLocalized, toLocalizedOrNull } from "@/lib/localized";
 import { courseInput, courseFromForm, type CourseInput } from "@/lib/validation/course";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "cohort.manage" as const;
 
@@ -44,7 +45,7 @@ export async function createCourse(
   await writeAudit(session.user.id, "create", "Course", course.id);
 
   revalidatePath(`/${locale}/admin/courses`);
-  redirect(`/${locale}/admin/courses`);
+  redirect(withFlash(`/${locale}/admin/courses`, "saved"));
 }
 
 export async function updateCourse(
@@ -68,7 +69,7 @@ export async function updateCourse(
   await writeAudit(session.user.id, "update", "Course", id);
 
   revalidatePath(`/${locale}/admin/courses`);
-  redirect(`/${locale}/admin/courses`);
+  redirect(withFlash(`/${locale}/admin/courses`, "saved"));
 }
 
 export async function deleteCourse(formData: FormData): Promise<void> {
@@ -81,5 +82,5 @@ export async function deleteCourse(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Course", id);
 
   revalidatePath(`/${locale}/admin/courses`);
-  redirect(`/${locale}/admin/courses`);
+  redirect(withFlash(`/${locale}/admin/courses`, "deleted"));
 }

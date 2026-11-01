@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
+import { formatDate } from "@/lib/dates";
 
 // Per-district branch page → render per-request.
 export const dynamic = "force-dynamic";
@@ -97,7 +98,7 @@ export default async function DistrictBranchPage({
                   {p.body}
                 </p>
                 <time className="mt-3 text-xs text-gray-400">
-                  {p.createdAt.toISOString().slice(0, 10)}
+                  {formatDate(p.createdAt, locale)}
                 </time>
               </div>
             </li>

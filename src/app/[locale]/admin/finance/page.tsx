@@ -6,6 +6,7 @@ import { formatINR } from "@/lib/money";
 import { financialStatus, grantUtilization, budgetVsActual } from "@/lib/finance";
 import { Card, Kpi } from "@/components/ui/card";
 import { Badge, StatusPill } from "@/components/ui/badge";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +103,7 @@ export default async function FinanceStatusPage({
         {f.byCategory.length === 0 ? (
           <p className="text-sm text-gray-400">{t("noExpenses")}</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr>
@@ -118,6 +120,7 @@ export default async function FinanceStatusPage({
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
 
@@ -127,6 +130,7 @@ export default async function FinanceStatusPage({
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
             {t("byDistrict")}
           </h2>
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr>
@@ -154,6 +158,7 @@ export default async function FinanceStatusPage({
               ))}
             </tbody>
           </table>
+          </div>
         </section>
       )}
 
@@ -261,6 +266,7 @@ export default async function FinanceStatusPage({
         {f.recent.length === 0 ? (
           <p className="text-sm text-gray-400">{t("noExpenses")}</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr>
@@ -273,7 +279,7 @@ export default async function FinanceStatusPage({
             <tbody>
               {f.recent.map((e) => (
                 <tr key={e.id}>
-                  <td className={td}>{e.incurredOn}</td>
+                  <td className={td}>{formatDate(e.incurredOn, locale)}</td>
                   <td className={td}>{e.category}</td>
                   <td className={td}>
                     <StatusPill status={e.status} label={t(`status_${e.status}`)} />
@@ -283,6 +289,7 @@ export default async function FinanceStatusPage({
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </section>
     </div>

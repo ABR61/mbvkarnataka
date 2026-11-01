@@ -7,6 +7,7 @@ import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { localized } from "@/lib/localized";
 import { Pagination } from "@/components/admin/pagination";
 import { APPLICATION_STATUSES } from "@/lib/validation/application";
+import { formatDate } from "@/lib/dates";
 
 const PAGE_SIZE = 15;
 
@@ -76,6 +77,7 @@ export default async function ApplicationsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -102,7 +104,7 @@ export default async function ApplicationsPage({
                       : "—"}
                 </td>
                 <td className={td}>{t(`status_${a.status}`)}</td>
-                <td className={td}>{a.createdAt.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(a.createdAt, locale)}</td>
                 <td className={td}>
                   <Link
                     href={`/admin/applications/${a.id}`}
@@ -115,6 +117,7 @@ export default async function ApplicationsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination

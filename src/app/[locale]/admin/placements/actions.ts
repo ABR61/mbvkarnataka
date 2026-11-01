@@ -8,6 +8,7 @@ import { writeAudit } from "@/lib/audit";
 import { parseDate } from "@/lib/validation/cohort";
 import { placementInput, followUpInput } from "@/lib/validation/placement";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "placement.manage" as const;
 
@@ -56,7 +57,7 @@ export async function createPlacement(
   await writeAudit(session.user.id, "create", "Placement", placement.id);
 
   revalidatePath(`/${locale}/admin/placements`);
-  redirect(`/${locale}/admin/placements`);
+  redirect(withFlash(`/${locale}/admin/placements`, "saved"));
 }
 
 export async function updatePlacement(
@@ -74,7 +75,7 @@ export async function updatePlacement(
   await writeAudit(session.user.id, "update", "Placement", id);
 
   revalidatePath(`/${locale}/admin/placements`);
-  redirect(`/${locale}/admin/placements`);
+  redirect(withFlash(`/${locale}/admin/placements`, "saved"));
 }
 
 export async function deletePlacement(formData: FormData): Promise<void> {
@@ -87,7 +88,7 @@ export async function deletePlacement(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Placement", id);
 
   revalidatePath(`/${locale}/admin/placements`);
-  redirect(`/${locale}/admin/placements`);
+  redirect(withFlash(`/${locale}/admin/placements`, "deleted"));
 }
 
 export async function addFollowUp(

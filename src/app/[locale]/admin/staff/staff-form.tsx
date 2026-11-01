@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 type District = { id: string; name: string };
 
@@ -69,6 +70,7 @@ export function StaffForm({
         </label>
       )}
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

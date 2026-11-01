@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "feedback.manage" as const;
 
@@ -28,7 +29,7 @@ export async function setFeedbackApproval(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/feedback`);
   revalidatePath(`/${locale}/future-programs`);
-  redirect(`/${locale}/admin/feedback`);
+  redirect(withFlash(`/${locale}/admin/feedback`, "saved"));
 }
 
 export async function deleteFeedback(formData: FormData): Promise<void> {
@@ -49,5 +50,5 @@ export async function deleteFeedback(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/feedback`);
   revalidatePath(`/${locale}/future-programs`);
-  redirect(`/${locale}/admin/feedback`);
+  redirect(withFlash(`/${locale}/admin/feedback`, "deleted"));
 }

@@ -14,7 +14,26 @@ import { consumeRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMITS } from "@/lib/rate-limit-config";
 import { getClientIp } from "@/lib/client-ip";
 
-export type ApplyState = FormState & { ok?: boolean };
+export type ApplyState = FormState & {
+  ok?: boolean;
+  /** What the applicant typed, echoed back on error so the form can refill
+   *  itself (React resets a form after its action runs). Excludes the photo. */
+  values?: Record<string, string>;
+};
+
+const ECHO_FIELDS = [
+  "firstName", "lastName", "phone", "email", "gender", "dateOfBirth",
+  "aadhaarNumber", "districtId", "programId", "message", "consent",
+] as const;
+
+function echo(formData: FormData): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const k of ECHO_FIELDS) {
+    const v = formData.get(k);
+    if (typeof v === "string" && v) out[k] = v;
+  }
+  return out;
+}
 
 /**
  * Public, unauthenticated application submission. Defenses: a hidden honeypot
@@ -35,10 +54,12 @@ export async function createApplication(
     limit: RATE_LIMITS.apply.limit,
     windowSec: RATE_LIMITS.apply.windowSec,
   });
-  if (!gate.ok) return { error: "rate_limited" };
+  if (!gate.ok) return { error: "rate_limited", values: echo(formData) };
 
   const parsed = applicationInput.safeParse(applicationFromForm(formData));
-  if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
+  if (!parsed.success) {
+    return { fieldErrors: zodFieldErrors(parsed.error), values: echo(formData) };
+  }
   const d = parsed.data;
 
   // Applicant photo, captured live on the camera — OPTIONAL for now (so it can
@@ -51,11 +72,13 @@ export async function createApplication(
       : null;
 
   if (formData.get("consent") !== "on") {
-    return { fieldErrors: { consent: "required" } };
+    return { fieldErrors: { consent: "required" }, values: echo(formData) };
   }
 
   const dob = parseDateOfBirth(d.dateOfBirth);
-  if (dob.error) return { fieldErrors: { dateOfBirth: dob.error } };
+  if (dob.error) {
+    return { fieldErrors: { dateOfBirth: dob.error }, values: echo(formData) };
+  }
 
   // Applying to an announced future program: verify it and inherit its district
   // so the branch admin who posted it sees the applicant in their pipeline.

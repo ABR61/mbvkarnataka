@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { cohortOptions } from "@/lib/options";
 import { ApprovalPanel, ConvertForm } from "../application-forms";
 import { updateApplication, convertApplication } from "../actions";
+import { formatDate } from "@/lib/dates";
 
 export default async function ApplicationDetailPage({
   params,
@@ -43,10 +44,7 @@ export default async function ApplicationDetailPage({
   return (
     <div className="flex max-w-3xl flex-col gap-8">
       <div>
-        <Link href="/admin/applications" className="text-sm text-gray-500 hover:underline">
-          ← {t("title")}
-        </Link>
-        <h1 className="mt-2 text-2xl font-bold">
+        <h1 className="text-2xl font-bold">
           {[app.firstName, app.lastName].filter(Boolean).join(" ")}
         </h1>
         <p className="text-sm text-gray-500">{t(`status_${app.status}`)}</p>
@@ -60,7 +58,7 @@ export default async function ApplicationDetailPage({
         {row(tp("gender"), app.gender ? tp(`gender_${app.gender}`) : "")}
         {row(
           tp("dateOfBirth"),
-          app.dateOfBirth ? app.dateOfBirth.toISOString().slice(0, 10) : "",
+          app.dateOfBirth ? formatDate(app.dateOfBirth, locale) : "",
         )}
         {row(tc("district"), app.district ? localized(app.district.name, locale) : "")}
         {row(
@@ -71,7 +69,7 @@ export default async function ApplicationDetailPage({
         )}
         {row(ta("aadhaar"), app.aadhaarNumber ?? "")}
         {row(t("message"), app.message ?? "")}
-        {row(t("consentGiven"), app.consentAt ? app.consentAt.toISOString().slice(0, 10) : "—")}
+        {row(t("consentGiven"), app.consentAt ? formatDate(app.consentAt, locale) : "—")}
       </section>
 
       {app.photoUrl && (

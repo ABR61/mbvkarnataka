@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { formatINR } from "@/lib/money";
 import { Pagination } from "@/components/admin/pagination";
+import { formatDate } from "@/lib/dates";
 
 const PAGE_SIZE = 20;
 
@@ -64,6 +65,7 @@ export default async function GrantsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -77,7 +79,7 @@ export default async function GrantsPage({
           <tbody>
             {rows.map((g) => (
               <tr key={g.id}>
-                <td className={td}>{g.receivedOn.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(g.receivedOn, locale)}</td>
                 <td className={td}>{g.funder}</td>
                 <td className={`${td} tabular-nums`}>{formatINR(g.amount.toString())}</td>
                 <td className={td}>{g.reference ?? "—"}</td>
@@ -90,6 +92,7 @@ export default async function GrantsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination basePath="/admin/grants" page={page} pageSize={PAGE_SIZE} total={total} query="" />

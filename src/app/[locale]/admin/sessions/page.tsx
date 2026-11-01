@@ -5,6 +5,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { Can } from "@/components/Can";
 import { Pagination } from "@/components/admin/pagination";
+import { formatDateWithWeekday } from "@/lib/dates";
 
 const PAGE_SIZE = 15;
 
@@ -42,7 +43,7 @@ export default async function SessionsPage({
 
   const th = "px-3 py-2 text-left font-medium text-gray-500";
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
-  const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
+  const fmtDate = (d: Date) => formatDateWithWeekday(d, locale);
 
   return (
     <div className="flex flex-col gap-4">
@@ -59,6 +60,7 @@ export default async function SessionsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -109,6 +111,7 @@ export default async function SessionsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination

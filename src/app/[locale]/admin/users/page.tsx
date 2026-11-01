@@ -72,6 +72,7 @@ export default async function UsersPage({
 
       <SearchBox placeholder={tc("search")} defaultValue={q} />
 
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr>
@@ -107,6 +108,7 @@ export default async function UsersPage({
           ))}
         </tbody>
       </table>
+      </div>
 
       <Pagination
         basePath="/admin/users"

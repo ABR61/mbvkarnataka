@@ -7,6 +7,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { budgetInput } from "@/lib/validation/expense";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 /** Set (upsert) a program's budget. */
 export async function setBudget(
@@ -32,5 +33,5 @@ export async function setBudget(
   await writeAudit(session.user.id, "update", "Budget", d.programId);
 
   revalidatePath(`/${locale}/admin/budgets`);
-  redirect(`/${locale}/admin/budgets`);
+  redirect(withFlash(`/${locale}/admin/budgets`, "saved"));
 }

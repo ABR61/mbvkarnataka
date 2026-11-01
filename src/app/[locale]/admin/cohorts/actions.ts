@@ -14,6 +14,7 @@ import {
 } from "@/lib/validation/cohort";
 import { randomCode, certificateSerial } from "@/lib/certificate";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "cohort.manage" as const;
 
@@ -55,7 +56,7 @@ export async function createCohort(
   await writeAudit(session.user.id, "create", "Cohort", cohort.id);
 
   revalidatePath(`/${locale}/admin/cohorts`);
-  redirect(`/${locale}/admin/cohorts/${cohort.id}/edit`);
+  redirect(withFlash(`/${locale}/admin/cohorts/${cohort.id}/edit`, "saved"));
 }
 
 export async function updateCohort(
@@ -80,7 +81,7 @@ export async function updateCohort(
   await writeAudit(session.user.id, "update", "Cohort", id);
 
   revalidatePath(`/${locale}/admin/cohorts`);
-  redirect(`/${locale}/admin/cohorts`);
+  redirect(withFlash(`/${locale}/admin/cohorts`, "saved"));
 }
 
 export async function deleteCohort(formData: FormData): Promise<void> {
@@ -93,7 +94,7 @@ export async function deleteCohort(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Cohort", id);
 
   revalidatePath(`/${locale}/admin/cohorts`);
-  redirect(`/${locale}/admin/cohorts`);
+  redirect(withFlash(`/${locale}/admin/cohorts`, "deleted"));
 }
 
 // ── Enrollment ──────────────────────────────────────────────

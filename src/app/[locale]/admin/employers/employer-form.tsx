@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Option } from "@/lib/options";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 const field =
   "rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 dark:border-gray-700 dark:bg-gray-900";
@@ -84,6 +85,7 @@ export function EmployerForm({
         <textarea name="note" rows={2} defaultValue={defaults.note} className={field} />
       </label>
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

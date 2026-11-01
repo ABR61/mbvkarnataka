@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { PersonFields, type PersonDefaults } from "@/components/forms/person-fields";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 export function TrainerForm({
   locale,
@@ -64,6 +65,7 @@ export function TrainerForm({
         <p className="text-xs text-gray-400">{t("emailLocked")}</p>
       )}
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

@@ -14,6 +14,7 @@ import {
   isAttendanceStatus,
 } from "@/lib/validation/session";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 function localeOf(formData: FormData): string {
   return (formData.get("locale") as string) || "en";
@@ -50,7 +51,7 @@ export async function createSession(
   await writeAudit(session.user.id, "create", "TrainingSession", created.id);
 
   revalidatePath(`/${locale}/admin/sessions`);
-  redirect(`/${locale}/admin/sessions`);
+  redirect(withFlash(`/${locale}/admin/sessions`, "saved"));
 }
 
 export async function updateSession(
@@ -74,7 +75,7 @@ export async function updateSession(
   await writeAudit(session.user.id, "update", "TrainingSession", id);
 
   revalidatePath(`/${locale}/admin/sessions`);
-  redirect(`/${locale}/admin/sessions`);
+  redirect(withFlash(`/${locale}/admin/sessions`, "saved"));
 }
 
 export async function deleteSession(formData: FormData): Promise<void> {
@@ -87,7 +88,7 @@ export async function deleteSession(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "TrainingSession", id);
 
   revalidatePath(`/${locale}/admin/sessions`);
-  redirect(`/${locale}/admin/sessions`);
+  redirect(withFlash(`/${locale}/admin/sessions`, "deleted"));
 }
 
 /**
@@ -135,5 +136,5 @@ export async function markAttendance(
   });
 
   revalidatePath(`/${locale}/admin/sessions/${sessionId}/attendance`);
-  redirect(`/${locale}/admin/sessions`);
+  redirect(withFlash(`/${locale}/admin/sessions`, "saved"));
 }

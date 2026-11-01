@@ -40,9 +40,13 @@ export function FeedbackForm({
                 name="rating"
                 value={n}
                 defaultChecked={currentRating === n}
+                aria-label={t("starsLabel", { n })}
                 className="peer sr-only"
               />
-              <span className="text-2xl text-gray-300 peer-checked:text-amber-500 group-hover:text-amber-400">
+              <span
+                aria-hidden
+                className="rounded text-3xl text-gray-300 peer-checked:text-amber-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500 group-hover:text-amber-400"
+              >
                 ★
               </span>
             </label>

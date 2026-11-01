@@ -20,7 +20,9 @@ export function LocaleSwitcher() {
           type="button"
           onClick={() => router.replace(pathname, { locale: loc })}
           disabled={loc === current}
-          className="rounded px-2 py-1 text-xs hover:bg-gray-100 disabled:font-semibold disabled:text-emerald-700 dark:hover:bg-gray-800"
+          aria-current={loc === current ? "true" : undefined}
+          lang={loc}
+          className="min-h-10 rounded-md px-3 py-2 text-sm hover:bg-gray-100 disabled:font-semibold disabled:text-emerald-700 dark:hover:bg-gray-800"
         >
           {LABELS[loc] ?? loc}
         </button>

@@ -8,6 +8,7 @@ import { writeAudit } from "@/lib/audit";
 import { parseDate } from "@/lib/validation/cohort";
 import { grantInput } from "@/lib/validation/expense";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "finance.manage" as const;
 
@@ -54,7 +55,7 @@ export async function createGrant(
   await writeAudit(session.user.id, "create", "Grant", grant.id);
 
   revalidatePath(`/${locale}/admin/grants`);
-  redirect(`/${locale}/admin/grants`);
+  redirect(withFlash(`/${locale}/admin/grants`, "saved"));
 }
 
 export async function updateGrant(
@@ -72,7 +73,7 @@ export async function updateGrant(
   await writeAudit(session.user.id, "update", "Grant", id);
 
   revalidatePath(`/${locale}/admin/grants`);
-  redirect(`/${locale}/admin/grants`);
+  redirect(withFlash(`/${locale}/admin/grants`, "saved"));
 }
 
 export async function deleteGrant(formData: FormData): Promise<void> {
@@ -93,5 +94,5 @@ export async function deleteGrant(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Grant", id);
 
   revalidatePath(`/${locale}/admin/grants`);
-  redirect(`/${locale}/admin/grants`);
+  redirect(withFlash(`/${locale}/admin/grants`, "deleted"));
 }

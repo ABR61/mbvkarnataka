@@ -134,6 +134,7 @@ export default async function EditCohortPage({
         {cohort.enrollments.length === 0 ? (
           <p className="text-sm text-gray-400">{t("noEnrollments")}</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <tbody>
               {cohort.enrollments.map((e) => (
@@ -185,6 +186,7 @@ export default async function EditCohortPage({
               ))}
             </tbody>
           </table>
+          </div>
         )}
 
         {atCapacity ? (
@@ -206,6 +208,7 @@ export default async function EditCohortPage({
         {cohort.trainerAssignments.length === 0 ? (
           <p className="text-sm text-gray-400">{t("noTrainers")}</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <tbody>
               {cohort.trainerAssignments.map((a) => (
@@ -226,6 +229,7 @@ export default async function EditCohortPage({
               ))}
             </tbody>
           </table>
+          </div>
         )}
 
         <AssignTrainerForm

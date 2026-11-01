@@ -16,6 +16,7 @@ import {
   parseDateOfBirth,
 } from "@/lib/validation/person";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const loginSchema = z.object({
   email: z.email("invalid"),
@@ -76,7 +77,7 @@ export async function createTrainee(
   });
 
   revalidatePath(`/${locale}/admin/trainees`);
-  redirect(`/${locale}/admin/trainees`);
+  redirect(withFlash(`/${locale}/admin/trainees`, "saved"));
 }
 
 export async function updateTrainee(
@@ -114,7 +115,7 @@ export async function updateTrainee(
   await writeAudit(session.user.id, "update", "Person", id, { kind: "TRAINEE" });
 
   revalidatePath(`/${locale}/admin/trainees`);
-  redirect(`/${locale}/admin/trainees`);
+  redirect(withFlash(`/${locale}/admin/trainees`, "saved"));
 }
 
 export async function deleteTrainee(formData: FormData): Promise<void> {
@@ -136,7 +137,7 @@ export async function deleteTrainee(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Person", id, { kind: "TRAINEE" });
 
   revalidatePath(`/${locale}/admin/trainees`);
-  redirect(`/${locale}/admin/trainees`);
+  redirect(withFlash(`/${locale}/admin/trainees`, "deleted"));
 }
 
 /**

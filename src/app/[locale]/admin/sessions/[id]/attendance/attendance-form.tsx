@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ATTENDANCE_STATUSES } from "@/lib/validation/session";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 type RosterRow = { personId: string; name: string; status: string };
 
@@ -21,7 +22,7 @@ export function AttendanceForm({
 }) {
   const t = useTranslations("Attendance");
   const tc = useTranslations("Common");
-  const [, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(action, {});
 
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
 
@@ -47,6 +48,7 @@ export function AttendanceForm({
         </button>
       </div>
 
+      <div className="overflow-x-auto">
       <table className="w-full max-w-xl text-sm">
         <tbody>
           {roster.map((r) => (
@@ -68,7 +70,9 @@ export function AttendanceForm({
           ))}
         </tbody>
       </table>
+      </div>
 
+      <FormError state={state} />
       <div className="flex items-center gap-3">
         <button
           type="submit"

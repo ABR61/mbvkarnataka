@@ -6,6 +6,7 @@ import { localized } from "@/lib/localized";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import { RATE_LIMITS } from "@/lib/rate-limit-config";
 import { getClientIp } from "@/lib/client-ip";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -65,7 +66,7 @@ export default async function VerifyCertificatePage({
             <Row label={t("serial")} value={cert.serialNumber} />
             <Row
               label={t("issued")}
-              value={cert.issuedAt.toISOString().slice(0, 10)}
+              value={formatDate(cert.issuedAt, locale)}
             />
           </dl>
         </div>

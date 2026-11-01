@@ -60,6 +60,7 @@ export default async function VendorsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -86,6 +87,7 @@ export default async function VendorsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination basePath="/admin/vendors" page={page} pageSize={PAGE_SIZE} total={total} query={q} />

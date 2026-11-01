@@ -9,6 +9,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { userCreateInput, userUpdateInput } from "@/lib/validation/user";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "user.manage" as const;
 
@@ -79,7 +80,7 @@ export async function createUser(
   await writeAudit(session.user.id, "create", "User", user.id);
 
   revalidatePath(`/${locale}/admin/users`);
-  redirect(`/${locale}/admin/users`);
+  redirect(withFlash(`/${locale}/admin/users`, "saved"));
 }
 
 export async function updateUser(
@@ -116,7 +117,7 @@ export async function updateUser(
   await writeAudit(session.user.id, "update", "User", id, { status: d.status });
 
   revalidatePath(`/${locale}/admin/users`);
-  redirect(`/${locale}/admin/users`);
+  redirect(withFlash(`/${locale}/admin/users`, "saved"));
 }
 
 export async function resetUserPassword(
@@ -151,5 +152,5 @@ export async function deleteUser(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "User", id);
 
   revalidatePath(`/${locale}/admin/users`);
-  redirect(`/${locale}/admin/users`);
+  redirect(withFlash(`/${locale}/admin/users`, "deleted"));
 }

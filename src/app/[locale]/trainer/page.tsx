@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
 import { TrainerClock } from "./trainer-clock";
 import { trainerCheckIn, trainerCheckOut } from "./actions";
+import { formatDate, todayISO } from "@/lib/dates";
+import { Link } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +44,7 @@ export default async function TrainerHomePage({
 
   const t = await getTranslations("TrainerHome");
 
-  const todayStr = new Date().toLocaleDateString("en-CA");
+  const todayStr = todayISO(); // India date, not server-local
   const today = person.staffAttendances.find(
     (r) => r.date.toISOString().slice(0, 10) === todayStr,
   );
@@ -78,12 +80,24 @@ export default async function TrainerHomePage({
         checkOutAction={trainerCheckOut}
       />
 
+      {/* Class (trainee) attendance lives in Sessions, which trainers can open. */}
+      <Link
+        href="/admin/sessions"
+        className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 hover:border-emerald-400 hover:bg-emerald-50/40 dark:border-gray-800 dark:hover:bg-emerald-950/20"
+      >
+        <span>
+          <span className="block font-semibold">{t("classAttendance")}</span>
+          <span className="block text-sm text-gray-600 dark:text-gray-400">{t("classAttendanceBody")}</span>
+        </span>
+        <span aria-hidden className="text-emerald-700">→</span>
+      </Link>
+
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
           {t("myAttendance")}
         </h2>
         {person.staffAttendances.length === 0 ? (
-          <p className="text-sm text-gray-400">{t("noAttendance")}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t("noAttendance")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-sm">
@@ -99,7 +113,7 @@ export default async function TrainerHomePage({
               <tbody>
                 {person.staffAttendances.map((r) => (
                   <tr key={r.id}>
-                    <td className={td}>{r.date.toISOString().slice(0, 10)}</td>
+                    <td className={td}>{formatDate(r.date, locale)}</td>
                     <td className={td}>
                       <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[r.status] ?? ""}`}>
                         {t(`status_${r.status}`)}

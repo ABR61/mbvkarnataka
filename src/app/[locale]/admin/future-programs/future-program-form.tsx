@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ImagePicker } from "@/components/image-picker";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 type District = { id: string; name: string };
 
@@ -113,6 +114,7 @@ export function FutureProgramForm({
         </label>
       </div>
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

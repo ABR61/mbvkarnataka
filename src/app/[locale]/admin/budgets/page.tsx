@@ -45,6 +45,7 @@ export default async function BudgetsPage({
         <p className="mt-1 text-sm text-gray-500">{t("intro")}</p>
       </div>
 
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr>
@@ -81,6 +82,7 @@ export default async function BudgetsPage({
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

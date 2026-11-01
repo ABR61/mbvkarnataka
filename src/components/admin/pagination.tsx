@@ -34,7 +34,12 @@ export async function Pagination({
 
   return (
     <nav className="mt-4 flex items-center justify-between text-sm">
-      <Link href={href(page - 1)} className={`${btn} ${page <= 1 ? disabled : ""}`}>
+      <Link
+        href={href(page - 1)}
+        aria-disabled={page <= 1}
+        tabIndex={page <= 1 ? -1 : undefined}
+        className={`${btn} ${page <= 1 ? disabled : ""}`}
+      >
         {t("previous")}
       </Link>
       <span className="text-gray-500">
@@ -42,6 +47,8 @@ export async function Pagination({
       </span>
       <Link
         href={href(page + 1)}
+        aria-disabled={page >= totalPages}
+        tabIndex={page >= totalPages ? -1 : undefined}
         className={`${btn} ${page >= totalPages ? disabled : ""}`}
       >
         {t("next")}

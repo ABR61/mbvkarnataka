@@ -135,6 +135,7 @@ export default async function ReportsPage({
                 }
               />
             </div>
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr>
@@ -159,6 +160,7 @@ export default async function ReportsPage({
                 ))}
               </tbody>
             </table>
+            </div>
           </>
         )}
       </section>
@@ -167,6 +169,7 @@ export default async function ReportsPage({
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
           {t("byDistrict")}
         </h2>
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -191,6 +194,7 @@ export default async function ReportsPage({
             ))}
           </tbody>
         </table>
+        </div>
       </section>
     </div>
   );

@@ -6,6 +6,7 @@ import { localized } from "@/lib/localized";
 import { PrintButton } from "@/components/admin/print-button";
 import { qrSvg } from "@/lib/qr";
 import { SITE_URL } from "@/lib/site";
+import { formatDate } from "@/lib/dates";
 
 export default async function CertificatePage({
   params,
@@ -20,7 +21,7 @@ export default async function CertificatePage({
   if (!cert) notFound();
 
   const t = await getTranslations("Certificates");
-  const issued = cert.issuedAt.toISOString().slice(0, 10);
+  const issued = formatDate(cert.issuedAt, locale);
 
   const verifyUrl = `${SITE_URL}/${locale}/verify/${cert.verifyCode}`;
   const qr = await qrSvg(verifyUrl);

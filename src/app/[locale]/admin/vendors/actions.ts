@@ -7,6 +7,7 @@ import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { vendorInput } from "@/lib/validation/expense";
 import { zodFieldErrors, type FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "finance.manage" as const;
 
@@ -47,7 +48,7 @@ export async function createVendor(
   await writeAudit(session.user.id, "create", "Vendor", vendor.id);
 
   revalidatePath(`/${locale}/admin/vendors`);
-  redirect(`/${locale}/admin/vendors`);
+  redirect(withFlash(`/${locale}/admin/vendors`, "saved"));
 }
 
 export async function updateVendor(
@@ -65,7 +66,7 @@ export async function updateVendor(
   await writeAudit(session.user.id, "update", "Vendor", id);
 
   revalidatePath(`/${locale}/admin/vendors`);
-  redirect(`/${locale}/admin/vendors`);
+  redirect(withFlash(`/${locale}/admin/vendors`, "saved"));
 }
 
 export async function deleteVendor(formData: FormData): Promise<void> {
@@ -78,5 +79,5 @@ export async function deleteVendor(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Vendor", id);
 
   revalidatePath(`/${locale}/admin/vendors`);
-  redirect(`/${locale}/admin/vendors`);
+  redirect(withFlash(`/${locale}/admin/vendors`, "deleted"));
 }

@@ -8,6 +8,7 @@ import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import { sanitizeImageUrl } from "@/lib/storage";
 import type { FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "program.plan" as const;
 
@@ -68,7 +69,7 @@ export async function createFutureProgram(
 
   revalidatePath(`/${locale}/admin/future-programs`);
   revalidatePath(`/${locale}/future-programs`);
-  redirect(`/${locale}/admin/future-programs`);
+  redirect(withFlash(`/${locale}/admin/future-programs`, "saved"));
 }
 
 /** Approve/unapprove — super admin (no district scope) only. */
@@ -88,7 +89,7 @@ export async function setFutureProgramApproval(formData: FormData): Promise<void
 
   revalidatePath(`/${locale}/admin/future-programs`);
   revalidatePath(`/${locale}/future-programs`);
-  redirect(`/${locale}/admin/future-programs`);
+  redirect(withFlash(`/${locale}/admin/future-programs`, "saved"));
 }
 
 export async function deleteFutureProgram(formData: FormData): Promise<void> {
@@ -109,5 +110,5 @@ export async function deleteFutureProgram(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/future-programs`);
   revalidatePath(`/${locale}/future-programs`);
-  redirect(`/${locale}/admin/future-programs`);
+  redirect(withFlash(`/${locale}/admin/future-programs`, "deleted"));
 }

@@ -7,6 +7,7 @@ import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import type { FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "staff.manage" as const;
 
@@ -49,7 +50,7 @@ export async function createStaff(
   await writeAudit(session.user.id, "create", "Person", person.id, { staff: true });
 
   revalidatePath(`/${locale}/admin/staff`);
-  redirect(`/${locale}/admin/staff`);
+  redirect(withFlash(`/${locale}/admin/staff`, "saved"));
 }
 
 export async function deleteStaff(formData: FormData): Promise<void> {
@@ -69,5 +70,5 @@ export async function deleteStaff(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Person", id, { staff: true });
 
   revalidatePath(`/${locale}/admin/staff`);
-  redirect(`/${locale}/admin/staff`);
+  redirect(withFlash(`/${locale}/admin/staff`, "deleted"));
 }

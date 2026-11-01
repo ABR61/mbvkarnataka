@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { createTraineeLogin } from "./actions";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 const field =
   "rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 dark:border-gray-700 dark:bg-gray-900";
@@ -42,6 +43,7 @@ export function TraineeLoginForm({ locale, id }: { locale: string; id: string })
         )}
       </label>
 
+      <FormError state={state} />
       <button
         type="submit"
         disabled={pending}

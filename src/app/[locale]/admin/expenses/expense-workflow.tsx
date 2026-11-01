@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { PAYMENT_METHODS } from "@/lib/validation/expense";
 import type { FormState } from "@/lib/forms";
 import { Button } from "@/components/ui/button";
+import { todayISO } from "@/lib/dates";
 
 type Act = (prev: FormState, formData: FormData) => Promise<FormState>;
 
@@ -39,7 +40,7 @@ export function ExpenseWorkflow({
   const err = (key?: string) =>
     key ? <span className="text-sm text-red-600">{t(`wf_${key}`)}</span> : null;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISO(); // India date
 
   return (
     <div className="flex max-w-xl flex-col gap-6">

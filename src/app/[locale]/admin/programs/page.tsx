@@ -74,6 +74,7 @@ export default async function ProgramsPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -105,6 +106,7 @@ export default async function ProgramsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination

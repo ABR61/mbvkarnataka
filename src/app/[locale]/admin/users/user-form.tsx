@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { USER_STATUSES } from "@/lib/validation/user";
 import type { FormState } from "@/lib/forms";
+import { FormError } from "@/components/ui/form-error";
 
 type Role = { id: string; name: string };
 type District = { id: string; name: string };
@@ -130,6 +131,7 @@ export function UserForm({
         <span className="text-xs text-gray-500">{t("branchDistrictHint")}</span>
       </label>
 
+      <FormError state={state} />
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

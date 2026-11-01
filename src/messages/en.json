@@ -98,14 +98,18 @@
     "backToPrograms": "Back to programs",
     "applyToProgram": "Apply for this program",
     "pastEvents": "Past Events",
-    "trainingPrograms": "Training Programs"
+    "trainingPrograms": "Training Programs",
+    "carouselPrev": "Previous photo",
+    "carouselNext": "Next photo",
+    "carouselGoTo": "Show photo {n}",
+    "trainerArea": "Trainer area"
   },
   "Apply": {
     "title": "Apply for training",
-    "intro": "Fill in your details and our team will get in touch. All fields except name and phone are optional.",
+    "intro": "Fill in your details and our team will get in touch. Fields marked * are required: your name, phone number, Aadhaar number and consent.",
     "program": "Program of interest",
     "message": "Anything you'd like to tell us?",
-    "consentLabel": "I consent to MBV processing my personal data for admissions (DPDP Act, 2023).",
+    "consentLabel": "I agree that MBV may store the details I've given (including my Aadhaar number and photo) to process my application and contact me about training. I can ask MBV to correct or delete them at any time. (DPDP Act, 2023)",
     "consentRequired": "Consent is required to apply.",
     "submit": "Submit application",
     "submitting": "Submitting…",
@@ -127,7 +131,8 @@
     "retake": "Retake",
     "cameraDenied": "Camera access was blocked. Please allow camera permission and try again.",
     "cameraUnsupported": "Live camera is not available on this device or browser.",
-    "photoOptionalHint": "Optional — take a live photo with your camera (needed on mobile for attendance)."
+    "photoOptionalHint": "Optional — take a live photo with your camera (needed on mobile for attendance).",
+    "phoneHint": "10-digit mobile number"
   },
   "Applications": {
     "title": "Applications",
@@ -233,7 +238,7 @@
     "mySchedule": "My schedule",
     "noSchedule": "No sessions scheduled yet.",
     "myCertificates": "My certificates",
-    "noCertificates": "No certificates yet.",
+    "noCertificates": "No certificates yet. When you finish a program, give feedback on it to receive your certificate.",
     "viewCertificate": "View",
     "editProfile": "Edit profile",
     "home": "Home",
@@ -248,8 +253,12 @@
     "attendance_ABSENT": "Absent",
     "attendance_LATE": "Late",
     "attendance_EXCUSED": "Excused",
-    "giveFeedback": "Give feedback",
-    "help": "How-to"
+    "giveFeedback": "Give feedback & get certificate",
+    "help": "How-to",
+    "noProfileHelp": "Your login isn't connected to a trainee record yet. Please contact your center so they can link it.",
+    "contactUs": "Contact us",
+    "browsePrograms": "Browse programs",
+    "applyNow": "Apply now"
   },
   "Expenses": {
     "title": "Expenses",
@@ -453,7 +462,7 @@
   },
   "SignIn": {
     "title": "Sign in",
-    "subtitle": "MBV staff portal",
+    "subtitle": "Sign in to your MBV account",
     "email": "Email",
     "password": "Password",
     "submit": "Sign in",
@@ -462,7 +471,10 @@
       "invalid": "Invalid email or password.",
       "unknown": "Something went wrong. Please try again.",
       "rate_limited": "Too many sign-in attempts. Please try again in {minutes, plural, one {# minute} other {# minutes}}."
-    }
+    },
+    "showPassword": "Show",
+    "hidePassword": "Hide",
+    "forgotHint": "Forgot your password? Ask your center or branch coordinator to reset it for you."
   },
   "Nav": {
     "dashboard": "Dashboard",
@@ -573,7 +585,10 @@
     "yourRoles": "Your roles",
     "signOut": "Sign out",
     "viewSite": "View site",
-    "dashboardIntro": "Training Operations back-office. Use the sidebar to navigate."
+    "dashboardIntro": "Training Operations back-office. Use the sidebar to navigate.",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "backTo": "Back to {section}"
   },
   "Common": {
     "save": "Save",
@@ -593,7 +608,19 @@
     "phone": "Phone",
     "status": "Status",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "flash_saved": "Saved ✓",
+    "flash_deleted": "Deleted ✓",
+    "confirmDelete": "Delete this? This can't be undone.",
+    "deleting": "Deleting…",
+    "formError_notFound": "This record no longer exists — it may have been deleted by someone else.",
+    "formError_locked": "This record is locked and can no longer be edited.",
+    "formError_invalid": "Some details aren't valid. Please check the form and try again.",
+    "formError_saveFailed": "Couldn't save. Please check the details and try again.",
+    "formError_duplicate": "This already exists.",
+    "formError_taken": "That value is already in use.",
+    "formError_generic": "Something went wrong. Please try again.",
+    "formError_fields": "Please correct the highlighted fields above."
   },
   "Centers": {
     "inUse": "This center can't be deleted — it has cohorts or recorded expenses. Set its status to Inactive instead.",
@@ -870,7 +897,8 @@
     "publishedNote": "Your feedback is live on the programs page.",
     "invalid": "Sorry, that could not be submitted.",
     "certificateEarned": "Certificate earned!",
-    "viewCertificate": "View certificate"
+    "viewCertificate": "View certificate",
+    "starsLabel": "{n, plural, one {# star} other {# stars}}"
   },
   "Staff": {
     "title": "Staff members",
@@ -963,17 +991,23 @@
     "welcome": "Hello, {name}",
     "clockedIn": "Clocked in",
     "clockedOut": "Clocked out",
-    "failed": "Could not verify. Make sure your device is registered and try again."
+    "error_unsupported": "This browser can't scan fingerprints or Face ID. Please use the phone or tablet set up for clocking in.",
+    "error_cancelled": "The scan was cancelled or timed out. Tap the button to try again.",
+    "error_notRegistered": "This fingerprint or device isn't registered yet. Ask your admin to register you on this device.",
+    "error_rateLimited": "Too many attempts. Please wait a minute and try again.",
+    "error_network": "No internet connection. Check the connection and try again.",
+    "error_failed": "Could not verify. Please try again.",
+    "firstTime": "First time? Ask your admin to register your fingerprint or Face ID on this device."
   },
   "TrainerHome": {
     "myArea": "Trainer area",
     "signOut": "Sign out",
     "greeting": "Hello, {name}",
     "today": "Today",
-    "checkIn": "Login",
-    "checkOut": "Logout",
-    "checkInBtn": "Mark my attendance (Login)",
-    "checkOutBtn": "Logout",
+    "checkIn": "Arrival",
+    "checkOut": "Departure",
+    "checkInBtn": "Mark my arrival",
+    "checkOutBtn": "Mark my departure",
     "saving": "Saving…",
     "checkedIn": "Logged in ✓",
     "checkedOut": "Logged out ✓",
@@ -987,10 +1021,15 @@
     "status_LATE": "Late",
     "status_EXCUSED": "Excused",
     "status_HOLIDAY": "Holiday",
-    "err_alreadyIn": "You have already logged in today.",
-    "err_notInYet": "Please log in first.",
+    "err_alreadyIn": "Your arrival is already recorded for today.",
+    "err_notInYet": "Please mark your arrival first.",
     "err_notTrainer": "Not a trainer account.",
-    "help": "How-to"
+    "help": "How-to",
+    "arrivedAt": "Arrival recorded at {time}",
+    "leftAt": "Departure recorded at {time}",
+    "confirmDeparture": "Record your departure now? This can't be changed later today.",
+    "classAttendance": "Class attendance",
+    "classAttendanceBody": "Mark which trainees attended your session."
   },
   "ImageUpload": {
     "choosePhoto": "Choose photo",
@@ -1166,7 +1205,7 @@
         "how": [
           "Click New trainer and enter their details plus an email and password. This creates their login with the Trainer role.",
           "Use Edit to update details. The email can't be changed afterwards.",
-          "Trainers sign in to their trainer area to record their own daily login and logout. They mark trainee attendance from Sessions."
+          "Trainers sign in to their trainer area to record their own daily arrival and departure. They mark trainee attendance from Sessions."
         ],
         "tips": [
           "Deleting a trainer also deletes their login."
@@ -1355,19 +1394,19 @@
     "items": [
       {
         "title": "Mark your attendance",
-        "body": "Each working day, tap Mark my attendance (Login) when you arrive, and Logout when you leave."
+        "body": "Each working day, tap Mark my arrival when you get to the center, and Mark my departure when you leave. Departure asks you to confirm."
       },
       {
         "title": "My attendance",
         "body": "Shows your past days with their status and the hours you worked."
       },
       {
-        "title": "Trainees' attendance",
-        "body": "To mark attendance for your class, open Sessions in the admin area, choose the session, then open Attendance."
+        "title": "Class attendance",
+        "body": "Tap Class attendance on your home page to open Sessions, choose the session, then mark which trainees attended."
       },
       {
         "title": "If something looks wrong",
-        "body": "\"Already logged in today\" means your login is already recorded — just use Logout at the end of the day. For anything else, contact your center or branch admin."
+        "body": "\"Your arrival is already recorded\" means it's saved — just mark your departure at the end of the day. For anything else, contact your center or branch admin."
       }
     ]
   }

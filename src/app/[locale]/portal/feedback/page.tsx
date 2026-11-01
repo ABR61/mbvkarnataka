@@ -98,12 +98,12 @@ export default async function PortalFeedbackPage({
                     <span className="text-xs text-emerald-700 dark:text-emerald-300">
                       {c.certificate.serialNumber}
                     </span>
-                    <a
-                      href={`/${locale}/portal/certificate/${c.certificate.id}`}
+                    <Link
+                      href={`/portal/certificate/${c.certificate.id}`}
                       className="ml-auto rounded-md bg-emerald-600 px-3 py-1.5 font-medium text-white hover:bg-emerald-700"
                     >
                       {t("viewCertificate")}
-                    </a>
+                    </Link>
                   </div>
                 )}
               </li>

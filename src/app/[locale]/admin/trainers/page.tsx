@@ -72,6 +72,7 @@ export default async function TrainersPage({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -105,6 +106,7 @@ export default async function TrainersPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
 
       <Pagination

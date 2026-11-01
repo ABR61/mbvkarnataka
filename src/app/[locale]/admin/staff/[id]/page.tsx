@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission, assertDistrict } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { RegisterBiometric } from "@/components/admin/register-biometric";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -68,10 +68,7 @@ export default async function StaffDetailPage({
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <Link href="/admin/staff" className="text-sm text-gray-500 hover:underline">
-          ← {t("title")}
-        </Link>
-        <h1 className="mt-2 text-2xl font-bold">
+        <h1 className="text-2xl font-bold">
           {[person.firstName, person.lastName].filter(Boolean).join(" ")}
         </h1>
         <p className="text-sm text-gray-500">
@@ -141,7 +138,7 @@ export default async function StaffDetailPage({
             <tbody>
               {recs.map((r) => (
                 <tr key={r.id}>
-                  <td className={td}>{r.date.toISOString().slice(0, 10)}</td>
+                  <td className={td}>{formatDate(r.date, locale)}</td>
                   <td className={td}>
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[r.status] ?? ""}`}>
                       {t(`status_${r.status}`)}

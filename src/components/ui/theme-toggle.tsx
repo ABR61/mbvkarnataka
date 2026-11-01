@@ -31,6 +31,7 @@ export function ThemeToggle() {
     >
       {/* Moon — shown in light mode (click to go dark) */}
       <svg
+        aria-hidden
         className="h-5 w-5 dark:hidden"
         fill="none"
         viewBox="0 0 24 24"
@@ -41,6 +42,7 @@ export function ThemeToggle() {
       </svg>
       {/* Sun — shown in dark mode (click to go light) */}
       <svg
+        aria-hidden
         className="hidden h-5 w-5 dark:block"
         fill="none"
         viewBox="0 0 24 24"

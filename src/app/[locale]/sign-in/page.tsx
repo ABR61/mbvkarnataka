@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
+import { homeFor, homePath } from "@/lib/home";
 import { SignInForm } from "./sign-in-form";
 
 export default async function SignInPage({
@@ -18,9 +19,13 @@ export default async function SignInPage({
   const { callbackUrl } = await searchParams;
   const next = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : undefined;
 
-  // Already signed in → honour the return path, else go to the back-office.
+  // Already signed in → honour the return path, else go to their own area.
   const session = await auth();
-  if (session?.user) redirect(next ?? `/${locale}/admin`);
+  if (session?.user) {
+    redirect(
+      next ?? homePath(await homeFor(session.user.id, session.user.permissions), locale),
+    );
+  }
 
   const t = await getTranslations("SignIn");
 

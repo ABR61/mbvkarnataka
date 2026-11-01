@@ -8,6 +8,7 @@ import { scopedDistrictId } from "@/lib/branch-scope";
 import { parseProgramRef } from "@/lib/program-ref";
 import { writeAudit } from "@/lib/audit";
 import type { FormState } from "@/lib/forms";
+import { withFlash } from "@/lib/flash";
 
 const PERMISSION = "feedback.manage" as const;
 
@@ -73,7 +74,7 @@ export async function createCompletion(
   await writeAudit(session.user.id, "create", "Completion", c.id);
 
   revalidatePath(`/${locale}/admin/completions`);
-  redirect(`/${locale}/admin/completions`);
+  redirect(withFlash(`/${locale}/admin/completions`, "saved"));
 }
 
 export async function deleteCompletion(formData: FormData): Promise<void> {
@@ -93,5 +94,5 @@ export async function deleteCompletion(formData: FormData): Promise<void> {
   await writeAudit(session.user.id, "delete", "Completion", id);
 
   revalidatePath(`/${locale}/admin/completions`);
-  redirect(`/${locale}/admin/completions`);
+  redirect(withFlash(`/${locale}/admin/completions`, "deleted"));
 }

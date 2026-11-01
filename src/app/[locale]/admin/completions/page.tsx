@@ -7,6 +7,7 @@ import { scopedDistrictId, withDistrictScope } from "@/lib/branch-scope";
 import { completionProgramName } from "@/lib/program-ref";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { deleteCompletion } from "./actions";
+import { formatDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +73,7 @@ export default async function CompletionsPage({
       {completions.length === 0 ? (
         <p className="py-8 text-center text-gray-400">{t("empty")}</p>
       ) : (
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr>
@@ -94,7 +96,7 @@ export default async function CompletionsPage({
                       ? badge(`★${c.feedback.rating} · ${t("published")}`, "green")
                       : badge(`★${c.feedback.rating} · ${t("pendingReview")}`, "amber")}
                 </td>
-                <td className={td}>{c.createdAt.toISOString().slice(0, 10)}</td>
+                <td className={td}>{formatDate(c.createdAt, locale)}</td>
                 <td className={td}>
                   <DeleteButton
                     action={deleteCompletion}
@@ -108,6 +110,7 @@ export default async function CompletionsPage({
             ))}
           </tbody>
         </table>
+        </div>
       )}
     </div>
   );
