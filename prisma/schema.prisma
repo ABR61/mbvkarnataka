@@ -429,6 +429,12 @@ model Attendance {
   status     AttendanceStatus @default(PRESENT)
   markedById String?
   markedAt   DateTime         @default(now())
+  // Set when the trainee checked in themselves (QR), with their phone's location.
+  selfCheckedInAt  DateTime?
+  checkInLat       Float?
+  checkInLng       Float?
+  checkInAccuracyM Int?
+  checkInDistanceM Int?
 
   session  TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   person   Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
@@ -855,6 +861,7 @@ enum AttendanceStatus {
 enum AttendanceChangeKind {
   MARK // recorded while the session's marking window was open
   CORRECTION // applied later through an approved correction request
+  SELF_CHECKIN // the trainee checked themselves in by scanning the session QR
 }
 
 enum CorrectionSource {

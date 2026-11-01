@@ -55,11 +55,15 @@ export default async function AttendancePage({
   };
 
   const statusByPerson = new Map(attendances.map((a) => [a.personId, a.status as string]));
+  const checkedInByPerson = new Map(
+    attendances.filter((a) => a.selfCheckedInAt).map((a) => [a.personId, a.selfCheckedInAt!.toISOString()]),
+  );
   const pendingByPerson = new Map(pendingCorrections.map((c) => [c.personId, c]));
   const roster = enrollments.map((e) => ({
     personId: e.personId,
     name: personName(e.person),
     status: statusByPerson.get(e.personId) ?? null,
+    checkedInAt: checkedInByPerson.get(e.personId) ?? null,
   }));
 
   const win = ts.status === "CANCELLED" ? "cancelled" : markingWindow(ts.sessionDate);

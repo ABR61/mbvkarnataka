@@ -1,13 +1,14 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ATTENDANCE_STATUSES } from "@/lib/validation/session";
 import type { FormState } from "@/lib/forms";
 import { ImagePicker } from "@/components/image-picker";
+import { CheckinQr } from "./checkin-qr";
 
-type RosterRow = { personId: string; name: string; status: string | null };
+type RosterRow = { personId: string; name: string; status: string | null; checkedInAt: string | null };
 type Geo =
   | { state: "requesting" }
   | { state: "ok"; lat: number; lng: number; accuracy: number }
@@ -36,6 +37,21 @@ export function AttendanceForm({
   const [photo, setPhoto] = useState(existingPhoto ?? "");
   const [geo, setGeo] = useState<Geo>({ state: "requesting" });
   const [attempt, setAttempt] = useState(0);
+  const [showQr, setShowQr] = useState(false);
+  const [checkedIn, setCheckedIn] = useState<Set<string>>(
+    () => new Set(roster.filter((r) => r.checkedInAt).map((r) => r.personId)),
+  );
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // When trainees check themselves in, pre-select "Present" for them unless the
+  // trainer has already chosen something.
+  const onCheckins = useCallback((ids: string[]) => {
+    setCheckedIn(new Set(ids));
+    for (const id of ids) {
+      const sel = formRef.current?.querySelector<HTMLSelectElement>(`select[name="status_${id}"]`);
+      if (sel && !sel.value) sel.value = "PRESENT";
+    }
+  }, []);
 
   // Ask for the phone's location when the form opens (and on "Try again").
   useEffect(() => {
@@ -59,7 +75,7 @@ export function AttendanceForm({
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-5">
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="sessionId" value={sessionId} />
       <input type="hidden" name="photoUrl" value={photo} />
@@ -106,6 +122,22 @@ export function AttendanceForm({
         </div>
       </div>
 
+      {/* Trainee self check-in by QR */}
+      <div className="flex flex-col gap-3">
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowQr((v) => !v)}
+            aria-expanded={showQr}
+            className="rounded-md border border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 dark:text-emerald-300 dark:hover:bg-emerald-950/40"
+          >
+            {showQr ? t("hideQr") : t("showQr")}
+          </button>
+          {!showQr && <span className="ml-3 text-xs text-gray-600 dark:text-gray-400">{t("qrHint")}</span>}
+        </div>
+        {showQr && <CheckinQr locale={locale} sessionId={sessionId} onCheckins={onCheckins} />}
+      </div>
+
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
@@ -129,7 +161,12 @@ export function AttendanceForm({
           <tbody>
             {roster.map((r) => (
               <tr key={r.personId}>
-                <td className={td}>{r.name}</td>
+                <td className={td}>
+                  {r.name}
+                  {checkedIn.has(r.personId) && (
+                    <span className="ml-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">✓ {t("selfCheckedIn")}</span>
+                  )}
+                </td>
                 <td className={`${td} w-44`}>
                   <select
                     name={`status_${r.personId}`}

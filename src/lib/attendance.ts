@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   findDoubleBookings,
   isBelowMinimum,
+  LOCATION_RADIUS_M,
   markingWindow,
   sessionFlags,
   summarizeAttendance,
@@ -227,7 +228,31 @@ export async function integrityReport(districtId: string | null, days = 30) {
   }
   lowAttendance.sort((a, b) => a.pct - b.pct);
 
-  return { days, evidence, unmarked, doubleBookings, perfectCohorts, lowAttendance };
+  // 6) QR self check-ins without a location, or from far away (e.g. a
+  //    forwarded code). Each needs a human look.
+  const selfRows = sessionIds.length
+    ? await prisma.attendance.findMany({
+        where: { sessionId: { in: sessionIds }, selfCheckedInAt: { not: null } },
+        select: {
+          sessionId: true,
+          checkInLat: true,
+          checkInDistanceM: true,
+          checkInAccuracyM: true,
+          person: { select: { firstName: true, lastName: true } },
+        },
+      })
+    : [];
+  const selfCheckins = selfRows
+    .map((r) => {
+      const far =
+        r.checkInDistanceM != null &&
+        Math.max(0, r.checkInDistanceM - (r.checkInAccuracyM ?? 0)) > LOCATION_RADIUS_M;
+      const reason: "noLocation" | "far" | null = r.checkInLat == null ? "noLocation" : far ? "far" : null;
+      return { person: personName(r.person), session: label(byId.get(r.sessionId)!), reason, distanceM: r.checkInDistanceM };
+    })
+    .filter((r): r is typeof r & { reason: "noLocation" | "far" } => r.reason !== null);
+
+  return { days, evidence, unmarked, doubleBookings, perfectCohorts, lowAttendance, selfCheckins };
 }
 
 /** Pending correction requests, newest first, limited to one district if given. */

@@ -44,6 +44,7 @@ export default async function AttendanceReviewPage({
     { label: t("evidenceGaps"), n: report.evidence.length, href: "#evidence" },
     { label: t("unmarked"), n: report.unmarked.length, href: "#unmarked" },
     { label: t("doubleBooked"), n: report.doubleBookings.length, href: "#double" },
+    { label: t("selfCheckins"), n: report.selfCheckins.length, href: "#self" },
     { label: t("perfect"), n: report.perfectCohorts.length, href: "#perfect" },
     { label: t("lowAttendance"), n: report.lowAttendance.length, href: "#low" },
   ];
@@ -56,7 +57,7 @@ export default async function AttendanceReviewPage({
       </div>
 
       {/* At a glance */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
         {counts.map((c) => (
           <a key={c.href} href={c.href}>
             <Card className={c.n > 0 ? "border-amber-300 dark:border-amber-800" : ""}>
@@ -175,6 +176,27 @@ export default async function AttendanceReviewPage({
             {report.doubleBookings.map((d, i) => (
               <li key={i}>
                 <span className="font-medium">{d.person}</span>: {sessionLink(d.a)} <span aria-hidden>⇄</span> {sessionLink(d.b)}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* QR self check-ins to check */}
+      <section id="self" className="flex scroll-mt-6 flex-col gap-3">
+        <h2 className={h2}>{t("selfCheckins")}</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t("selfIntro")}</p>
+        {report.selfCheckins.length === 0 ? (
+          none(t("noSelf"))
+        ) : (
+          <ul className="flex flex-col gap-2 text-sm">
+            {report.selfCheckins.map((r, i) => (
+              <li key={i} className="flex flex-wrap items-center gap-2">
+                <span className="font-medium">{r.person}</span>
+                {sessionLink(r.session)}
+                <Badge tone="amber">
+                  {r.reason === "far" ? t("selfFar", { m: r.distanceM ?? 0 }) : t("selfNoLocation")}
+                </Badge>
               </li>
             ))}
           </ul>

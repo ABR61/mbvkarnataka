@@ -886,7 +886,21 @@
     "pendingTo": "Correction pending → {status}",
     "history": "Change history",
     "kind_MARK": "Marked",
-    "kind_CORRECTION": "Approved correction"
+    "kind_CORRECTION": "Approved correction",
+    "showQr": "Show check-in QR",
+    "hideQr": "Hide check-in QR",
+    "qrHint": "Trainees with a portal login can scan it to check themselves in.",
+    "qrAlt": "Check-in QR code",
+    "qrLoading": "Loading QR…",
+    "qrRotates": "New code in {s}s",
+    "qrInstructions": "Ask trainees to scan this with their phone camera, sign in if asked, and tap “Check me in”. The code changes every 30 seconds, so a photo of it soon stops working.",
+    "checkedIn": "Checked in ({n})",
+    "noLocationShort": "no location",
+    "qrClosed": "Check-in is only open on the session day.",
+    "qrError": "Couldn't load the QR code.",
+    "qrOffline": "No connection — retrying…",
+    "selfCheckedIn": "checked in",
+    "kind_SELF_CHECKIN": "Self check-in (QR)"
   },
   "Import": {
     "traineesTitle": "Import trainees",
@@ -1265,6 +1279,7 @@
         "how": [
           "Click New session: pick the cohort and course (required), and optionally the venue, trainer, date, times and topic.",
           "On the session day, open its Attendance: take a class photo, let the phone record your location, then mark every trainee Present, Absent, Late or Excused and save.",
+          "Trainees with a portal login can check themselves in: tap “Show check-in QR” and let them scan it. Their check-ins appear live and pre-fill “Present”.",
           "You can correct attendance freely during the session day. After that it locks — use Request correction with a reason, and another person approves it.",
           "Every change is kept in the session's change history."
         ],
@@ -1477,6 +1492,10 @@
         "body": "Lists your sessions and your attendance for each once it's marked, plus your attendance % for each program. If something is wrong, tap Report a mistake — a staff member reviews it."
       },
       {
+        "title": "Checking in to class",
+        "body": "In class, scan the QR code on your trainer's screen with your phone camera, sign in if asked, and tap “Check me in”. Allow location access — it confirms you're at the center."
+      },
+      {
         "title": "My certificates",
         "body": "When you finish a program, your certificate appears here. Open it to view or print it. The QR code on it lets anyone — for example an employer — scan and confirm it's genuine."
       },
@@ -1552,6 +1571,41 @@
     "err_invalid": "This request isn't valid.",
     "err_notFound": "This request no longer exists.",
     "err_badState": "This request has already been decided.",
-    "err_sameReviewer": "You can't review this — you asked for it, or it's your own attendance. Ask another reviewer."
+    "err_sameReviewer": "You can't review this — you asked for it, or it's your own attendance. Ask another reviewer.",
+    "selfCheckins": "QR check-ins to check",
+    "selfIntro": "Trainees who checked in by QR without sharing their location, or from far away — a sign the code may have been forwarded.",
+    "noSelf": "All QR check-ins came from the center.",
+    "selfFar": "{m} m from the center",
+    "selfNoLocation": "No location shared"
+  },
+  "Checkin": {
+    "title": "Class check-in",
+    "hello": "Hello, {name}",
+    "course": "Course",
+    "center": "Center",
+    "date": "Session",
+    "checkMeIn": "Check me in",
+    "checkingIn": "Checking in…",
+    "done": "You're checked in. See you in class!",
+    "locating": "Getting your location…",
+    "locationOk": "Location ready — it's checked against the center.",
+    "locationMissing": "Location not available. You can still check in, but it will be reviewed.",
+    "expiredTitle": "This code has expired",
+    "expiredBody": "Check-in codes change every 30 seconds. Please scan the code on your trainer's screen again.",
+    "closedTitle": "Check-in is closed",
+    "closedBody": "You can only check in on the day of the session.",
+    "notEnrolledTitle": "Not in this class",
+    "notEnrolledBody": "Your account isn't enrolled in the cohort for this session. Please speak to your trainer.",
+    "alreadyTitle": "Already checked in",
+    "alreadyBody": "You checked in at {at}.",
+    "alreadyMarkedTitle": "Attendance already recorded",
+    "alreadyMarkedBody": "Your trainer has already recorded you as {status} for this session.",
+    "err_rateLimited": "Too many attempts. Please wait a few minutes.",
+    "err_expired": "This check-in link has expired. Scan the code again.",
+    "err_notTrainee": "This account isn't linked to a trainee record.",
+    "err_closed": "Check-in for this session is closed.",
+    "err_notEnrolled": "You're not enrolled in this class.",
+    "err_already": "You've already checked in.",
+    "err_alreadyMarked": "Your trainer has already recorded your attendance."
   }
 }
