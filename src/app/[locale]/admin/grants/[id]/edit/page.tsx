@@ -34,6 +34,9 @@ export default async function EditGrantPage({
           amount: grant.amount.toString(),
           reference: grant.reference ?? "",
           receivedOn: grant.receivedOn.toISOString().slice(0, 10),
+          purpose: grant.purpose ?? "",
+          restricted: grant.restricted,
+          foreignSource: grant.foreignSource,
           note: grant.note ?? "",
         }}
       />

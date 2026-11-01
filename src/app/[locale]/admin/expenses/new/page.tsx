@@ -8,6 +8,7 @@ import {
   cohortOptions,
   centerOptions,
   vendorOptions,
+  grantOptions,
   districtOptions,
 } from "@/lib/options";
 import { ExpenseForm } from "../expense-form";
@@ -23,12 +24,13 @@ export default async function NewExpensePage({
   const session = await requirePermission("expense.record");
 
   const scope = scopedDistrictId(session);
-  const [programs, cohorts, centers, vendors, districts, fixed] =
+  const [programs, cohorts, centers, vendors, grants, districts, fixed] =
     await Promise.all([
       programOptions(locale),
       cohortOptions(locale),
       centerOptions(locale),
       vendorOptions(),
+      grantOptions(),
       scope ? Promise.resolve(undefined) : districtOptions(locale),
       scope
         ? prisma.district.findUnique({ where: { id: scope } })
@@ -45,6 +47,7 @@ export default async function NewExpensePage({
         cohorts={cohorts}
         centers={centers}
         vendors={vendors}
+        grants={grants}
         districts={districts}
         fixedDistrictName={fixed ? localized(fixed.name, locale) : undefined}
         action={createExpense}

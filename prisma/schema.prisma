@@ -611,20 +611,36 @@ model Expense {
   cohortId    String?
   centerId    String?
   vendorId    String?
+  grantId     String? // funding source this spend draws from
   districtId  String? // the branch (district) this spend belongs to
   createdById String?
   createdAt   DateTime      @default(now())
+
+  // Maker-checker workflow: who approved / paid / voided, and when. Payment
+  // details are captured when the expense is marked PAID.
+  approvedById     String?
+  approvedAt       DateTime?
+  paidById         String?
+  paidAt           DateTime?
+  paymentMethod    PaymentMethod?
+  paymentReference String?
+  receiptUrl       String? // R2 URL or data-URL image of the receipt
+  voidedById       String?
+  voidedAt         DateTime?
+  voidReason       String?
 
   program       Program?  @relation(fields: [programId], references: [id], onDelete: SetNull)
   cohort        Cohort?   @relation(fields: [cohortId], references: [id], onDelete: SetNull)
   center        Center?   @relation(fields: [centerId], references: [id], onDelete: SetNull)
   vendorRecord  Vendor?   @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  grant         Grant?    @relation(fields: [grantId], references: [id], onDelete: SetNull)
   district      District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
 
   @@index([programId])
   @@index([status])
   @@index([incurredOn])
   @@index([districtId])
+  @@index([grantId])
 }
 
 model Vendor {
@@ -640,14 +656,19 @@ model Vendor {
 }
 
 model Grant {
-  id          String   @id @default(cuid())
-  funder      String
-  amount      Decimal  @db.Decimal(14, 2)
-  reference   String?
-  receivedOn  DateTime
-  note        String?
-  createdById String?
-  createdAt   DateTime @default(now())
+  id            String   @id @default(cuid())
+  funder        String
+  amount        Decimal  @db.Decimal(14, 2)
+  reference     String?
+  receivedOn    DateTime
+  purpose       String? // what the grant is earmarked for
+  restricted    Boolean  @default(false) // restricted funds must be spent on purpose
+  foreignSource Boolean  @default(false) // FCRA: foreign contribution (India compliance)
+  note          String?
+  createdById   String?
+  createdAt     DateTime @default(now())
+
+  expenses Expense[]
 
   @@index([receivedOn])
 }
@@ -749,6 +770,16 @@ enum ExpenseStatus {
   PENDING
   APPROVED
   PAID
+  VOID
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  UPI
+  CHEQUE
+  CARD
+  OTHER
 }
 
 enum PlacementStatus {

@@ -3,7 +3,6 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { EXPENSE_STATUSES } from "@/lib/validation/expense";
 import type { FormState } from "@/lib/forms";
 
 type Option = { id: string; name: string };
@@ -14,6 +13,7 @@ export function ExpenseForm({
   cohorts,
   centers,
   vendors,
+  grants,
   districts,
   fixedDistrictName,
   action,
@@ -24,6 +24,7 @@ export function ExpenseForm({
   cohorts: Option[];
   centers: Option[];
   vendors: Option[];
+  grants: Option[];
   districts?: Option[];
   fixedDistrictName?: string;
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
@@ -33,12 +34,12 @@ export function ExpenseForm({
     incurredOn?: string;
     category?: string;
     vendorId?: string;
+    grantId?: string;
     note?: string;
     programId?: string;
     cohortId?: string;
     centerId?: string;
     districtId?: string;
-    status?: string;
   };
 }) {
   const t = useTranslations("Expenses");
@@ -127,20 +128,13 @@ export function ExpenseForm({
         districts && select("districtId", tc("district"), districts, defaults.districtId)
       )}
 
+      {select("grantId", t("grant"), grants, defaults.grantId)}
+
       {select("programId", t("program"), programs, defaults.programId)}
       <div className="grid grid-cols-2 gap-3">
         {select("cohortId", t("cohort"), cohorts, defaults.cohortId)}
         {select("centerId", t("center"), centers, defaults.centerId)}
       </div>
-
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium">{tc("status")}</span>
-        <select name="status" defaultValue={defaults.status ?? "PENDING"} className={field}>
-          {EXPENSE_STATUSES.map((s) => (
-            <option key={s} value={s}>{t(`status_${s}`)}</option>
-          ))}
-        </select>
-      </label>
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">{t("note")}</span>

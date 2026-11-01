@@ -12,7 +12,7 @@ export default async function GrantsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -20,6 +20,7 @@ export default async function GrantsPage({
 
   const sp = await searchParams;
   const page = Math.max(1, Number.parseInt(sp.page ?? "1", 10) || 1);
+  const inUseError = sp.error === "inUse";
 
   const [rows, total, agg] = await Promise.all([
     prisma.grant.findMany({
@@ -48,6 +49,12 @@ export default async function GrantsPage({
           {t("new")}
         </Link>
       </div>
+
+      {inUseError && (
+        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          {t("inUse")}
+        </p>
+      )}
 
       <p className="text-sm text-gray-500">
         {t("totalReceived")}:{" "}

@@ -21,6 +21,9 @@ export function GrantForm({
     amount?: string;
     reference?: string;
     receivedOn?: string;
+    purpose?: string;
+    restricted?: boolean;
+    foreignSource?: boolean;
     note?: string;
   };
 }) {
@@ -55,6 +58,42 @@ export function GrantForm({
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">{t("reference")}</span>
         <input name="reference" defaultValue={defaults.reference} className={field} />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">{t("purpose")}</span>
+        <input
+          name="purpose"
+          defaultValue={defaults.purpose}
+          placeholder={t("purposeHint")}
+          className={field}
+        />
+      </label>
+
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          name="restricted"
+          defaultChecked={defaults.restricted}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium">{t("restricted")}</span>
+          <span className="block text-xs text-gray-500">{t("restrictedHint")}</span>
+        </span>
+      </label>
+
+      <label className="flex items-start gap-2 text-sm">
+        <input
+          type="checkbox"
+          name="foreignSource"
+          defaultChecked={defaults.foreignSource}
+          className="mt-1"
+        />
+        <span>
+          <span className="font-medium">{t("foreignSource")}</span>
+          <span className="block text-xs text-gray-500">{t("foreignSourceHint")}</span>
+        </span>
       </label>
 
       <label className="flex flex-col gap-1 text-sm">

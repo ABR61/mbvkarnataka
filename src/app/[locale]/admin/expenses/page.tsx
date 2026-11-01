@@ -37,6 +37,12 @@ export default async function ExpensesPage({
   if (!scope && districtFilter) base.districtId = districtFilter;
   const where: Prisma.ExpenseWhereInput = withDistrictScope(base, scope);
 
+  // The headline total must not count voided (reversed) expenses. When the user
+  // is explicitly viewing one status, total that status as-is; otherwise exclude VOID.
+  const totalWhere: Prisma.ExpenseWhereInput = status
+    ? where
+    : { ...where, status: { not: "VOID" } };
+
   // District filter dropdown — only for the super admin (branch admins are scoped).
   const districts = scope ? [] : await districtOptions(locale);
 
@@ -49,7 +55,7 @@ export default async function ExpensesPage({
       take: PAGE_SIZE,
     }),
     prisma.expense.count({ where }),
-    prisma.expense.aggregate({ where, _sum: { amount: true } }),
+    prisma.expense.aggregate({ where: totalWhere, _sum: { amount: true } }),
   ]);
 
   const t = await getTranslations("Expenses");

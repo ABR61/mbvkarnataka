@@ -104,6 +104,14 @@ export async function employerOptions(): Promise<Option[]> {
   return employers.map((e) => ({ id: e.id, name: e.name }));
 }
 
+export async function grantOptions(): Promise<Option[]> {
+  const grants = await prisma.grant.findMany({ orderBy: { receivedOn: "desc" } });
+  return grants.map((g) => ({
+    id: g.id,
+    name: g.reference ? `${g.funder} (${g.reference})` : g.funder,
+  }));
+}
+
 export async function cohortOptions(locale: string): Promise<Option[]> {
   const cohorts = await prisma.cohort.findMany({
     include: { program: true, center: true },

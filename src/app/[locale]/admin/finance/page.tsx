@@ -1,10 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { requirePermission } from "@/lib/auth-guards";
+import { localized } from "@/lib/localized";
 import { formatINR } from "@/lib/money";
-import { financialStatus } from "@/lib/finance";
+import { financialStatus, grantUtilization, budgetVsActual } from "@/lib/finance";
 import { Card, Kpi } from "@/components/ui/card";
-import { StatusPill } from "@/components/ui/badge";
+import { Badge, StatusPill } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,11 @@ export default async function FinanceStatusPage({
   const { locale } = await params;
   setRequestLocale(locale);
   await requirePermission("finance.manage");
-  const f = await financialStatus(locale);
+  const [f, funds, budgets] = await Promise.all([
+    financialStatus(locale),
+    grantUtilization(),
+    budgetVsActual(),
+  ]);
   const t = await getTranslations("Finance");
 
   const th = "px-3 py-2 text-left font-medium text-gray-500";
@@ -149,6 +154,97 @@ export default async function FinanceStatusPage({
               ))}
             </tbody>
           </table>
+        </section>
+      )}
+
+      {/* Fund accounting: grant utilisation */}
+      {funds.grants.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("grantUtilisation")}
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr>
+                  <th className={th}>{t("funder")}</th>
+                  <th className={thNum}>{t("received")}</th>
+                  <th className={thNum}>{t("committed")}</th>
+                  <th className={thNum}>{t("remaining")}</th>
+                  <th className={th}>{t("flags")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {funds.grants.map((g) => (
+                  <tr key={g.id}>
+                    <td className={td}>
+                      {g.funder}
+                      {g.purpose && (
+                        <span className="block text-xs text-gray-400">{g.purpose}</span>
+                      )}
+                    </td>
+                    <td className={tdNum}>{formatINR(g.amount)}</td>
+                    <td className={tdNum}>{formatINR(g.committed)}</td>
+                    <td className={`${tdNum} ${g.overspent ? "text-red-600" : ""}`}>
+                      {formatINR(g.remaining)}
+                    </td>
+                    <td className={td}>
+                      <span className="flex flex-wrap gap-1">
+                        {g.restricted && <Badge tone="blue">{t("restricted")}</Badge>}
+                        {g.foreignSource && <Badge tone="amber">{t("fcra")}</Badge>}
+                        {g.overspent && <Badge tone="red">{t("overspent")}</Badge>}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {funds.unallocatedCommitted > 0 && (
+            <p className="mt-2 text-xs text-gray-500">
+              {t("unallocated")}: {formatINR(funds.unallocatedCommitted)}
+            </p>
+          )}
+        </section>
+      )}
+
+      {/* Budget vs actual */}
+      {budgets.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("budgetVsActual")}
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-sm">
+              <thead>
+                <tr>
+                  <th className={th}>{t("program")}</th>
+                  <th className={thNum}>{t("budget")}</th>
+                  <th className={thNum}>{t("actual")}</th>
+                  <th className={thNum}>{t("remaining")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {budgets.map((b) => (
+                  <tr key={b.programId}>
+                    <td className={td}>
+                      {localized(b.name, locale)}
+                      {b.over && (
+                        <Badge tone="red" className="ml-2">
+                          {t("overBudget")}
+                        </Badge>
+                      )}
+                    </td>
+                    <td className={tdNum}>{formatINR(b.budget)}</td>
+                    <td className={tdNum}>{formatINR(b.actual)}</td>
+                    <td className={`${tdNum} ${b.over ? "text-red-600" : ""}`}>
+                      {formatINR(b.remaining)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       )}
 
