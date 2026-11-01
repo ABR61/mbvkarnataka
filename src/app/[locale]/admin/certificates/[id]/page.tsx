@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { PrintButton } from "@/components/admin/print-button";
+import { qrSvg } from "@/lib/qr";
+import { SITE_URL } from "@/lib/site";
 
 export default async function CertificatePage({
   params,
@@ -19,6 +21,9 @@ export default async function CertificatePage({
 
   const t = await getTranslations("Certificates");
   const issued = cert.issuedAt.toISOString().slice(0, 10);
+
+  const verifyUrl = `${SITE_URL}/${locale}/verify/${cert.verifyCode}`;
+  const qr = await qrSvg(verifyUrl);
 
   return (
     <div className="flex flex-col items-center gap-6 py-6">
@@ -47,9 +52,11 @@ export default async function CertificatePage({
             {t("issued")}: {issued}
           </span>
         </div>
-        <p className="mt-4 text-xs text-gray-400">
-          {t("verifyAt")}: /{locale}/verify/{cert.verifyCode}
-        </p>
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <div className="h-28 w-28" dangerouslySetInnerHTML={{ __html: qr }} />
+          <p className="text-xs text-gray-400">{t("scanToVerify")}</p>
+          <p className="break-all text-[10px] text-gray-400">{verifyUrl}</p>
+        </div>
       </article>
 
       <div className="print:hidden">

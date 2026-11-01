@@ -2,7 +2,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requirePermission } from "@/lib/auth-guards";
 import { localized } from "@/lib/localized";
 import { formatINR } from "@/lib/money";
-import { districtReport, orgSummary, placementSummary } from "@/lib/reports";
+import {
+  districtReport,
+  orgSummary,
+  placementSummary,
+  followUpProgression,
+} from "@/lib/reports";
 
 export const dynamic = "force-dynamic";
 
@@ -26,10 +31,11 @@ export default async function ReportsPage({
   setRequestLocale(locale);
   await requirePermission("report.view");
 
-  const [summary, districts, placements] = await Promise.all([
+  const [summary, districts, placements, progression] = await Promise.all([
     orgSummary(),
     districtReport(),
     placementSummary(),
+    followUpProgression(),
   ]);
   const t = await getTranslations("Reports");
 
@@ -85,6 +91,76 @@ export default async function ReportsPage({
           <Kpi label={t("status_ACTIVE")} value={placements.byStatus.ACTIVE} />
           <Kpi label={t("status_EXITED")} value={placements.byStatus.EXITED} />
         </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          {t("outcomesOverTime")}
+        </h2>
+        {progression.periods.length === 0 ? (
+          <p className="text-sm text-gray-400">{t("noFollowUps")}</p>
+        ) : (
+          <>
+            <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Kpi
+                label={t("baselineSalary")}
+                value={
+                  progression.baselineAvgSalary != null
+                    ? formatINR(progression.baselineAvgSalary)
+                    : "—"
+                }
+              />
+              <Kpi
+                label={t("latestIncome")}
+                value={
+                  progression.latestAvgIncome != null
+                    ? formatINR(progression.latestAvgIncome)
+                    : "—"
+                }
+              />
+              <Kpi
+                label={t("incomeUplift")}
+                value={
+                  progression.baselineAvgSalary && progression.latestAvgIncome
+                    ? `${
+                        progression.latestAvgIncome >= progression.baselineAvgSalary
+                          ? "+"
+                          : ""
+                      }${Math.round(
+                        ((progression.latestAvgIncome - progression.baselineAvgSalary) /
+                          progression.baselineAvgSalary) *
+                          100,
+                      )}%`
+                    : "—"
+                }
+              />
+            </div>
+            <table className="w-full text-sm">
+              <thead>
+                <tr>
+                  <th className={th}>{t("checkpoint")}</th>
+                  <th className={thNum}>{t("followedUp")}</th>
+                  <th className={thNum}>{t("stillEmployed")}</th>
+                  <th className={thNum}>{t("retention")}</th>
+                  <th className={thNum}>{t("avgIncome")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {progression.periods.map((p) => (
+                  <tr key={p.periodMonths}>
+                    <td className={td}>{t("months", { count: p.periodMonths })}</td>
+                    <td className={tdNum}>{p.followed}</td>
+                    <td className={tdNum}>{p.stillEmployed}</td>
+                    <td className={tdNum}>{pct(p.retention)}</td>
+                    <td className={tdNum}>
+                      {p.avgIncome != null ? formatINR(p.avgIncome) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
       </section>
 
       <section>

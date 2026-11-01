@@ -28,6 +28,7 @@ const NAV: { href: string; key: string; permission: Permission | null }[] = [
   { href: "/admin/grants", key: "grants", permission: "finance.manage" },
   { href: "/admin/reports", key: "reports", permission: "report.view" },
   { href: "/admin/users", key: "users", permission: "user.manage" },
+  { href: "/admin/audit", key: "audit", permission: "user.manage" },
 ];
 
 export async function Sidebar() {

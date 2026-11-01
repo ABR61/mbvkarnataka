@@ -176,6 +176,7 @@
     "serial": "Serial",
     "issued": "Issued",
     "verifyAt": "Verify at",
+    "scanToVerify": "Scan to verify this certificate",
     "print": "Print"
   },
   "Verify": {
@@ -369,6 +370,16 @@
     "intro": "Organisation-wide and district-wise training metrics.",
     "exportCsv": "Export CSV",
     "placementOutcomes": "Placement outcomes",
+    "outcomesOverTime": "Outcomes over time",
+    "noFollowUps": "No follow-up data recorded yet.",
+    "baselineSalary": "Avg. salary at placement",
+    "latestIncome": "Avg. latest income",
+    "incomeUplift": "Income uplift",
+    "checkpoint": "Checkpoint",
+    "followedUp": "Followed up",
+    "stillEmployed": "Still employed",
+    "avgIncome": "Avg. income",
+    "months": "{count, plural, one {# month} other {# months}}",
     "placed": "Placed",
     "placementRate": "Placement rate",
     "avgSalary": "Avg. monthly salary",
@@ -444,7 +455,8 @@
     "completions": "Completions",
     "feedback": "Feedback",
     "staff": "Staff",
-    "finance": "Financial management"
+    "finance": "Financial management",
+    "audit": "Audit log"
   },
   "FuturePrograms": {
     "title": "Future programs",
@@ -943,5 +955,26 @@
     "home": "Go to home page",
     "notFoundTitle": "Page not found",
     "notFoundDescription": "The page you're looking for doesn't exist or may have moved."
+  },
+  "Audit": {
+    "title": "Audit log",
+    "intro": "A record of sensitive actions across the platform, newest first.",
+    "entity": "Entity",
+    "entityHint": "e.g. Application, auth.login",
+    "action": "Action",
+    "allActions": "All actions",
+    "action_create": "Created",
+    "action_update": "Updated",
+    "action_delete": "Deleted",
+    "action_blocked": "Blocked",
+    "filter": "Filter",
+    "clear": "Clear",
+    "resultCount": "{count, plural, one {# entry} other {# entries}}",
+    "time": "Time",
+    "user": "User",
+    "entityId": "Record",
+    "details": "Details",
+    "system": "System",
+    "empty": "No audit entries match these filters."
   }
 }

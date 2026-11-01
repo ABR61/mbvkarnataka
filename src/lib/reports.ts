@@ -150,3 +150,72 @@ export async function orgSummary(districtId?: string | null) {
     pendingApplications,
   };
 }
+
+export type FollowUpProgression = {
+  // One row per follow-up checkpoint (3, 6, 12 months since placement).
+  periods: {
+    periodMonths: number;
+    followed: number; // follow-ups recorded at this checkpoint
+    stillEmployed: number; // how many were still employed
+    retention: number; // stillEmployed / followed, 0..1
+    avgIncome: number | null; // avg monthly income reported at this checkpoint
+  }[];
+  // Income uplift: baseline salary at placement vs the latest follow-up income,
+  // over placements that have at least one follow-up (like-for-like).
+  baselineAvgSalary: number | null;
+  latestAvgIncome: number | null;
+};
+
+/**
+ * Longitudinal M&E: how placed trainees fare over time. Aggregates FollowUp
+ * records by checkpoint and computes income uplift from placement to the most
+ * recent follow-up. This is the data funders look for to see lasting impact.
+ */
+export async function followUpProgression(): Promise<FollowUpProgression> {
+  const [periodRows, baselineRow, latestRow] = await Promise.all([
+    prisma.$queryRaw<
+      { period: number; followed: bigint; still: bigint; avg_income: unknown }[]
+    >`
+      SELECT "periodMonths" AS period,
+             COUNT(*) AS followed,
+             COUNT(*) FILTER (WHERE "stillEmployed") AS still,
+             AVG("monthlyIncome") AS avg_income
+      FROM "FollowUp"
+      WHERE "periodMonths" IS NOT NULL
+      GROUP BY "periodMonths"
+      ORDER BY "periodMonths"
+    `,
+    prisma.$queryRaw<{ avg_salary: unknown }[]>`
+      SELECT AVG(p."monthlySalary") AS avg_salary
+      FROM "Placement" p
+      WHERE EXISTS (SELECT 1 FROM "FollowUp" f WHERE f."placementId" = p.id)
+    `,
+    prisma.$queryRaw<{ avg_income: unknown }[]>`
+      SELECT AVG(latest."monthlyIncome") AS avg_income
+      FROM (
+        SELECT DISTINCT ON ("placementId") "monthlyIncome"
+        FROM "FollowUp"
+        WHERE "monthlyIncome" IS NOT NULL
+        ORDER BY "placementId", "followUpOn" DESC
+      ) latest
+    `,
+  ]);
+
+  const num = (v: unknown): number | null => (v == null ? null : Number(v));
+
+  return {
+    periods: periodRows.map((r) => {
+      const followed = Number(r.followed);
+      const stillEmployed = Number(r.still);
+      return {
+        periodMonths: Number(r.period),
+        followed,
+        stillEmployed,
+        retention: followed > 0 ? stillEmployed / followed : 0,
+        avgIncome: num(r.avg_income),
+      };
+    }),
+    baselineAvgSalary: num(baselineRow[0]?.avg_salary),
+    latestAvgIncome: num(latestRow[0]?.avg_income),
+  };
+}

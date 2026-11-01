@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
 import { Link } from "@/i18n/navigation";
 import { PrintButton } from "@/components/admin/print-button";
+import { qrSvg } from "@/lib/qr";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +33,11 @@ export default async function PortalCertificatePage({
   const tp = await getTranslations("PortalFeedback");
   const issued = cert.issuedAt.toISOString().slice(0, 10);
 
+  // A scannable link to the public verification page, embedded on the cert so a
+  // printed copy can be verified by anyone (employer, funder) with a phone.
+  const verifyUrl = `${SITE_URL}/${locale}/verify/${cert.verifyCode}`;
+  const qr = await qrSvg(verifyUrl);
+
   return (
     <div className="flex flex-col items-center gap-6 py-6">
       <article className="w-full max-w-2xl rounded-lg border-4 border-emerald-700 bg-white px-10 py-12 text-center dark:bg-gray-950">
@@ -53,9 +60,11 @@ export default async function PortalCertificatePage({
             {t("issued")}: {issued}
           </span>
         </div>
-        <p className="mt-4 text-xs text-gray-400">
-          {t("verifyAt")}: /{locale}/verify/{cert.verifyCode}
-        </p>
+        <div className="mt-8 flex flex-col items-center gap-2">
+          <div className="h-28 w-28" dangerouslySetInnerHTML={{ __html: qr }} />
+          <p className="text-xs text-gray-400">{t("scanToVerify")}</p>
+          <p className="break-all text-[10px] text-gray-400">{verifyUrl}</p>
+        </div>
       </article>
 
       <div className="flex items-center gap-4 print:hidden">

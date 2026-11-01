@@ -176,6 +176,7 @@
     "serial": "ಸರಣಿ",
     "issued": "ನೀಡಿದ ದಿನಾಂಕ",
     "verifyAt": "ಪರಿಶೀಲಿಸಿ",
+    "scanToVerify": "ಈ ಪ್ರಮಾಣಪತ್ರವನ್ನು ಪರಿಶೀಲಿಸಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
     "print": "ಮುದ್ರಿಸಿ"
   },
   "Verify": {
@@ -369,6 +370,16 @@
     "intro": "ಸಂಸ್ಥೆ-ವ್ಯಾಪಿ ಮತ್ತು ಜಿಲ್ಲಾವಾರು ತರಬೇತಿ ಮಾಪನಗಳು.",
     "exportCsv": "CSV ರಫ್ತು",
     "placementOutcomes": "ಉದ್ಯೋಗ ನಿಯೋಜನೆ ಫಲಿತಾಂಶಗಳು",
+    "outcomesOverTime": "ಕಾಲಾನಂತರದ ಫಲಿತಾಂಶಗಳು",
+    "noFollowUps": "ಇನ್ನೂ ಯಾವುದೇ ಅನುಸರಣಾ ಡೇಟಾ ದಾಖಲಾಗಿಲ್ಲ.",
+    "baselineSalary": "ನಿಯೋಜನೆ ಸಮಯದ ಸರಾಸರಿ ವೇತನ",
+    "latestIncome": "ಸರಾಸರಿ ಇತ್ತೀಚಿನ ಆದಾಯ",
+    "incomeUplift": "ಆದಾಯ ಹೆಚ್ಚಳ",
+    "checkpoint": "ಹಂತ",
+    "followedUp": "ಅನುಸರಿಸಲಾಗಿದೆ",
+    "stillEmployed": "ಇನ್ನೂ ಉದ್ಯೋಗದಲ್ಲಿ",
+    "avgIncome": "ಸರಾಸರಿ ಆದಾಯ",
+    "months": "{count, plural, one {# ತಿಂಗಳು} other {# ತಿಂಗಳುಗಳು}}",
     "placed": "ನಿಯೋಜಿಸಲಾಗಿದೆ",
     "placementRate": "ನಿಯೋಜನೆ ದರ",
     "avgSalary": "ಸರಾಸರಿ ಮಾಸಿಕ ವೇತನ",
@@ -444,7 +455,8 @@
     "completions": "ಪೂರ್ಣಗೊಳಿಸಿದವರು",
     "feedback": "ಪ್ರತಿಕ್ರಿಯೆ",
     "staff": "ಸಿಬ್ಬಂದಿ",
-    "finance": "ಆರ್ಥಿಕ ನಿರ್ವಹಣೆ"
+    "finance": "ಆರ್ಥಿಕ ನಿರ್ವಹಣೆ",
+    "audit": "ಆಡಿಟ್ ಲಾಗ್"
   },
   "FuturePrograms": {
     "title": "ಭವಿಷ್ಯದ ಕಾರ್ಯಕ್ರಮಗಳು",
@@ -943,5 +955,26 @@
     "home": "ಮುಖಪುಟಕ್ಕೆ ಹೋಗಿ",
     "notFoundTitle": "ಪುಟ ಕಂಡುಬಂದಿಲ್ಲ",
     "notFoundDescription": "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪುಟ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ ಅಥವಾ ಸ್ಥಳಾಂತರಗೊಂಡಿರಬಹುದು."
+  },
+  "Audit": {
+    "title": "ಆಡಿಟ್ ಲಾಗ್",
+    "intro": "ವೇದಿಕೆಯಾದ್ಯಂತ ಸೂಕ್ಷ್ಮ ಕ್ರಿಯೆಗಳ ದಾಖಲೆ, ಹೊಸವು ಮೊದಲು.",
+    "entity": "ಘಟಕ",
+    "entityHint": "ಉದಾ. Application, auth.login",
+    "action": "ಕ್ರಿಯೆ",
+    "allActions": "ಎಲ್ಲಾ ಕ್ರಿಯೆಗಳು",
+    "action_create": "ರಚಿಸಲಾಗಿದೆ",
+    "action_update": "ನವೀಕರಿಸಲಾಗಿದೆ",
+    "action_delete": "ಅಳಿಸಲಾಗಿದೆ",
+    "action_blocked": "ನಿರ್ಬಂಧಿಸಲಾಗಿದೆ",
+    "filter": "ಫಿಲ್ಟರ್",
+    "clear": "ತೆರವುಗೊಳಿಸಿ",
+    "resultCount": "{count, plural, one {# ನಮೂದು} other {# ನಮೂದುಗಳು}}",
+    "time": "ಸಮಯ",
+    "user": "ಬಳಕೆದಾರ",
+    "entityId": "ದಾಖಲೆ",
+    "details": "ವಿವರಗಳು",
+    "system": "ಸಿಸ್ಟಮ್",
+    "empty": "ಈ ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಯಾವುದೇ ಆಡಿಟ್ ನಮೂದುಗಳು ಹೊಂದಿಕೆಯಾಗುವುದಿಲ್ಲ."
   }
 }
