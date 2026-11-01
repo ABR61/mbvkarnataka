@@ -43,6 +43,11 @@ const STATUS_TONES: Record<string, Tone> = {
   REJECTED: "red",
   CANCELLED: "red",
   INACTIVE: "gray",
+  // Attendance
+  PRESENT: "green",
+  ABSENT: "red",
+  LATE: "amber",
+  EXCUSED: "gray",
 };
 
 /** Status pill that colours itself from a status code and shows a provided label. */

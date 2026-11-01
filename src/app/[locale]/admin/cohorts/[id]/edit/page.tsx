@@ -25,6 +25,9 @@ import {
   unassignTrainer,
   issueCertificate,
 } from "../../actions";
+import { cohortAttendance } from "@/lib/attendance";
+import { isBelowMinimum } from "@/lib/attendance-rules";
+import { ConfirmButton } from "@/components/ui/confirm-button";
 
 const personName = (p: { firstName: string; lastName: string | null }) =>
   [p.firstName, p.lastName].filter(Boolean).join(" ");
@@ -33,10 +36,13 @@ const toDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";
 
 export default async function EditCohortPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { locale, id } = await params;
+  const { error } = await searchParams;
   setRequestLocale(locale);
   await requirePermission("cohort.manage");
 
@@ -66,29 +72,9 @@ export default async function EditCohortPage({
   const enrollCandidates = allTrainees.filter((t) => !enrolledIds.has(t.id));
   const assignCandidates = allTrainers.filter((t) => !assignedIds.has(t.id));
 
-  // Per-trainee attendance: PRESENT or LATE counts as attended over all sessions.
-  const sessions = await prisma.trainingSession.findMany({
-    where: { cohortId: id },
-    select: { id: true },
-  });
-  const totalSessions = sessions.length;
-  const attendances = totalSessions
-    ? await prisma.attendance.findMany({
-        where: { sessionId: { in: sessions.map((s) => s.id) } },
-        select: { personId: true, status: true },
-      })
-    : [];
-  const attendedByPerson = new Map<string, number>();
-  for (const a of attendances) {
-    if (a.status === "PRESENT" || a.status === "LATE") {
-      attendedByPerson.set(a.personId, (attendedByPerson.get(a.personId) ?? 0) + 1);
-    }
-  }
-  const attendancePct = (personId: string) => {
-    if (totalSessions === 0) return "—";
-    const attended = attendedByPerson.get(personId) ?? 0;
-    return `${attended}/${totalSessions} (${Math.round((attended / totalSessions) * 100)}%)`;
-  };
+  // Attendance over held (marked, non-cancelled) sessions, vs the program minimum.
+  const { min: minPct, byPerson } = await cohortAttendance(id);
+  const attendanceFor = (personId: string) => byPerson.get(personId);
 
   const t = await getTranslations("Cohorts");
 
@@ -100,6 +86,16 @@ export default async function EditCohortPage({
   return (
     <div className="flex max-w-3xl flex-col gap-8">
       <div className="flex flex-col gap-4">
+        {error === "hasRecords" && (
+          <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            {t("hasRecordsError")}
+          </p>
+        )}
+        {error === "belowAttendance" && (
+          <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            {t("belowAttendanceError")}
+          </p>
+        )}
         <h1 className="text-2xl font-bold">
           {t("editTitle")}
           {cohort.code ? ` · ${cohort.code}` : ""}
@@ -150,8 +146,20 @@ export default async function EditCohortPage({
                       action={updateEnrollmentStatus}
                     />
                   </td>
-                  <td className={`${td} text-gray-500`}>
-                    {t("attendance")}: {attendancePct(e.personId)}
+                  <td className={`${td} whitespace-nowrap`}>
+                    {(() => {
+                      const a = attendanceFor(e.personId);
+                      if (!a || a.pct === null) {
+                        return <span className="text-gray-600 dark:text-gray-400">{t("attendance")}: —</span>;
+                      }
+                      const low = isBelowMinimum(a.pct, minPct);
+                      return (
+                        <span className={low ? "font-medium text-red-700 dark:text-red-400" : "text-gray-700 dark:text-gray-300"}>
+                          {t("attendance")}: {a.attended}/{a.held - a.excused} ({a.pct}%)
+                          {low && <span className="block text-xs">{t("belowMinimum", { min: minPct })}</span>}
+                        </span>
+                      );
+                    })()}
                   </td>
                   <td className={td}>
                     {e.certificate ? (
@@ -162,14 +170,39 @@ export default async function EditCohortPage({
                         {t("viewCertificate")}
                       </Link>
                     ) : (
-                      <form action={issueCertificate} className="inline">
-                        <input type="hidden" name="locale" value={locale} />
-                        <input type="hidden" name="id" value={e.id} />
-                        <input type="hidden" name="cohortId" value={cohort.id} />
-                        <button type="submit" className="text-gray-600 hover:underline dark:text-gray-300">
-                          {t("issueCertificate")}
-                        </button>
-                      </form>
+                      isBelowMinimum(attendanceFor(e.personId)?.pct ?? null, minPct) ? (
+                        <details className="text-sm">
+                          <summary className="cursor-pointer text-red-700 hover:underline dark:text-red-400">
+                            {t("issueWithOverride")}
+                          </summary>
+                          <form action={issueCertificate} className="mt-2 flex flex-col gap-2">
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="id" value={e.id} />
+                            <input type="hidden" name="cohortId" value={cohort.id} />
+                            <textarea
+                              name="overrideReason"
+                              required
+                              minLength={10}
+                              rows={2}
+                              placeholder={t("overrideReasonHint")}
+                              aria-label={t("overrideReasonHint")}
+                              className="rounded-md border border-gray-300 px-2 py-1.5 text-sm dark:border-gray-700 dark:bg-gray-900"
+                            />
+                            <button type="submit" className="self-start rounded-md border border-red-300 px-3 py-1.5 text-red-700 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950">
+                              {t("issueAnyway")}
+                            </button>
+                          </form>
+                        </details>
+                      ) : (
+                        <form action={issueCertificate} className="inline">
+                          <input type="hidden" name="locale" value={locale} />
+                          <input type="hidden" name="id" value={e.id} />
+                          <input type="hidden" name="cohortId" value={cohort.id} />
+                          <button type="submit" className="text-gray-600 hover:underline dark:text-gray-300">
+                            {t("issueCertificate")}
+                          </button>
+                        </form>
+                      )
                     )}
                   </td>
                   <td className={`${td} text-right`}>
@@ -177,9 +210,9 @@ export default async function EditCohortPage({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="id" value={e.id} />
                       <input type="hidden" name="cohortId" value={cohort.id} />
-                      <button type="submit" className="text-red-600 hover:underline">
+                      <ConfirmButton message={t("confirmRemove")} className="text-red-600 hover:underline">
                         {t("remove")}
-                      </button>
+                      </ConfirmButton>
                     </form>
                   </td>
                 </tr>
@@ -220,9 +253,9 @@ export default async function EditCohortPage({
                       <input type="hidden" name="locale" value={locale} />
                       <input type="hidden" name="id" value={a.id} />
                       <input type="hidden" name="cohortId" value={cohort.id} />
-                      <button type="submit" className="text-red-600 hover:underline">
+                      <ConfirmButton message={t("confirmRemove")} className="text-red-600 hover:underline">
                         {t("remove")}
-                      </button>
+                      </ConfirmButton>
                     </form>
                   </td>
                 </tr>

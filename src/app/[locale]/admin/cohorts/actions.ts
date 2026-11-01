@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
 import { isUniqueViolationOn } from "@/lib/db-errors";
+import { traineeAttendance } from "@/lib/attendance";
+import { isBelowMinimum } from "@/lib/attendance-rules";
 import {
   cohortInput,
   cohortFromForm,
@@ -90,6 +92,17 @@ export async function deleteCohort(formData: FormData): Promise<void> {
   const id = formData.get("id") as string;
   if (!id) return;
 
+  // Deleting a cohort would cascade away its sessions' attendance (and the
+  // change history) and its trainees' certificates. Once any of that exists
+  // the cohort must be kept — mark it Completed or Cancelled instead.
+  const [certificates, attendance] = await Promise.all([
+    prisma.certificate.count({ where: { enrollment: { cohortId: id } } }),
+    prisma.attendance.count({ where: { session: { cohortId: id } } }),
+  ]);
+  if (certificates + attendance > 0) {
+    redirect(`/${locale}/admin/cohorts?error=inUse`);
+  }
+
   await prisma.cohort.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "Cohort", id);
 
@@ -173,6 +186,21 @@ export async function unenrollTrainee(formData: FormData): Promise<void> {
   const cohortId = formData.get("cohortId") as string;
   if (!id) return;
 
+  // Removing an enrollment would cascade-delete the trainee's certificate, and
+  // orphan their attendance in this cohort. If either exists, keep the record
+  // and set the status to Dropped instead.
+  const enrollment = await prisma.enrollment.findUnique({
+    where: { id },
+    select: { personId: true, cohortId: true, certificate: { select: { id: true } } },
+  });
+  if (!enrollment) return;
+  const attended = await prisma.attendance.count({
+    where: { personId: enrollment.personId, session: { cohortId: enrollment.cohortId } },
+  });
+  if (enrollment.certificate || attended > 0) {
+    redirect(`/${locale}/admin/cohorts/${cohortId}/edit?error=hasRecords`);
+  }
+
   await prisma.enrollment.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "Enrollment", id, { cohortId });
 
@@ -246,6 +274,16 @@ export async function issueCertificate(formData: FormData): Promise<void> {
   });
   if (!enrollment) return;
 
+  // Attendance must meet the program's minimum. Below it, a certificate can
+  // only be issued with a written reason, which is stored on the certificate
+  // and in the audit log. (No marked sessions yet = nothing to measure.)
+  const { min, summary } = await traineeAttendance(enrollment.cohortId, enrollment.personId);
+  const overrideReason = ((formData.get("overrideReason") as string) ?? "").trim();
+  const below = isBelowMinimum(summary.pct, min);
+  if (below && overrideReason.length < 10) {
+    redirect(`/${locale}/admin/cohorts/${cohortId}/edit?error=belowAttendance`);
+  }
+
   const year = new Date().getUTCFullYear();
   const personName = [enrollment.person.firstName, enrollment.person.lastName]
     .filter(Boolean)
@@ -262,6 +300,8 @@ export async function issueCertificate(formData: FormData): Promise<void> {
         programName: enrollment.cohort.program.name ?? { en: "" },
         centerName: enrollment.cohort.center.name ?? undefined,
         issuedById: session.user.id,
+        attendancePct: summary.pct,
+        attendanceOverrideReason: below ? overrideReason : null,
       },
     }),
     prisma.enrollment.update({
@@ -271,6 +311,9 @@ export async function issueCertificate(formData: FormData): Promise<void> {
   ]);
   await writeAudit(session.user.id, "create", "Certificate", enrollmentId, {
     cohortId,
+    attendancePct: summary.pct,
+    minAttendancePct: min,
+    ...(below ? { attendanceOverride: overrideReason } : {}),
   });
 
   revalidatePath(`/${locale}/admin/cohorts/${cohortId}/edit`);

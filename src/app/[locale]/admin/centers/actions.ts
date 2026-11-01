@@ -34,6 +34,8 @@ export async function createCenter(
       address: d.address || null,
       contactPhone: d.contactPhone || null,
       status: d.status,
+      latitude: d.latitude,
+      longitude: d.longitude,
     },
   });
   await writeAudit(session.user.id, "create", "Center", center.id);
@@ -63,6 +65,8 @@ export async function updateCenter(
       address: d.address || null,
       contactPhone: d.contactPhone || null,
       status: d.status,
+      latitude: d.latitude,
+      longitude: d.longitude,
     },
   });
   await writeAudit(session.user.id, "update", "Center", id);

@@ -142,6 +142,8 @@ model Person {
   district           District?           @relation(fields: [districtId], references: [id])
   enrollments        Enrollment[]
   attendances        Attendance[]
+  attendanceLogs        AttendanceLog[]
+  attendanceCorrections AttendanceCorrection[]
   staffAttendances   StaffAttendance[]
   credentials        StaffCredential[]
   trainerSessions    TrainingSession[]   @relation("SessionTrainer")
@@ -276,6 +278,9 @@ model Center {
   districtId   String
   address      String?
   contactPhone String?
+  // GPS location, used to check that attendance is marked at the center.
+  latitude     Float?
+  longitude    Float?
   status       CenterStatus @default(ACTIVE)
   createdAt    DateTime     @default(now())
 
@@ -309,6 +314,8 @@ model Program {
   description   Json? // { en, kn }
   category      String?
   durationWeeks Int?
+  // Minimum attendance (%) a trainee needs before a certificate can be issued.
+  minAttendancePct Int @default(80)
   status        String   @default("active")
   createdAt     DateTime @default(now())
 
@@ -390,6 +397,15 @@ model TrainingSession {
   sessionDate DateTime
   startTime   String? // "HH:mm"
   endTime     String? // "HH:mm"
+  // Evidence captured when attendance is first marked: a photo of the class,
+  // and where the marking phone was (and how far that is from the center).
+  photoUrl         String?
+  markedLat        Float?
+  markedLng        Float?
+  markedAccuracyM  Int?
+  markedDistanceM  Int?
+  firstMarkedAt    DateTime?
+  firstMarkedById  String?
   topic       Json? // { en, kn }
   status      SessionStatus @default(SCHEDULED)
 
@@ -398,6 +414,8 @@ model TrainingSession {
   venue       Venue?       @relation(fields: [venueId], references: [id])
   trainer     Person?      @relation("SessionTrainer", fields: [trainerId], references: [id])
   attendances Attendance[]
+  attendanceLogs        AttendanceLog[]
+  attendanceCorrections AttendanceCorrection[]
 
   @@index([cohortId])
   @@index([sessionDate])
@@ -577,6 +595,9 @@ model Certificate {
   centerName   Json? // snapshot { en, kn }
   issuedAt     DateTime @default(now())
   issuedById   String?
+  // Attendance at issue time, and why it was issued anyway if below the minimum.
+  attendancePct            Int?
+  attendanceOverrideReason String?
 
   enrollment Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
   completion Completion? @relation(fields: [completionId], references: [id], onDelete: Cascade)
@@ -825,4 +846,70 @@ enum AttendanceStatus {
   LATE
   EXCUSED
   HOLIDAY
+}
+
+// ─────────────────────────────────────────────────────────────
+// Attendance integrity: append-only history and correction requests
+// ─────────────────────────────────────────────────────────────
+
+enum AttendanceChangeKind {
+  MARK // recorded while the session's marking window was open
+  CORRECTION // applied later through an approved correction request
+}
+
+enum CorrectionSource {
+  STAFF // a trainer or coordinator asked for the change
+  TRAINEE // the trainee reported a mistake from their portal
+}
+
+enum CorrectionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Every attendance change ever made. Rows are only ever inserted, never
+// updated or deleted, so the full history of a record can be shown.
+model AttendanceLog {
+  id           String               @id @default(cuid())
+  sessionId    String
+  personId     String
+  fromStatus   AttendanceStatus?
+  toStatus     AttendanceStatus
+  kind         AttendanceChangeKind
+  reason       String?
+  changedById  String? // marker, or the approver for corrections
+  correctionId String?
+  createdAt    DateTime             @default(now())
+
+  session TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  person  Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([personId])
+}
+
+// A request to change attendance after the marking window has closed. Must be
+// approved by someone other than the requester before it takes effect.
+model AttendanceCorrection {
+  id            String            @id @default(cuid())
+  sessionId     String
+  personId      String
+  fromStatus    AttendanceStatus?
+  toStatus      AttendanceStatus
+  reason        String
+  source        CorrectionSource
+  status        CorrectionStatus  @default(PENDING)
+  requestedById String?
+  requestedAt   DateTime          @default(now())
+  reviewedById  String?
+  reviewedAt    DateTime?
+  reviewNote    String?
+
+  session TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  person  Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([sessionId])
+  @@index([personId])
 }

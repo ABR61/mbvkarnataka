@@ -12,6 +12,11 @@ export const programInput = z.object({
   descKn: z.string().trim().optional().default(""),
   category: z.string().trim().optional().default(""),
   durationWeeks: optionalInt,
+  // Minimum attendance (%) for a certificate; blank keeps the default of 80.
+  minAttendancePct: z.preprocess(
+    (v) => (v === "" || v == null ? 80 : Number(v)),
+    z.number().int().min(0, "invalid").max(100, "invalid"),
+  ),
   status: z.enum(["active", "inactive"]),
 });
 
@@ -25,6 +30,7 @@ export function programFromForm(formData: FormData) {
     descKn: formData.get("descKn") ?? "",
     category: formData.get("category") ?? "",
     durationWeeks: formData.get("durationWeeks") ?? "",
+    minAttendancePct: formData.get("minAttendancePct") ?? "",
     status: formData.get("status"),
   };
 }

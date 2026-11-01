@@ -24,6 +24,7 @@ function baseData(d: ProgramInput) {
     name: toLocalized(d.nameEn, d.nameKn),
     category: d.category || null,
     durationWeeks: d.durationWeeks,
+    minAttendancePct: d.minAttendancePct,
     status: d.status,
   };
 }

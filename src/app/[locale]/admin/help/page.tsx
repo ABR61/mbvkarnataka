@@ -25,6 +25,7 @@ const SECTIONS: {
   { id: "programs", key: "programs", href: "/admin/programs", permission: "cohort.manage", group: "training" },
   { id: "cohorts", key: "cohorts", href: "/admin/cohorts", permission: "cohort.manage", group: "training" },
   { id: "sessions", key: "sessions", href: "/admin/sessions", permission: "session.manage", group: "training" },
+  { id: "attendance", key: "attendanceReview", href: "/admin/attendance", permission: "attendance.review", group: "training" },
   { id: "trainees", key: "trainees", href: "/admin/trainees", permission: "trainee.manage", group: "training" },
   { id: "trainers", key: "trainers", href: "/admin/trainers", permission: "trainer.manage", group: "training" },
   { id: "staff", key: "staff", href: "/admin/staff", permission: "staff.manage", group: "training" },

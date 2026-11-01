@@ -5,6 +5,12 @@ import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
 import { Link } from "@/i18n/navigation";
 import { formatDate, formatDateWithWeekday } from "@/lib/dates";
+import { traineeAttendance } from "@/lib/attendance";
+import { isBelowMinimum } from "@/lib/attendance-rules";
+import { todayISO } from "@/lib/dates";
+import { StatusPill } from "@/components/ui/badge";
+import { ReportAttendance } from "./report-attendance";
+import { reportAttendanceIssue } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +63,20 @@ export default async function PortalPage({
         orderBy: { sessionDate: "asc" },
       })
     : [];
+  // Attendance per program (vs its minimum) and any reports under review.
+  const [attendanceByCohort, pendingReports] = await Promise.all([
+    Promise.all(
+      person.enrollments.map(async (e) => [e.cohortId, await traineeAttendance(e.cohortId, person.id)] as const),
+    ).then((pairs) => new Map(pairs)),
+    prisma.attendanceCorrection.findMany({
+      where: { personId: person.id, status: "PENDING" },
+      select: { sessionId: true },
+    }),
+  ]);
+  const underReview = new Set(pendingReports.map((r) => r.sessionId));
+  const today = todayISO();
+  const ta = await getTranslations("Attendance");
+
   // All of this person's certificates — both enrollment-based and the ones
   // earned by leaving feedback on a completed program.
   const certificates = await prisma.certificate.findMany({
@@ -129,6 +149,17 @@ export default async function PortalPage({
                   {e.cohort.code ? ` · ${e.cohort.code}` : ""} ·{" "}
                   {t(`status_${e.status}`)}
                 </div>
+                {(() => {
+                  const a = attendanceByCohort.get(e.cohortId);
+                  if (!a || a.summary.pct === null) return null;
+                  const low = isBelowMinimum(a.summary.pct, a.min);
+                  return (
+                    <div className={`mt-1 text-sm ${low ? "font-medium text-red-700 dark:text-red-400" : "text-gray-700 dark:text-gray-300"}`}>
+                      {t("myAttendance", { pct: a.summary.pct, min: a.min })}
+                      {low && <span className="block text-xs">{t("attendanceWarning", { min: a.min })}</span>}
+                    </div>
+                  );
+                })()}
               </li>
             ))}
           </ul>
@@ -143,17 +174,42 @@ export default async function PortalPage({
           <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <tbody>
-              {/* Attendance status is intentionally not shown to students —
-                  only admins/trainers can see attendance. */}
-              {sessions.map((s) => (
-                <tr key={s.id}>
-                  <td className={td}>
-                    {formatDateWithWeekday(s.sessionDate, locale)}
-                    {s.startTime ? ` ${s.startTime}` : ""}
-                  </td>
-                  <td className={td}>{localized(s.course.name, locale)}</td>
-                </tr>
-              ))}
+              {/* Trainees see their own attendance so they can spot and report
+                  mistakes — reports go to a reviewer, never straight in. */}
+              {sessions.map((s) => {
+                const mine = s.attendances[0];
+                const upcoming = s.sessionDate.toISOString().slice(0, 10) > today;
+                return (
+                  <tr key={s.id}>
+                    <td className={td}>
+                      {formatDateWithWeekday(s.sessionDate, locale)}
+                      {s.startTime ? ` ${s.startTime}` : ""}
+                    </td>
+                    <td className={td}>{localized(s.course.name, locale)}</td>
+                    <td className={td}>
+                      {mine ? (
+                        <div className="flex flex-col items-start gap-1">
+                          <StatusPill status={mine.status} label={ta(`status_${mine.status}`)} />
+                          {underReview.has(s.id) ? (
+                            <span className="text-xs text-amber-800 dark:text-amber-300">{t("underReview")}</span>
+                          ) : (
+                            <ReportAttendance
+                              locale={locale}
+                              sessionId={s.id}
+                              current={mine.status}
+                              action={reportAttendanceIssue}
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-600 dark:text-gray-400">
+                          {upcoming ? t("upcoming") : t("notMarkedYet")}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           </div>

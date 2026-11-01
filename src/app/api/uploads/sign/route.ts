@@ -20,6 +20,8 @@ import {
 const KINDS: Record<string, { prefix: string; permission: Permission }> = {
   post: { prefix: "activities", permission: "post.manage" },
   "future-program": { prefix: "future-programs", permission: "program.plan" },
+  // Class photo taken when attendance is marked (evidence of the session).
+  session: { prefix: "sessions", permission: "attendance.mark" },
 };
 
 export async function POST(req: Request) {

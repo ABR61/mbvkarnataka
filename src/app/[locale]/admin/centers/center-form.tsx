@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { BilingualField } from "@/components/forms/bilingual-field";
 import type { FormState } from "@/lib/forms";
 import { FormError } from "@/components/ui/form-error";
+import { CenterLocationFields } from "@/components/admin/center-location-fields";
 
 type CenterDefaults = {
   id?: string;
@@ -15,6 +16,8 @@ type CenterDefaults = {
   address?: string;
   contactPhone?: string;
   status?: "ACTIVE" | "INACTIVE";
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export function CenterForm({
@@ -87,6 +90,8 @@ export function CenterForm({
           className={field}
         />
       </label>
+
+      <CenterLocationFields latitude={defaults.latitude} longitude={defaults.longitude} fieldClass={field} />
 
       <label className="flex flex-col gap-1 text-sm">
         <span className="font-medium">{tc("status")}</span>

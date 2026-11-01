@@ -258,7 +258,17 @@
     "noProfileHelp": "Your login isn't connected to a trainee record yet. Please contact your center so they can link it.",
     "contactUs": "Contact us",
     "browsePrograms": "Browse programs",
-    "applyNow": "Apply now"
+    "applyNow": "Apply now",
+    "myAttendance": "Attendance: {pct}% (minimum {min}% for a certificate)",
+    "attendanceWarning": "Below {min}% — attend the remaining sessions to qualify for your certificate.",
+    "underReview": "Your report is being reviewed",
+    "upcoming": "Upcoming",
+    "notMarkedYet": "Not marked yet",
+    "reportSent": "Report sent — we'll review it",
+    "reportMistake": "Report a mistake",
+    "shouldBe": "It should be",
+    "whatHappened": "What happened?",
+    "sendReport": "Send report"
   },
   "Expenses": {
     "title": "Expenses",
@@ -443,7 +453,14 @@
     "district": "District",
     "cohorts": "Cohorts",
     "enrolled": "Enrolled",
-    "completed": "Completed"
+    "completed": "Completed",
+    "attendanceByCohort": "Attendance by cohort",
+    "exportAttendance": "Export attendance (CSV)",
+    "noAttendanceYet": "No attendance has been recorded yet.",
+    "cohort": "Cohort",
+    "sessionsHeld": "Sessions held",
+    "avgAttendance": "Avg. attendance",
+    "belowMinimum": "Below minimum"
   },
   "Moodle": {
     "title": "Moodle (LMS) integration",
@@ -504,7 +521,8 @@
     "staff": "Staff",
     "finance": "Financial management",
     "audit": "Audit log",
-    "help": "How-to guide"
+    "help": "How-to guide",
+    "attendanceReview": "Attendance review"
   },
   "FuturePrograms": {
     "title": "Future programs",
@@ -630,7 +648,15 @@
     "editTitle": "Edit center",
     "name": "Name",
     "empty": "No centers yet.",
-    "confirmDelete": "Delete this center? This cannot be undone."
+    "confirmDelete": "Delete this center? This cannot be undone.",
+    "location": "Location (for attendance checks)",
+    "locationHint": "Attendance marked far from this point is flagged for review. Easiest: stand at the center and tap “Use my current location”.",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "locating": "Getting location…",
+    "useMyLocation": "Use my current location",
+    "locationFilled": "Filled in — remember to save",
+    "locationFailed": "Couldn't get the location. Allow location access, or type the coordinates in."
   },
   "Districts": {
     "title": "Districts",
@@ -662,7 +688,9 @@
     "durationWeeks": "Duration (weeks)",
     "courses": "Courses",
     "empty": "No programs yet.",
-    "confirmDelete": "Delete this program? This cannot be undone."
+    "confirmDelete": "Delete this program? This cannot be undone.",
+    "minAttendancePct": "Minimum attendance for a certificate (%)",
+    "minAttendanceHint": "Below this, a certificate can only be issued with a recorded reason. Default 80."
   },
   "Courses": {
     "title": "Courses",
@@ -773,7 +801,15 @@
     "viewCertificate": "View certificate",
     "importEnrollments": "Import enrollments",
     "deleteCohort": "Delete cohort",
-    "confirmDelete": "Delete this cohort? Enrollments and sessions will be removed. This cannot be undone."
+    "confirmDelete": "Delete this cohort? Enrollments and sessions will be removed. This cannot be undone.",
+    "belowMinimum": "Below the {min}% minimum",
+    "issueWithOverride": "Issue with override…",
+    "overrideReasonHint": "Why issue despite low attendance? (at least 10 characters — this is recorded)",
+    "issueAnyway": "Issue certificate anyway",
+    "belowAttendanceError": "That trainee's attendance is below the program's minimum. To issue anyway, open “Issue with override” and give a reason.",
+    "confirmRemove": "Remove this trainee from the cohort?",
+    "hasRecordsError": "This trainee can't be removed — they have attendance or a certificate in this cohort. Set their status to Dropped instead; that keeps the record.",
+    "inUse": "This cohort can't be deleted — it has attendance records or issued certificates. Set its status to Completed or Cancelled instead."
   },
   "Sessions": {
     "title": "Sessions",
@@ -804,7 +840,53 @@
     "status_PRESENT": "Present",
     "status_ABSENT": "Absent",
     "status_LATE": "Late",
-    "status_EXCUSED": "Excused"
+    "status_EXCUSED": "Excused",
+    "classPhoto": "Class photo",
+    "classPhotoHint": "Take one photo of the class during the session. It is kept as evidence that the session took place.",
+    "location": "Location",
+    "locating": "Getting your location…",
+    "locationCaptured": "Location recorded (accurate to about {accuracy} m)",
+    "locationDenied": "Location permission was refused. Attendance can still be saved, but the session will be flagged for review.",
+    "locationUnavailable": "Location isn't available on this device right now. Attendance can still be saved, but the session will be flagged for review.",
+    "tryAgain": "Try again",
+    "markEveryone": "Every trainee must be marked before saving.",
+    "statusFor": "Attendance for {name}",
+    "choose": "Choose…",
+    "err_incomplete": "Please mark every trainee before saving.",
+    "err_locked": "Marking for this session has closed. Use Request correction instead.",
+    "err_notYet": "This session hasn't started yet — attendance opens on the session day.",
+    "err_cancelled": "This session was cancelled, so attendance can't be marked.",
+    "err_invalid": "Something in the request isn't valid. Please reload the page and try again.",
+    "err_notFound": "This session no longer exists.",
+    "err_stillOpen": "Marking is still open for this session — change it directly instead.",
+    "err_noChange": "That's already the recorded status.",
+    "err_duplicate": "A correction for this is already waiting for approval.",
+    "err_reason": "Please give a reason (at least 5 characters).",
+    "err_notMarked": "Attendance hasn't been marked for this session yet.",
+    "correctionRequested": "Sent for approval",
+    "requestCorrection": "Request correction",
+    "changeTo": "Change to",
+    "reason": "Reason",
+    "reasonHint": "e.g. Marked absent by mistake — she signed the register",
+    "sendForApproval": "Send for approval",
+    "windowOpen": "Attendance can be marked today. After today it locks, and changes will need approval.",
+    "windowLocked": "This session is locked. To change a record, request a correction — someone else must approve it.",
+    "windowNotYet": "Attendance for this session opens on {date}.",
+    "windowCancelled": "This session was cancelled.",
+    "firstMarked": "First marked",
+    "notRecorded": "Not recorded",
+    "distanceFromCenter": "{m} m from the center (GPS ±{accuracy} m)",
+    "recordedCenterUnmapped": "Recorded, but the center has no location set",
+    "flag_noPhoto": "No class photo",
+    "flag_noLocation": "No location",
+    "flag_farFromCenter": "Marked far from the center",
+    "flag_centerNotMapped": "Center location not set",
+    "evidenceComplete": "Evidence complete",
+    "notMarked": "Not marked",
+    "pendingTo": "Correction pending → {status}",
+    "history": "Change history",
+    "kind_MARK": "Marked",
+    "kind_CORRECTION": "Approved correction"
   },
   "Import": {
     "traineesTitle": "Import trainees",
@@ -1029,7 +1111,8 @@
     "leftAt": "Departure recorded at {time}",
     "confirmDeparture": "Record your departure now? This can't be changed later today.",
     "classAttendance": "Class attendance",
-    "classAttendanceBody": "Mark which trainees attended your session."
+    "classAttendanceBody": "Mark which trainees attended your session.",
+    "noClassAccess": "You don't have access to mark class attendance yet. Ask your center or branch admin to give your login the Trainer role."
   },
   "ImageUpload": {
     "choosePhoto": "Choose photo",
@@ -1143,7 +1226,8 @@
           "Set the status to Inactive for a center that's no longer used."
         ],
         "tips": [
-          "A center with cohorts or recorded expenses can't be deleted — set its status to Inactive instead."
+          "A center with cohorts or recorded expenses can't be deleted — set its status to Inactive instead.",
+          "Set each center's location (stand there and tap “Use my current location”) so attendance marked elsewhere is flagged."
         ]
       },
       "programs": {
@@ -1155,7 +1239,8 @@
           "Each batch of a program is run as a cohort."
         ],
         "tips": [
-          "A program with cohorts, completions, applications or expenses can't be deleted — mark it inactive instead."
+          "A program with cohorts, completions, applications or expenses can't be deleted — mark it inactive instead.",
+          "Set the minimum attendance for a certificate per program (default 80%)."
         ]
       },
       "cohorts": {
@@ -1170,7 +1255,8 @@
         "tips": [
           "Enrollment is blocked when the cohort is full.",
           "If saving says the code is taken, choose a different cohort code.",
-          "A certificate keeps the names as they were when it was issued — fix spellings first."
+          "A certificate keeps the names as they were when it was issued — fix spellings first.",
+          "A certificate needs the program's minimum attendance (80% unless set otherwise). Below it, use “Issue with override” and give a reason — it's recorded on the certificate."
         ]
       },
       "sessions": {
@@ -1178,11 +1264,13 @@
         "purpose": "Individual class sessions for a cohort, and the attendance for each.",
         "how": [
           "Click New session: pick the cohort and course (required), and optionally the venue, trainer, date, times and topic.",
-          "Open a session's Attendance to mark every enrolled trainee Present, Absent, Late or Excused in one go, then save.",
-          "You can reopen attendance and save again to correct it."
+          "On the session day, open its Attendance: take a class photo, let the phone record your location, then mark every trainee Present, Absent, Late or Excused and save.",
+          "You can correct attendance freely during the session day. After that it locks — use Request correction with a reason, and another person approves it.",
+          "Every change is kept in the session's change history."
         ],
         "tips": [
-          "Marking attendance needs the separate 'mark attendance' permission (trainers have it)."
+          "Missing photo or location doesn't stop you saving, but the session is flagged for review.",
+          "Nobody is marked present by default — every trainee needs an explicit choice. “Mark all present” is a deliberate shortcut."
         ]
       },
       "trainees": {
@@ -1359,6 +1447,20 @@
           "Entries can't be edited or removed.",
           "Blocked entries are sign-in attempts stopped by the too-many-attempts limit."
         ]
+      },
+      "attendanceReview": {
+        "title": "Attendance review",
+        "purpose": "Keeps attendance honest: approve or reject correction requests, and check automatic warning flags.",
+        "how": [
+          "Under Correction requests, read the reason and approve or reject (a note is required to reject). You can't review a request you made, or your own attendance.",
+          "Missing evidence lists sessions marked without a class photo or location, or marked far from the center — follow up with the trainer.",
+          "Sessions never marked, Present in two places and Perfect records point to sessions worth checking.",
+          "Below minimum lists trainees who won't qualify for a certificate unless their attendance improves."
+        ],
+        "tips": [
+          "Branch admins see only their own district.",
+          "Every approved correction is kept in the session's change history, with the reason and who approved it."
+        ]
       }
     }
   },
@@ -1371,8 +1473,8 @@
         "body": "Shows each program you're enrolled in and your status: Enrolled, Completed or Dropped."
       },
       {
-        "title": "My schedule",
-        "body": "Lists your upcoming sessions, and your attendance (Present, Absent, Late or Excused) once it has been marked."
+        "title": "My schedule & attendance",
+        "body": "Lists your sessions and your attendance for each once it's marked, plus your attendance % for each program. If something is wrong, tap Report a mistake — a staff member reviews it."
       },
       {
         "title": "My certificates",
@@ -1402,12 +1504,54 @@
       },
       {
         "title": "Class attendance",
-        "body": "Tap Class attendance on your home page to open Sessions, choose the session, then mark which trainees attended."
+        "body": "Tap Class attendance on your home page, choose today's session, take a class photo, let the phone record your location, and mark every trainee. It locks after the session day — later changes need a correction request and someone else's approval."
       },
       {
         "title": "If something looks wrong",
         "body": "\"Your arrival is already recorded\" means it's saved — just mark your departure at the end of the day. For anything else, contact your center or branch admin."
       }
     ]
+  },
+  "AttendanceReview": {
+    "title": "Attendance review",
+    "intro": "Approve or reject correction requests, and look into anything unusual in the last {days} days.",
+    "pending": "Correction requests",
+    "evidenceGaps": "Missing evidence",
+    "unmarked": "Sessions never marked",
+    "doubleBooked": "Present in two places",
+    "perfect": "Perfect records",
+    "lowAttendance": "Below minimum",
+    "noPending": "No requests waiting.",
+    "trainee": "Trainee",
+    "session": "Session",
+    "change": "Change",
+    "reasonCol": "Reason",
+    "requestedBy": "Requested by",
+    "decision": "Decision",
+    "source_STAFF": "Staff",
+    "source_TRAINEE": "Trainee",
+    "evidenceIntro": "Marked sessions without a class photo or location, or marked far from the center.",
+    "noEvidenceGaps": "Every marked session has its evidence.",
+    "unmarkedIntro": "Past sessions where nobody recorded attendance.",
+    "noUnmarked": "No past sessions are missing attendance.",
+    "doubleIntro": "The same trainee marked present at two centers, or in overlapping sessions, on the same day.",
+    "noDouble": "No trainee is marked present in two places.",
+    "perfectIntro": "Cohorts where every trainee was present at every one of 5 or more sessions. This can be genuine, but is worth a check.",
+    "noPerfect": "Nothing unusual.",
+    "sessionsAllPresent": "{n} sessions, everyone present",
+    "lowIntro": "Trainees in active cohorts whose attendance is below their program's minimum for a certificate.",
+    "noLow": "Everyone is at or above the minimum.",
+    "cohort": "Cohort",
+    "attendance": "Attendance",
+    "minimum": "minimum {min}%",
+    "done": "Done",
+    "notePlaceholder": "Note (required to reject)",
+    "approve": "Approve",
+    "reject": "Reject",
+    "err_noteRequired": "Please add a short note explaining the rejection.",
+    "err_invalid": "This request isn't valid.",
+    "err_notFound": "This request no longer exists.",
+    "err_badState": "This request has already been decided.",
+    "err_sameReviewer": "You can't review this — you asked for it, or it's your own attendance. Ask another reviewer."
   }
 }

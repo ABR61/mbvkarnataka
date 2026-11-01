@@ -38,6 +38,7 @@ export default async function EditProgramPage({
           descKn: desc.kn ?? "",
           category: program.category ?? "",
           durationWeeks: program.durationWeeks,
+          minAttendancePct: program.minAttendancePct,
           status: program.status === "inactive" ? "inactive" : "active",
         }}
       />

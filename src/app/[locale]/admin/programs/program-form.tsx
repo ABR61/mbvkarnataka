@@ -22,6 +22,7 @@ export function ProgramForm({
     descKn?: string;
     category?: string;
     durationWeeks?: number | null;
+    minAttendancePct?: number;
     status?: "active" | "inactive";
   };
 }) {
@@ -68,6 +69,19 @@ export function ProgramForm({
           defaultValue={defaults.durationWeeks ?? ""}
           className={field}
         />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm">
+        <span className="font-medium">{t("minAttendancePct")}</span>
+        <input
+          name="minAttendancePct"
+          type="number"
+          min={0}
+          max={100}
+          defaultValue={defaults.minAttendancePct ?? 80}
+          className={`${field} w-28`}
+        />
+        <span className="text-xs text-gray-600 dark:text-gray-400">{t("minAttendanceHint")}</span>
       </label>
 
       <label className="flex flex-col gap-1 text-sm">

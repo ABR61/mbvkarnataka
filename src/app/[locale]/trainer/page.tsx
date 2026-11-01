@@ -7,6 +7,7 @@ import { TrainerClock } from "./trainer-clock";
 import { trainerCheckIn, trainerCheckOut } from "./actions";
 import { formatDate, todayISO } from "@/lib/dates";
 import { Link } from "@/i18n/navigation";
+import { hasPermission } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -80,17 +81,25 @@ export default async function TrainerHomePage({
         checkOutAction={trainerCheckOut}
       />
 
-      {/* Class (trainee) attendance lives in Sessions, which trainers can open. */}
-      <Link
-        href="/admin/sessions"
-        className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 hover:border-emerald-400 hover:bg-emerald-50/40 dark:border-gray-800 dark:hover:bg-emerald-950/20"
-      >
-        <span>
-          <span className="block font-semibold">{t("classAttendance")}</span>
-          <span className="block text-sm text-gray-600 dark:text-gray-400">{t("classAttendanceBody")}</span>
-        </span>
-        <span aria-hidden className="text-emerald-700">→</span>
-      </Link>
+      {/* Class (trainee) attendance lives in Sessions. Only link there if this
+          login can actually mark attendance — otherwise the admin area would
+          bounce them straight back here. */}
+      {hasPermission(session?.user?.permissions, "attendance.mark") ? (
+        <Link
+          href="/admin/sessions"
+          className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4 hover:border-emerald-400 hover:bg-emerald-50/40 dark:border-gray-800 dark:hover:bg-emerald-950/20"
+        >
+          <span>
+            <span className="block font-semibold">{t("classAttendance")}</span>
+            <span className="block text-sm text-gray-600 dark:text-gray-400">{t("classAttendanceBody")}</span>
+          </span>
+          <span aria-hidden className="text-emerald-700">→</span>
+        </Link>
+      ) : (
+        <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+          {t("noClassAccess")}
+        </p>
+      )}
 
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">

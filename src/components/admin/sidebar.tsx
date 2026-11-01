@@ -22,6 +22,7 @@ const NAV: { href: string; key: string; permission: Permission | null }[] = [
   { href: "/admin/completions", key: "completions", permission: "feedback.manage" },
   { href: "/admin/feedback", key: "feedback", permission: "feedback.manage" },
   { href: "/admin/sessions", key: "sessions", permission: "session.manage" },
+  { href: "/admin/attendance", key: "attendanceReview", permission: "attendance.review" },
   { href: "/admin/finance", key: "finance", permission: "finance.manage" },
   { href: "/admin/expenses", key: "expenses", permission: "expense.record" },
   { href: "/admin/grants", key: "grants", permission: "finance.manage" },

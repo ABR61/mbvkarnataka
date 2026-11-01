@@ -25,7 +25,7 @@ export function ImagePicker({
   onChange,
 }: {
   /** Upload bucket + permission bucket; must match a key in the sign route. */
-  kind: "post" | "future-program";
+  kind: "post" | "future-program" | "session";
   value: string;
   onChange: (url: string) => void;
 }) {

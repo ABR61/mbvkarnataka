@@ -43,6 +43,8 @@ export default async function EditCenterPage({
           districtId: center.districtId,
           address: center.address ?? "",
           contactPhone: center.contactPhone ?? "",
+          latitude: center.latitude,
+          longitude: center.longitude,
           status: center.status,
         }}
       />

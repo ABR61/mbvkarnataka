@@ -8,6 +8,7 @@ import {
   placementSummary,
   followUpProgression,
 } from "@/lib/reports";
+import { attendanceReport } from "@/lib/attendance";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,12 @@ export default async function ReportsPage({
   setRequestLocale(locale);
   await requirePermission("report.view");
 
-  const [summary, districts, placements, progression] = await Promise.all([
+  const [summary, districts, placements, progression, attendance] = await Promise.all([
     orgSummary(),
     districtReport(),
     placementSummary(),
     followUpProgression(),
+    attendanceReport(),
   ]);
   const t = await getTranslations("Reports");
 
@@ -162,6 +164,55 @@ export default async function ReportsPage({
             </table>
             </div>
           </>
+        )}
+      </section>
+
+      <section>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
+            {t("attendanceByCohort")}
+          </h2>
+          <a
+            href={`/${locale}/admin/reports/attendance-export`}
+            download
+            className="rounded-md border border-emerald-600 px-3 py-1.5 text-sm font-medium text-emerald-700 hover:bg-emerald-50"
+          >
+            {t("exportAttendance")}
+          </a>
+        </div>
+        {attendance.cohorts.length === 0 ? (
+          <p className="text-sm text-gray-600 dark:text-gray-400">{t("noAttendanceYet")}</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr>
+                  <th className={th}>{t("cohort")}</th>
+                  <th className={thNum}>{t("sessionsHeld")}</th>
+                  <th className={thNum}>{t("trainees")}</th>
+                  <th className={thNum}>{t("avgAttendance")}</th>
+                  <th className={thNum}>{t("belowMinimum")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendance.cohorts.map((c) => (
+                  <tr key={c.id}>
+                    <td className={td}>
+                      {localized(c.program, locale)}
+                      {c.code ? ` · ${c.code}` : ""}
+                      <span className="block text-xs text-gray-600 dark:text-gray-400">{localized(c.center, locale)}</span>
+                    </td>
+                    <td className={tdNum}>{c.held}</td>
+                    <td className={tdNum}>{c.trainees}</td>
+                    <td className={tdNum}>{c.avgPct === null ? "—" : `${c.avgPct}%`}</td>
+                    <td className={`${tdNum} ${c.below > 0 ? "font-semibold text-red-700 dark:text-red-400" : ""}`}>
+                      {c.below} <span className="text-xs font-normal text-gray-600 dark:text-gray-400">(&lt; {c.min}%)</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
 
