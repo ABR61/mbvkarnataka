@@ -14,7 +14,7 @@ export default async function SessionsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -25,6 +25,7 @@ export default async function SessionsPage({
 
   const [rows, total] = await Promise.all([
     prisma.trainingSession.findMany({
+      omit: { photoUrl: true }, // class photos can be large; not needed in the list
       include: {
         cohort: { include: { _count: { select: { enrollments: true } } } },
         course: true,
@@ -47,6 +48,11 @@ export default async function SessionsPage({
 
   return (
     <div className="flex flex-col gap-4">
+      {sp.error === "hasAttendance" && (
+        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          {t("hasAttendance")}
+        </p>
+      )}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
         <Link

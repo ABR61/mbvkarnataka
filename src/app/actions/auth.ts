@@ -8,6 +8,7 @@ import { RATE_LIMITS } from "@/lib/rate-limit-config";
 import { getClientIp } from "@/lib/client-ip";
 import { writeAudit } from "@/lib/audit";
 import { homeForEmail, homePath } from "@/lib/home";
+import { safeInternalPath } from "@/lib/safe-path";
 
 export type SignInState = {
   error?: "invalid" | "unknown" | "rate_limited";
@@ -53,9 +54,8 @@ export async function authenticate(
   // Land each person in their own area (trainer / admin / portal) instead of
   // bouncing everyone through /admin. Only used if the password is correct.
   const redirectTo =
-    callbackUrl && callbackUrl.startsWith("/")
-      ? callbackUrl
-      : homePath(await homeForEmail(((formData.get("email") as string) ?? "").trim()), locale);
+    safeInternalPath(callbackUrl) ??
+    homePath(await homeForEmail(((formData.get("email") as string) ?? "").trim()), locale);
 
   try {
     await signIn("credentials", {

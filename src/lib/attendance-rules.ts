@@ -80,14 +80,18 @@ export function summarizeAttendance(
     if (s === "PRESENT" || s === "LATE") attended++;
     else if (s === "EXCUSED") excused++;
   }
-  const held = heldSessionIds.length;
-  const absent = held - attended - excused;
+  return summaryFromCounts(heldSessionIds.length, attended, excused);
+}
+
+/** The same summary from pre-aggregated counts (e.g. a SQL GROUP BY) — the one
+ *  place the percentage formula lives, so both paths always agree. */
+export function summaryFromCounts(held: number, attended: number, excused: number): AttendanceSummary {
   const denom = held - excused;
   return {
     held,
     attended,
     excused,
-    absent,
+    absent: held - attended - excused,
     pct: denom > 0 ? Math.round((attended / denom) * 100) : null,
   };
 }

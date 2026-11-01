@@ -30,7 +30,8 @@ export default async function AttendancePage({
 
   const [enrollments, attendances, pendingCorrections, logs] = await Promise.all([
     prisma.enrollment.findMany({
-      where: { cohortId: ts.cohortId },
+      // Dropped trainees leave the roster (their past records stay in history).
+      where: { cohortId: ts.cohortId, status: { not: "DROPPED" } },
       include: { person: true },
       orderBy: { person: { firstName: "asc" } },
     }),

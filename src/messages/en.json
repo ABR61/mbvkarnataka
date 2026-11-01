@@ -638,7 +638,8 @@
     "formError_duplicate": "This already exists.",
     "formError_taken": "That value is already in use.",
     "formError_generic": "Something went wrong. Please try again.",
-    "formError_fields": "Please correct the highlighted fields above."
+    "formError_fields": "Please correct the highlighted fields above.",
+    "formError_attendanceRecorded": "Attendance has already been recorded for this session, so its date and cohort can't change and it can't be cancelled. You can still edit the time, venue, trainer and topic."
   },
   "Centers": {
     "inUse": "This center can't be deleted — it has cohorts or recorded expenses. Set its status to Inactive instead.",
@@ -830,7 +831,8 @@
     "status_SCHEDULED": "Scheduled",
     "status_COMPLETED": "Completed",
     "status_CANCELLED": "Cancelled",
-    "confirmDelete": "Delete this session? Attendance records will be removed."
+    "confirmDelete": "Delete this session? Attendance records will be removed.",
+    "hasAttendance": "This session can't be deleted — attendance has been recorded for it. Corrections go through Request correction on its attendance page."
   },
   "Attendance": {
     "title": "Attendance",

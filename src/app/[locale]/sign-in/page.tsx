@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { homeFor, homePath } from "@/lib/home";
+import { safeInternalPath } from "@/lib/safe-path";
 import { SignInForm } from "./sign-in-form";
 
 export default async function SignInPage({
@@ -17,7 +18,7 @@ export default async function SignInPage({
   // Optional return path (must be an internal path) to send the user back to
   // where they came from (e.g. the "Login to plan" button on Future programs).
   const { callbackUrl } = await searchParams;
-  const next = callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : undefined;
+  const next = safeInternalPath(callbackUrl); // rejects "//evil.com"-style open redirects
 
   // Already signed in → honour the return path, else go to their own area.
   const session = await auth();

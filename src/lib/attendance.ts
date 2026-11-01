@@ -1,4 +1,5 @@
 import "server-only";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   findDoubleBookings,
@@ -7,54 +8,25 @@ import {
   markingWindow,
   sessionFlags,
   summarizeAttendance,
+  summaryFromCounts,
   type AttendanceSummary,
 } from "@/lib/attendance-rules";
 import { todayISO } from "@/lib/dates";
 
-/** Sessions of a cohort that have been held — i.e. attendance was marked for
- *  at least one trainee — excluding cancelled ones. */
-export async function heldSessionIds(cohortId: string): Promise<string[]> {
-  const sessions = await prisma.trainingSession.findMany({
-    where: { cohortId, status: { not: "CANCELLED" }, attendances: { some: {} } },
-    select: { id: true },
-  });
-  return sessions.map((s) => s.id);
-}
-
 /** Attendance summary for every trainee in a cohort, keyed by personId, plus
- *  the program's minimum. */
+ *  the program's minimum. (One aggregate query — see cohortsAttendance.) */
 export async function cohortAttendance(cohortId: string): Promise<{
   min: number;
   byPerson: Map<string, AttendanceSummary>;
 }> {
-  const [cohort, held] = await Promise.all([
-    prisma.cohort.findUnique({
-      where: { id: cohortId },
-      select: { program: { select: { minAttendancePct: true } }, enrollments: { select: { personId: true } } },
-    }),
-    heldSessionIds(cohortId),
-  ]);
-  const rows = held.length
-    ? await prisma.attendance.findMany({
-        where: { sessionId: { in: held } },
-        select: { personId: true, sessionId: true, status: true },
-      })
-    : [];
-  const rowsByPerson = new Map<string, { sessionId: string; status: string }[]>();
-  for (const r of rows) {
-    rowsByPerson.set(r.personId, [...(rowsByPerson.get(r.personId) ?? []), r]);
-  }
-  const byPerson = new Map<string, AttendanceSummary>();
-  for (const e of cohort?.enrollments ?? []) {
-    byPerson.set(e.personId, summarizeAttendance(held, rowsByPerson.get(e.personId) ?? []));
-  }
-  return { min: cohort?.program.minAttendancePct ?? 80, byPerson };
+  const r = (await cohortsAttendance([cohortId])).get(cohortId);
+  return { min: r?.min ?? 80, byPerson: r?.byPerson ?? new Map() };
 }
 
 /** One trainee's attendance in one cohort. */
 export async function traineeAttendance(cohortId: string, personId: string) {
-  const { min, byPerson } = await cohortAttendance(cohortId);
-  return { min, summary: byPerson.get(personId) ?? summarizeAttendance([], []) };
+  const r = (await cohortsAttendance([cohortId], { personId })).get(cohortId);
+  return { min: r?.min ?? 80, summary: r?.byPerson.get(personId) ?? summarizeAttendance([], []) };
 }
 
 const personName = (p: { firstName: string; lastName: string | null }) =>
@@ -82,7 +54,6 @@ export async function integrityReport(districtId: string | null, days = 30) {
       sessionDate: true,
       startTime: true,
       endTime: true,
-      photoUrl: true,
       markedLat: true,
       markedDistanceM: true,
       markedAccuracyM: true,
@@ -93,6 +64,17 @@ export async function integrityReport(districtId: string | null, days = 30) {
     },
     orderBy: { sessionDate: "desc" },
   });
+
+  // Which sessions have a class photo — fetched as ids only, so we never load
+  // the photos themselves (they can be large inline images without R2).
+  const withPhoto = new Set(
+    (
+      await prisma.trainingSession.findMany({
+        where: { id: { in: sessions.map((x) => x.id) }, photoUrl: { not: null } },
+        select: { id: true },
+      })
+    ).map((x) => x.id),
+  );
 
   const label = (s: (typeof sessions)[number]) => ({
     id: s.id,
@@ -108,7 +90,7 @@ export async function integrityReport(districtId: string | null, days = 30) {
     .map((s) => ({
       ...label(s),
       flags: sessionFlags({
-        photoUrl: s.photoUrl,
+        photoUrl: withPhoto.has(s.id) ? "yes" : null,
         markedLat: s.markedLat,
         markedDistanceM:
           s.markedDistanceM != null ? Math.max(0, s.markedDistanceM - (s.markedAccuracyM ?? 0)) : null,
@@ -207,8 +189,9 @@ export async function integrityReport(districtId: string | null, days = 30) {
     attended: number;
     held: number;
   }[] = [];
+  const activeStats = await cohortsAttendance(activeCohorts.map((c) => c.id));
   for (const c of activeCohorts) {
-    const { min, byPerson } = await cohortAttendance(c.id);
+    const { min, byPerson } = activeStats.get(c.id) ?? { min: 80, byPerson: new Map() };
     for (const e of c.enrollments) {
       const s = byPerson.get(e.person.id);
       if (s && isBelowMinimum(s.pct, min)) {
@@ -334,8 +317,9 @@ export async function attendanceReport(): Promise<{
 
   const cohortRows = [];
   const trainees: TraineeAttendanceRow[] = [];
+  const stats = await cohortsAttendance(cohorts.map((c) => c.id));
   for (const c of cohorts) {
-    const { min, byPerson } = await cohortAttendance(c.id);
+    const { min, byPerson } = stats.get(c.id) ?? { min: 80, byPerson: new Map() };
     const pcts: number[] = [];
     let below = 0;
     let held = 0;
@@ -343,8 +327,12 @@ export async function attendanceReport(): Promise<{
       const s = byPerson.get(e.person.id);
       if (!s) continue;
       held = Math.max(held, s.held);
-      if (s.pct !== null) pcts.push(s.pct);
-      if (isBelowMinimum(s.pct, min)) below++;
+      // Dropped trainees are listed (CSV) but don't count toward the cohort's
+      // average or its below-minimum figure.
+      if (e.status !== "DROPPED") {
+        if (s.pct !== null) pcts.push(s.pct);
+        if (isBelowMinimum(s.pct, min)) below++;
+      }
       trainees.push({
         person: personName(e.person),
         phone: e.person.phone,
@@ -371,4 +359,72 @@ export async function attendanceReport(): Promise<{
     });
   }
   return { cohorts: cohortRows, trainees };
+}
+
+/**
+ * Attendance summaries for many cohorts in ONE aggregate query (plus one for
+ * program minimums), instead of loading every attendance row cohort by cohort.
+ * Same rules as summarizeAttendance: only held (marked, non-cancelled) sessions
+ * count; present/late = attended; excused leaves the denominator.
+ * Optionally limited to one person (e.g. the trainee portal).
+ */
+export async function cohortsAttendance(
+  cohortIds: readonly string[],
+  opts: { personId?: string } = {},
+): Promise<
+  Map<string, { min: number; byPerson: Map<string, AttendanceSummary & { enrollmentStatus: string }> }>
+> {
+  const out = new Map<
+    string,
+    { min: number; byPerson: Map<string, AttendanceSummary & { enrollmentStatus: string }> }
+  >();
+  if (cohortIds.length === 0) return out;
+  const ids = [...cohortIds];
+  const personFilter = opts.personId ? Prisma.sql`AND e."personId" = ${opts.personId}` : Prisma.empty;
+
+  const [rows, mins] = await Promise.all([
+    prisma.$queryRaw<
+      { cohortId: string; personId: string; enrollmentStatus: string; held: number; attended: number; excused: number }[]
+    >`
+      WITH held AS (
+        SELECT ts.id, ts."cohortId"
+        FROM training_sessions ts
+        WHERE ts."cohortId" = ANY(${ids})
+          AND ts.status <> 'CANCELLED'
+          AND EXISTS (SELECT 1 FROM "Attendance" x WHERE x."sessionId" = ts.id)
+      ),
+      held_count AS (
+        SELECT "cohortId", COUNT(*)::int AS n FROM held GROUP BY "cohortId"
+      ),
+      marks AS (
+        SELECT h."cohortId", a."personId",
+               COUNT(*) FILTER (WHERE a.status IN ('PRESENT', 'LATE'))::int AS attended,
+               COUNT(*) FILTER (WHERE a.status = 'EXCUSED')::int AS excused
+        FROM held h
+        JOIN "Attendance" a ON a."sessionId" = h.id
+        GROUP BY h."cohortId", a."personId"
+      )
+      SELECT e."cohortId", e."personId", e.status::text AS "enrollmentStatus",
+             COALESCE(hc.n, 0) AS held,
+             COALESCE(m.attended, 0) AS attended,
+             COALESCE(m.excused, 0) AS excused
+      FROM "Enrollment" e
+      LEFT JOIN held_count hc ON hc."cohortId" = e."cohortId"
+      LEFT JOIN marks m ON m."cohortId" = e."cohortId" AND m."personId" = e."personId"
+      WHERE e."cohortId" = ANY(${ids}) ${personFilter}
+    `,
+    prisma.cohort.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, program: { select: { minAttendancePct: true } } },
+    }),
+  ]);
+
+  for (const c of mins) out.set(c.id, { min: c.program.minAttendancePct, byPerson: new Map() });
+  for (const r of rows) {
+    out.get(r.cohortId)?.byPerson.set(r.personId, {
+      ...summaryFromCounts(Number(r.held), Number(r.attended), Number(r.excused)),
+      enrollmentStatus: r.enrollmentStatus,
+    });
+  }
+  return out;
 }

@@ -5,8 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { localized } from "@/lib/localized";
 import { Link } from "@/i18n/navigation";
 import { formatDate, formatDateWithWeekday } from "@/lib/dates";
-import { traineeAttendance } from "@/lib/attendance";
-import { isBelowMinimum } from "@/lib/attendance-rules";
+import { cohortsAttendance } from "@/lib/attendance";
+import { isBelowMinimum, summaryFromCounts } from "@/lib/attendance-rules";
 import { todayISO } from "@/lib/dates";
 import { StatusPill } from "@/components/ui/badge";
 import { ReportAttendance } from "./report-attendance";
@@ -56,6 +56,7 @@ export default async function PortalPage({
   const sessions = cohortIds.length
     ? await prisma.trainingSession.findMany({
         where: { cohortId: { in: cohortIds } },
+        omit: { photoUrl: true }, // class photos can be large; not needed here
         include: {
           course: true,
           attendances: { where: { personId: person.id } },
@@ -65,9 +66,19 @@ export default async function PortalPage({
     : [];
   // Attendance per program (vs its minimum) and any reports under review.
   const [attendanceByCohort, pendingReports] = await Promise.all([
-    Promise.all(
-      person.enrollments.map(async (e) => [e.cohortId, await traineeAttendance(e.cohortId, person.id)] as const),
-    ).then((pairs) => new Map(pairs)),
+    // One aggregate query for all of this trainee's programs.
+    cohortsAttendance(
+      person.enrollments.map((e) => e.cohortId),
+      { personId: person.id },
+    ).then(
+      (m) =>
+        new Map(
+          [...m].map(([cohortId, v]) => [
+            cohortId,
+            { min: v.min, summary: v.byPerson.get(person.id) ?? summaryFromCounts(0, 0, 0) },
+          ]),
+        ),
+    ),
     prisma.attendanceCorrection.findMany({
       where: { personId: person.id, status: "PENDING" },
       select: { sessionId: true },

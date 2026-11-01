@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { FormState } from "@/lib/forms";
 
-const KNOWN = ["notFound", "locked", "invalid", "saveFailed", "duplicate", "taken"] as const;
+const KNOWN = ["notFound", "locked", "invalid", "saveFailed", "duplicate", "taken", "attendanceRecorded"] as const;
 
 /**
  * Message shown beside a form's Save button when the server action fails, so a

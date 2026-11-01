@@ -69,8 +69,26 @@ export async function updateSession(
   const parsed = sessionInput.safeParse(sessionFromForm(formData));
   if (!parsed.success) return { fieldErrors: zodFieldErrors(parsed.error) };
   const d = parsed.data;
-  const topic = toLocalizedOrNull(d.topicEn, d.topicKn);
 
+  // Once attendance exists the session is part of the record: moving its date
+  // would reopen a locked session for marking (bypassing approved
+  // corrections), changing its cohort would orphan the attendance, and
+  // cancelling it would silently drop it from everyone's percentage.
+  const existing = await prisma.trainingSession.findUnique({
+    where: { id },
+    select: { cohortId: true, sessionDate: true, status: true, _count: { select: { attendances: true } } },
+  });
+  if (!existing) return { error: "notFound" };
+  if (existing._count.attendances > 0) {
+    const newDay = (parseDate(d.sessionDate) ?? new Date()).toISOString().slice(0, 10);
+    const oldDay = existing.sessionDate.toISOString().slice(0, 10);
+    const newlyCancelled = d.status === "CANCELLED" && existing.status !== "CANCELLED";
+    if (d.cohortId !== existing.cohortId || newDay !== oldDay || newlyCancelled) {
+      return { error: "attendanceRecorded" };
+    }
+  }
+
+  const topic = toLocalizedOrNull(d.topicEn, d.topicKn);
   await prisma.trainingSession.update({
     where: { id },
     data: { ...sessionScalars(d), topic: topic ?? Prisma.DbNull },
@@ -86,6 +104,11 @@ export async function deleteSession(formData: FormData): Promise<void> {
   const session = await requirePermission("session.manage");
   const id = formData.get("id") as string;
   if (!id) return;
+
+  // A session with attendance can't be deleted — that would erase the
+  // attendance and its whole change history.
+  const marked = await prisma.attendance.count({ where: { sessionId: id } });
+  if (marked > 0) redirect(`/${locale}/admin/sessions?error=hasAttendance`);
 
   await prisma.trainingSession.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "TrainingSession", id);
@@ -137,12 +160,13 @@ export async function markAttendance(
   const win = markingWindow(ts.sessionDate);
   if (win !== "open") return { error: win === "locked" ? "locked" : "notYet" };
 
+  // Trainees who have dropped out aren't marked any more.
   const enrollments = await prisma.enrollment.findMany({
-    where: { cohortId: ts.cohortId },
+    where: { cohortId: ts.cohortId, status: { not: "DROPPED" } },
     select: { personId: true },
   });
 
-  // Every trainee must be marked explicitly.
+  // Every (active) trainee must be marked explicitly.
   const marks: { personId: string; status: AttendanceStatusValue }[] = [];
   for (const e of enrollments) {
     const status = formData.get(`status_${e.personId}`);
