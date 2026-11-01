@@ -3,6 +3,7 @@ import { signOutAction } from "@/app/actions/auth";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { HelpLink } from "@/components/admin/help-link";
 
 export async function Topbar({
   user,
@@ -25,6 +26,7 @@ export async function Topbar({
         </Link>
         <LocaleSwitcher />
         <ThemeToggle />
+        <HelpLink />
         <span className="text-gray-600 dark:text-gray-300">
           {user.name ?? user.email}
         </span>

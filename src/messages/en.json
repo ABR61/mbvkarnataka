@@ -1050,6 +1050,271 @@
     "budgetTitle": "Budgets",
     "budgetBody": "Set a budget per programme. The finance page compares budget against actual (non-voided) spend and flags any programme that has gone over.",
     "rolesTitle": "Who can do what",
-    "rolesBody": "Branch admins record expenses for their own district. Finance staff and Admins approve, pay, and void. Admins can do everything, but the separation-of-duties rule (recorder ≠ approver) still applies to everyone."
+    "rolesBody": "Branch admins record expenses for their own district. Finance staff and Admins approve, pay, and void. Admins can do everything, but the separation-of-duties rule (recorder ≠ approver) still applies to everyone.",
+    "helpForPage": "How-to for this page",
+    "contents": "Contents",
+    "howTo": "How to",
+    "tips": "Good to know",
+    "openPage": "Open this page",
+    "accountingDeepDive": "Accounting workflow (in depth)",
+    "groups": {
+      "overview": "Overview",
+      "training": "Training operations",
+      "admissions": "Admissions & public site",
+      "outcomes": "Outcomes & reporting",
+      "finance": "Finance",
+      "admin": "Administration"
+    },
+    "pages": {
+      "dashboard": {
+        "title": "Dashboard",
+        "purpose": "Your starting point: headline numbers for trainees, active cohorts, certificates and pending applications.",
+        "how": [
+          "Open it any time from the top of the sidebar.",
+          "Branch admins see only their own district's numbers; the district name is shown as a badge.",
+          "Your roles are listed so you can confirm what you're allowed to do."
+        ],
+        "tips": [
+          "If a menu item you expect is missing, your role doesn't include that permission — ask an administrator."
+        ]
+      },
+      "districts": {
+        "title": "Districts",
+        "purpose": "The 31 Karnataka districts (pre-loaded). They group centers, trainees, staff and spending by branch.",
+        "how": [
+          "Search for a district and click Edit to correct its English or Kannada name, code or state.",
+          "Districts can't be added or deleted — the list is fixed."
+        ],
+        "tips": [
+          "The district code is what the trainee CSV import uses (column districtCode), so keep codes accurate."
+        ]
+      },
+      "centers": {
+        "title": "Centers",
+        "purpose": "Training centers within each district.",
+        "how": [
+          "Click New center, enter the name in English and Kannada, pick the district, and add the address and phone.",
+          "Use Edit to update details.",
+          "Set the status to Inactive for a center that's no longer used."
+        ],
+        "tips": [
+          "Delete is permanent and isn't blocked by linked cohorts — prefer marking a center Inactive."
+        ]
+      },
+      "programs": {
+        "title": "Programs",
+        "purpose": "The catalogue of training programs (for example tailoring or electrical work).",
+        "how": [
+          "Click New program and enter the name (and optional description) in both languages, the category and the duration in weeks.",
+          "Mark a program inactive when it's no longer offered.",
+          "Each batch of a program is run as a cohort."
+        ],
+        "tips": [
+          "Delete is permanent — prefer marking a program inactive."
+        ]
+      },
+      "cohorts": {
+        "title": "Cohorts",
+        "purpose": "A batch of one program at one center, with dates and a seat capacity.",
+        "how": [
+          "Click New cohort: choose the program and center, give a unique code, dates and capacity. You're taken to the cohort page after saving.",
+          "On the cohort page, enroll trainees, assign trainers, and update each trainee's status (Enrolled, Completed or Dropped — add a reason when dropping).",
+          "Click Issue certificate for a trainee who has finished. This marks them Completed and creates a certificate anyone can verify by QR code.",
+          "To enroll many trainees at once, use Import with a CSV of cohortCode and traineePhone. Check the preview, then commit."
+        ],
+        "tips": [
+          "Enrollment is blocked when the cohort is full.",
+          "If saving says the code is taken, choose a different cohort code.",
+          "A certificate keeps the names as they were when it was issued — fix spellings first."
+        ]
+      },
+      "sessions": {
+        "title": "Sessions",
+        "purpose": "Individual class sessions for a cohort, and the attendance for each.",
+        "how": [
+          "Click New session: pick the cohort and course (required), and optionally the venue, trainer, date, times and topic.",
+          "Open a session's Attendance to mark every enrolled trainee Present, Absent, Late or Excused in one go, then save.",
+          "You can reopen attendance and save again to correct it."
+        ],
+        "tips": [
+          "Marking attendance needs the separate 'mark attendance' permission (trainers have it)."
+        ]
+      },
+      "trainees": {
+        "title": "Trainees",
+        "purpose": "Trainee records, with their consent recorded under the DPDP Act.",
+        "how": [
+          "Search by name or phone, or click New trainee to add one.",
+          "Tick the consent box — it's required, and the consent is recorded.",
+          "On a trainee's edit page, use Create portal login to give them access to the trainee portal (email and a password of at least 8 characters).",
+          "To add many, use Import with a CSV: firstName is required; lastName, gender, dateOfBirth, phone, email, address and districtCode are optional. Preview, then commit."
+        ],
+        "tips": [
+          "Branch admins see and edit only trainees in their own district.",
+          "Trainee details are personal data — only record what you need."
+        ]
+      },
+      "trainers": {
+        "title": "Trainers",
+        "purpose": "Trainer records, each with their own login.",
+        "how": [
+          "Click New trainer and enter their details plus an email and password. This creates their login with the Trainer role.",
+          "Use Edit to update details. The email can't be changed afterwards.",
+          "Trainers sign in to their own trainer area, where they mark attendance."
+        ],
+        "tips": [
+          "Deleting a trainer also deletes their login."
+        ]
+      },
+      "staff": {
+        "title": "Staff & attendance",
+        "purpose": "Staff members, their daily attendance and biometric clock-in.",
+        "how": [
+          "Click New staff member and enter their name, phone and role.",
+          "Open Attendance, pick a date, mark everyone (Present, Absent, Late, Excused or Holiday, with optional in and out times) and save the whole day.",
+          "Open a staff member to see their attendance history and hours, and to Register biometric (fingerprint or Face ID on the device they'll use).",
+          "Registered staff can then clock in and out on the Clock page. The first scan of the day checks them in; the next checks them out."
+        ],
+        "tips": [
+          "Register biometrics on the same website address staff will use to clock in — a registration only works on the address where it was created.",
+          "Branch admins manage staff in their own district only."
+        ]
+      },
+      "applications": {
+        "title": "Applications",
+        "purpose": "Admission applications submitted on the public website.",
+        "how": [
+          "Filter by status and open an application to review it.",
+          "Branch admins review applicants from their district and set Under review, Branch approved or Rejected, adding a note.",
+          "A super admin gives the final acceptance and clicks Convert to trainee. This creates the trainee record and can enroll them in a cohort straight away."
+        ],
+        "tips": [
+          "An application can be converted only once.",
+          "The usual flow: Submitted → Under review → Branch approved → Accepted → Converted (or Rejected)."
+        ]
+      },
+      "posts": {
+        "title": "Posts",
+        "purpose": "News and activity updates shown on the public website.",
+        "how": [
+          "Click New post and add a title, text and an optional photo.",
+          "Posts by a super admin go live immediately. Posts by a branch admin stay Pending until a super admin approves them.",
+          "Super admins can approve, unapprove (hide) or delete posts."
+        ],
+        "tips": []
+      },
+      "futurePrograms": {
+        "title": "Future programs",
+        "purpose": "Upcoming programs announced on the public site so people can apply early.",
+        "how": [
+          "Click New future program and add a title and description, plus an optional image, objectives, duration and number of seats.",
+          "As with posts, branch admin entries wait for super admin approval before they appear publicly.",
+          "There's no edit: to change one, delete it and create it again."
+        ],
+        "tips": [
+          "People can apply directly to an approved future program. Their application goes to that program's district."
+        ]
+      },
+      "completions": {
+        "title": "Completions",
+        "purpose": "Records that a participant finished a program, which lets them give feedback and earn a completion certificate.",
+        "how": [
+          "Click New completion and choose the participant and the program (or future program).",
+          "The participant then sees a feedback form in their portal.",
+          "Delete a completion that was added by mistake."
+        ],
+        "tips": [
+          "The same person can't be marked complete twice for the same program."
+        ]
+      },
+      "feedback": {
+        "title": "Feedback",
+        "purpose": "Moderate participant feedback before it appears publicly.",
+        "how": [
+          "Pending feedback is listed first.",
+          "A super admin publishes good feedback, which then appears on the programs page, or unpublishes it.",
+          "Delete feedback that's inappropriate."
+        ],
+        "tips": []
+      },
+      "reports": {
+        "title": "Reports",
+        "purpose": "Organisation-wide numbers for planning and for funders.",
+        "how": [
+          "See the summary, placement outcomes, outcomes over time (3-, 6- and 12-month follow-ups and income uplift) and the district-wise table.",
+          "Click Export CSV to download the district table. It opens correctly in Excel, including Kannada."
+        ],
+        "tips": [
+          "Reports always cover all districts."
+        ]
+      },
+      "finance": {
+        "title": "Financial management",
+        "purpose": "A read-only overview of the organisation's money.",
+        "how": [
+          "Check income, spending, balance and budget at the top.",
+          "Review spend by status, category and branch, grant utilisation, and budget vs actual.",
+          "Use Add expense or Add grant to record new items."
+        ],
+        "tips": [
+          "Voided expenses are left out of every total.",
+          "A red figure means a restricted grant is overspent or a program is over budget."
+        ]
+      },
+      "expenses": {
+        "title": "Expenses",
+        "purpose": "Record spending and move it through approval and payment.",
+        "how": [
+          "Click New expense and enter the amount, date and category, plus optionally the vendor, grant, program, cohort and center. It starts as Pending.",
+          "An approver (not the person who recorded it) opens the expense and clicks Approve.",
+          "Finance records the payment — method, date and reference (UTR or cheque number) — and clicks Mark as paid.",
+          "To reverse a mistake after approval, Void the expense with a reason."
+        ],
+        "tips": [
+          "Only Pending expenses can be edited or deleted.",
+          "The Accounting workflow section below explains the full rules."
+        ]
+      },
+      "grants": {
+        "title": "Grants",
+        "purpose": "Funds received from donors and funders.",
+        "how": [
+          "Click New grant and enter the funder, amount and date received, plus the reference and purpose.",
+          "Tick Restricted if the grant may only be spent on its stated purpose. Payments that would overspend it are blocked.",
+          "Tick Foreign source for FCRA (foreign contribution) tracking.",
+          "Link expenses to the grant so the finance page can show how it was used."
+        ],
+        "tips": [
+          "A grant that has expenses charged to it can't be deleted."
+        ]
+      },
+      "users": {
+        "title": "Users",
+        "purpose": "Login accounts and their roles.",
+        "how": [
+          "Click New user and enter the email, name, password, language and one or more roles.",
+          "To make someone a branch admin, give them the Branch admin role and choose their district.",
+          "Use Reset password to set a new one (8 or more characters). Set the status to Suspended to block access without deleting the account.",
+          "To add many users, use Import with a CSV of name, email, password, locale and roles (separate roles with ;)."
+        ],
+        "tips": [
+          "Imported users don't get a district — edit them afterwards to assign one.",
+          "A role change takes effect the next time that person signs in.",
+          "You can't delete your own account."
+        ]
+      },
+      "audit": {
+        "title": "Audit log",
+        "purpose": "A read-only record of sensitive actions: who created, changed or deleted what, and when — plus blocked sign-in attempts.",
+        "how": [
+          "Filter by entity (for example Expense or Application) and by action.",
+          "Each row shows the time, the person and the record affected."
+        ],
+        "tips": [
+          "Entries can't be edited or removed.",
+          "Blocked entries are sign-in attempts stopped by the too-many-attempts limit."
+        ]
+      }
+    }
   }
 }
