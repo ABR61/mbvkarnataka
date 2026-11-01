@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { authenticate, type SignInState } from "@/app/actions/auth";
+import { Button } from "@/components/ui/button";
 
 const initialState: SignInState = {};
 
@@ -55,13 +56,9 @@ export function SignInForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 rounded-md bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="mt-2">
         {pending ? t("signingIn") : t("submit")}
-      </button>
+      </Button>
     </form>
   );
 }

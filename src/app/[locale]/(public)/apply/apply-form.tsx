@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { GENDERS } from "@/lib/validation/person";
 import { CameraCapture } from "@/components/camera-capture";
+import { Button } from "@/components/ui/button";
 import { createApplication, type ApplyState } from "./actions";
 
 type Option = { id: string; name: string };
@@ -181,13 +182,9 @@ export function ApplyForm({
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded-md bg-emerald-600 px-6 py-2.5 font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={pending} className="self-start">
         {pending ? t("submitting") : t("submit")}
-      </button>
+      </Button>
     </form>
   );
 }

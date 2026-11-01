@@ -3,27 +3,10 @@ import { Link } from "@/i18n/navigation";
 import { requirePermission } from "@/lib/auth-guards";
 import { formatINR } from "@/lib/money";
 import { financialStatus } from "@/lib/finance";
+import { Card, Kpi } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/badge";
 
 export const dynamic = "force-dynamic";
-
-const card = "rounded-xl border border-gray-200 p-5 dark:border-gray-800";
-
-function Kpi({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: string;
-  accent?: string;
-}) {
-  return (
-    <div className={card}>
-      <div className={`text-2xl font-bold ${accent ?? ""}`}>{value}</div>
-      <div className="mt-1 text-xs text-gray-500">{label}</div>
-    </div>
-  );
-}
 
 export default async function FinanceStatusPage({
   params,
@@ -40,12 +23,6 @@ export default async function FinanceStatusPage({
   const thNum = "px-3 py-2 text-right font-medium text-gray-500";
   const td = "px-3 py-2 border-t border-gray-100 dark:border-gray-800";
   const tdNum = `${td} text-right tabular-nums`;
-
-  const statusTone: Record<string, string> = {
-    PAID: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300",
-    APPROVED: "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300",
-    PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
-  };
 
   return (
     <div className="flex flex-col gap-8">
@@ -78,7 +55,7 @@ export default async function FinanceStatusPage({
 
       {/* Salary & events + expense status */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className={card}>
+        <Card>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
             {t("highlights")}
           </h2>
@@ -92,8 +69,8 @@ export default async function FinanceStatusPage({
               <dd className="font-semibold tabular-nums">{formatINR(f.events)}</dd>
             </div>
           </dl>
-        </div>
-        <div className={card}>
+        </Card>
+        <Card>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
             {t("byStatus")}
           </h2>
@@ -101,9 +78,7 @@ export default async function FinanceStatusPage({
             {(["PAID", "APPROVED", "PENDING"] as const).map((s) => (
               <div key={s} className="flex items-center justify-between">
                 <dt>
-                  <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[s]}`}>
-                    {t(`status_${s}`)}
-                  </span>
+                  <StatusPill status={s} label={t(`status_${s}`)} />
                 </dt>
                 <dd className="font-semibold tabular-nums">
                   {formatINR(s === "PAID" ? f.paid : s === "APPROVED" ? f.approved : f.pending)}
@@ -111,7 +86,7 @@ export default async function FinanceStatusPage({
               </div>
             ))}
           </dl>
-        </div>
+        </Card>
       </section>
 
       {/* Spend by category */}
@@ -205,9 +180,7 @@ export default async function FinanceStatusPage({
                   <td className={td}>{e.incurredOn}</td>
                   <td className={td}>{e.category}</td>
                   <td className={td}>
-                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusTone[e.status] ?? ""}`}>
-                      {t(`status_${e.status}`)}
-                    </span>
+                    <StatusPill status={e.status} label={t(`status_${e.status}`)} />
                   </td>
                   <td className={tdNum}>{formatINR(e.amount)}</td>
                 </tr>

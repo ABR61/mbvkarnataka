@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { auth } from "@/auth";
 import { signOutAction } from "@/app/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NavDropdown } from "@/components/public/nav-dropdown";
 import { MobileMenu } from "@/components/public/mobile-menu";
 
@@ -96,6 +97,9 @@ export async function PublicHeader() {
           )}
           <div className="shrink-0">
             <LocaleSwitcher />
+          </div>
+          <div className="shrink-0">
+            <ThemeToggle />
           </div>
           {loggedIn ? (
             <form action={signOutAction} className="shrink-0">

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 type Item = { href: React.ComponentProps<typeof Link>["href"]; label: string };
 
@@ -120,8 +121,9 @@ export function MobileMenu({
               {auth.login.label}
             </Link>
           )}
-          <div className="border-t border-gray-100 px-4 py-2 dark:border-gray-800">
+          <div className="flex items-center justify-between border-t border-gray-100 px-4 py-2 dark:border-gray-800">
             <LocaleSwitcher />
+            <ThemeToggle />
           </div>
         </div>
       )}

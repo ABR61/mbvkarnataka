@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export type BranchSlide = {
@@ -90,8 +91,20 @@ export function BranchCarousel({ slides }: { slides: BranchSlide[] }) {
               idx === safeI ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={s.imageUrl} alt={s.title} className="h-full w-full object-cover" />
+            <Image
+              src={s.imageUrl}
+              alt={s.title}
+              fill
+              // Full-bleed hero, so the image spans the viewport width.
+              sizes="100vw"
+              // Only the first slide is likely in view on load — prioritise it
+              // for LCP and lazy-load the rest.
+              priority={idx === 0}
+              // Data-URL fallbacks (when R2 isn't configured) can't be optimised
+              // by the image pipeline; R2/remote URLs are optimised normally.
+              unoptimized={s.imageUrl.startsWith("data:")}
+              className="object-cover"
+            />
             <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent px-5 pb-14 pt-20 text-left text-white sm:px-10 sm:pb-16">
               <div className="mx-auto w-full max-w-6xl">
                 <span className="text-xs font-semibold uppercase tracking-widest text-emerald-300">

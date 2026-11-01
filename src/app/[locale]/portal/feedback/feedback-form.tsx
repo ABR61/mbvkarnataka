@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import type { FormState } from "@/lib/forms";
+import { useActionToast } from "@/components/ui/toast";
+import { Button } from "@/components/ui/button";
 
 export function FeedbackForm({
   locale,
@@ -20,6 +22,7 @@ export function FeedbackForm({
   const t = useTranslations("PortalFeedback");
   const tc = useTranslations("Common");
   const [state, formAction, pending] = useActionState(action, {});
+  useActionToast(state, { success: t("submitted"), error: t("invalid") });
 
   return (
     <form action={formAction} className="mt-3 flex flex-col gap-3">
@@ -67,13 +70,9 @@ export function FeedbackForm({
       )}
 
       <div>
-        <button
-          type="submit"
-          disabled={pending}
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
-        >
+        <Button type="submit" size="sm" disabled={pending}>
           {pending ? tc("saving") : t("submit")}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireAuth } from "@/lib/auth-guards";
 import { signOutAction } from "@/app/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function PortalLayout({
   children,
@@ -22,6 +23,7 @@ export default async function PortalLayout({
         <div className="flex items-center gap-4 text-sm">
           <span className="font-medium">{t("myPortal")}</span>
           <LocaleSwitcher />
+          <ThemeToggle />
           <span className="text-gray-500">
             {session.user.name ?? session.user.email}
           </span>

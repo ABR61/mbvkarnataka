@@ -535,6 +535,7 @@
     "delete": "Delete",
     "search": "Search…",
     "actions": "Actions",
+    "toggleTheme": "Toggle light/dark theme",
     "required": "This field is required.",
     "previous": "Previous",
     "next": "Next",
@@ -934,5 +935,13 @@
     "notAnImage": "Please choose an image file.",
     "cameraUnsupported": "Camera is not available on this device.",
     "cameraDenied": "Camera access was blocked."
+  },
+  "Errors": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. You can try again, or head back to the home page.",
+    "retry": "Try again",
+    "home": "Go to home page",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you're looking for doesn't exist or may have moved."
   }
 }

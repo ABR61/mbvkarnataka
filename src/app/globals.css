@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Dark mode is driven by a `data-theme` attribute on <html> so the in-app
+   toggle can override the OS preference. `dark:` utilities and the CSS vars
+   below both react to it:
+     • no attribute  → follow the OS (prefers-color-scheme)
+     • data-theme=dark / light → explicit user choice wins */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,11 +19,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Follow the OS only when the user hasn't made an explicit choice. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+/* Explicit overrides from the toggle. */
+:root[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+:root[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 body {
