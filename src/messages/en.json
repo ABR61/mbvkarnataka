@@ -490,7 +490,8 @@
     "feedback": "Feedback",
     "staff": "Staff",
     "finance": "Financial management",
-    "audit": "Audit log"
+    "audit": "Audit log",
+    "help": "How-to guide"
   },
   "FuturePrograms": {
     "title": "Future programs",
@@ -1025,5 +1026,30 @@
     "details": "Details",
     "system": "System",
     "empty": "No audit entries match these filters."
+  },
+  "Help": {
+    "title": "How-to guide",
+    "intro": "Short walkthroughs of how key processes work in the platform. More sections will be added over time.",
+    "acctTitle": "Accounting & payments",
+    "acctIntro": "Every expense moves through a controlled approval workflow. This keeps spending accountable and the records trustworthy for audits and funders.",
+    "lifecycleTitle": "The expense lifecycle",
+    "step1Title": "1. Record (Pending)",
+    "step1Body": "Anyone with the “record expenses” permission creates an expense. It starts as Pending. You can still edit or delete it while it is Pending.",
+    "step2Title": "2. Approve",
+    "step2Body": "A finance approver reviews and approves it. The approver must be a different person from whoever recorded it — this two-person check prevents fraud and mistakes.",
+    "step3Title": "3. Pay",
+    "step3Body": "Once approved, finance marks it Paid and records how it was paid (cash, bank transfer, UPI, cheque…), the payment date, and a reference such as a UTR or cheque number.",
+    "voidTitle": "Voiding (reversing) an expense",
+    "voidBody": "Mistakes are never deleted after approval — they are Voided with a reason. The record stays visible for the audit trail but no longer counts toward any total.",
+    "lockTitle": "Why some expenses are locked",
+    "lockBody": "Once an expense is Approved or Paid it can no longer be edited or deleted. To change it, Void it and record a fresh expense. This protects the financial history from being rewritten.",
+    "sodTitle": "Separation of duties",
+    "sodBody": "The person who records an expense cannot approve it. If you see a “you recorded this” message, ask another approver to review it.",
+    "fundsTitle": "Grants & fund accounting",
+    "fundsBody": "Link an expense to the grant it is funded from. The finance page then shows each grant’s received, committed, and remaining amounts. Mark a grant Restricted when it may only be spent on its stated purpose — the system blocks any payment that would overspend it. Mark Foreign source for FCRA tracking.",
+    "budgetTitle": "Budgets",
+    "budgetBody": "Set a budget per programme. The finance page compares budget against actual (non-voided) spend and flags any programme that has gone over.",
+    "rolesTitle": "Who can do what",
+    "rolesBody": "Branch admins record expenses for their own district. Finance staff and Admins approve, pay, and void. Admins can do everything, but the separation-of-duties rule (recorder ≠ approver) still applies to everyone."
   }
 }
