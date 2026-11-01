@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
+import { scopedDistrictId } from "@/lib/branch-scope";
 import { writeAudit } from "@/lib/audit";
 import { parseCsv } from "@/lib/csv";
 import { GENDERS, parseDateOfBirth } from "@/lib/validation/person";
@@ -32,6 +33,9 @@ export async function importTrainees(
 ): Promise<ImportState> {
   const locale = (formData.get("locale") as string) || "en";
   const session = await requirePermission("trainee.manage");
+  // Branch admins may only import into their own district (same rule as the
+  // single-trainee form). Super admins (scope = null) can use any district.
+  const scope = scopedDistrictId(session);
   const mode = formData.get("mode") === "commit" ? "commit" : "preview";
   const csv = ((formData.get("csv") as string) ?? "").trim();
   if (!csv) return { error: "empty" };
@@ -67,7 +71,10 @@ export async function importTrainees(
     if (districtCode) {
       districtId = codeToId.get(districtCode) ?? null;
       if (!districtId) errors.push("district_unknown");
+      else if (scope && districtId !== scope) errors.push("district_outOfScope");
     }
+    // A branch admin's rows always land in their district.
+    if (scope) districtId = scope;
 
     const lastName = (row.lastName ?? "").trim();
     return {
@@ -105,16 +112,19 @@ export async function importTrainees(
   let committed = 0;
   for (const r of parsed) {
     if (!r.ok) continue;
-    const person = await prisma.person.create({
-      data: { kind: "TRAINEE", ...r.data },
-    });
-    await prisma.consentRecord.create({
-      data: {
-        personId: person.id,
-        consentType: "data_processing",
-        version: "v1-bulk",
-        ipAddress: ip,
-      },
+    // Person + consent together, so a trainee is never stored without consent.
+    await prisma.$transaction(async (tx) => {
+      const person = await tx.person.create({
+        data: { kind: "TRAINEE", ...r.data },
+      });
+      await tx.consentRecord.create({
+        data: {
+          personId: person.id,
+          consentType: "data_processing",
+          version: "v1-bulk",
+          ipAddress: ip,
+        },
+      });
     });
     committed++;
   }

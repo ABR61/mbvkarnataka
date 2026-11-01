@@ -14,7 +14,7 @@ export default async function ProgramsPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; error?: string }>;
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -62,6 +62,12 @@ export default async function ProgramsPage({
           {t("new")}
         </Link>
       </div>
+
+      {sp.error === "inUse" && (
+        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          {t("inUse")}
+        </p>
+      )}
 
       <SearchBox placeholder={tc("search")} defaultValue={q} />
 

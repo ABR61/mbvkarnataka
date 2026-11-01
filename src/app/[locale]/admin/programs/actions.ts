@@ -78,6 +78,20 @@ export async function deleteProgram(formData: FormData): Promise<void> {
   const id = formData.get("id") as string;
   if (!id) return;
 
+  // A program in use must be kept: cohorts would make the delete fail, and
+  // completions (with their feedback) and the budget would be cascade-deleted,
+  // while applications and expenses would silently lose their link.
+  // Mark it inactive instead.
+  const [cohorts, completions, applications, expenses] = await Promise.all([
+    prisma.cohort.count({ where: { programId: id } }),
+    prisma.completion.count({ where: { programId: id } }),
+    prisma.application.count({ where: { programId: id } }),
+    prisma.expense.count({ where: { programId: id } }),
+  ]);
+  if (cohorts + completions + applications + expenses > 0) {
+    redirect(`/${locale}/admin/programs?error=inUse`);
+  }
+
   await prisma.program.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "Program", id);
 

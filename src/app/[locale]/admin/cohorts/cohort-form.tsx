@@ -122,6 +122,12 @@ export function CohortForm({
         </select>
       </label>
 
+      {state.error === "saveFailed" && (
+        <p role="alert" className="text-sm text-red-600">
+          {t("saveFailed")}
+        </p>
+      )}
+
       <div className="mt-2 flex items-center gap-3">
         <button
           type="submit"

@@ -248,7 +248,8 @@
     "attendance_ABSENT": "Absent",
     "attendance_LATE": "Late",
     "attendance_EXCUSED": "Excused",
-    "giveFeedback": "Give feedback"
+    "giveFeedback": "Give feedback",
+    "help": "How-to"
   },
   "Expenses": {
     "title": "Expenses",
@@ -595,6 +596,7 @@
     "inactive": "Inactive"
   },
   "Centers": {
+    "inUse": "This center can't be deleted — it has cohorts or recorded expenses. Set its status to Inactive instead.",
     "title": "Centers",
     "new": "New center",
     "newTitle": "New center",
@@ -622,6 +624,7 @@
     "confirmDelete": "Delete this venue? This cannot be undone."
   },
   "Programs": {
+    "inUse": "This program can't be deleted — it has cohorts, completions, applications or expenses. Mark it inactive instead.",
     "title": "Programs",
     "new": "New program",
     "newTitle": "New program",
@@ -711,6 +714,7 @@
     "endDate": "End date",
     "enrolled": "Enrolled",
     "codeTaken": "That code is already in use.",
+    "saveFailed": "Couldn't save the cohort. Please check the details and try again.",
     "status_PLANNED": "Planned",
     "status_ACTIVE": "Active",
     "status_COMPLETED": "Completed",
@@ -805,6 +809,7 @@
     "dob_under18": "Must be 18 or older",
     "email_invalid": "Invalid email",
     "district_unknown": "Unknown district code",
+    "district_outOfScope": "You can only import trainees into your own district",
     "cohort_required": "Cohort code is required",
     "cohort_unknown": "Unknown cohort code",
     "phone_required": "Phone is required",
@@ -984,7 +989,8 @@
     "status_HOLIDAY": "Holiday",
     "err_alreadyIn": "You have already logged in today.",
     "err_notInYet": "Please log in first.",
-    "err_notTrainer": "Not a trainer account."
+    "err_notTrainer": "Not a trainer account.",
+    "help": "How-to"
   },
   "ImageUpload": {
     "choosePhoto": "Choose photo",
@@ -1098,7 +1104,7 @@
           "Set the status to Inactive for a center that's no longer used."
         ],
         "tips": [
-          "Delete is permanent and isn't blocked by linked cohorts — prefer marking a center Inactive."
+          "A center with cohorts or recorded expenses can't be deleted — set its status to Inactive instead."
         ]
       },
       "programs": {
@@ -1110,7 +1116,7 @@
           "Each batch of a program is run as a cohort."
         ],
         "tips": [
-          "Delete is permanent — prefer marking a program inactive."
+          "A program with cohorts, completions, applications or expenses can't be deleted — mark it inactive instead."
         ]
       },
       "cohorts": {
@@ -1150,7 +1156,7 @@
           "To add many, use Import with a CSV: firstName is required; lastName, gender, dateOfBirth, phone, email, address and districtCode are optional. Preview, then commit."
         ],
         "tips": [
-          "Branch admins see and edit only trainees in their own district.",
+          "Branch admins see, edit and import trainees only in their own district — CSV rows for another district are rejected.",
           "Trainee details are personal data — only record what you need."
         ]
       },
@@ -1160,7 +1166,7 @@
         "how": [
           "Click New trainer and enter their details plus an email and password. This creates their login with the Trainer role.",
           "Use Edit to update details. The email can't be changed afterwards.",
-          "Trainers sign in to their own trainer area, where they mark attendance."
+          "Trainers sign in to their trainer area to record their own daily login and logout. They mark trainee attendance from Sessions."
         ],
         "tips": [
           "Deleting a trainer also deletes their login."
@@ -1316,5 +1322,53 @@
         ]
       }
     }
+  },
+  "PortalHelp": {
+    "title": "How to use your portal",
+    "intro": "Everything about your training in one place.",
+    "items": [
+      {
+        "title": "My programs",
+        "body": "Shows each program you're enrolled in and your status: Enrolled, Completed or Dropped."
+      },
+      {
+        "title": "My schedule",
+        "body": "Lists your upcoming sessions, and your attendance (Present, Absent, Late or Excused) once it has been marked."
+      },
+      {
+        "title": "My certificates",
+        "body": "When you finish a program, your certificate appears here. Open it to view or print it. The QR code on it lets anyone — for example an employer — scan and confirm it's genuine."
+      },
+      {
+        "title": "Give feedback",
+        "body": "After a program is marked complete, you can rate it and leave comments. Feedback is reviewed before it appears publicly."
+      },
+      {
+        "title": "Edit profile",
+        "body": "Keep your contact details up to date so the team can reach you about classes and job opportunities."
+      }
+    ]
+  },
+  "TrainerHelp": {
+    "title": "How to use the trainer area",
+    "intro": "Record your working day and keep track of your attendance.",
+    "items": [
+      {
+        "title": "Mark your attendance",
+        "body": "Each working day, tap Mark my attendance (Login) when you arrive, and Logout when you leave."
+      },
+      {
+        "title": "My attendance",
+        "body": "Shows your past days with their status and the hours you worked."
+      },
+      {
+        "title": "Trainees' attendance",
+        "body": "To mark attendance for your class, open Sessions in the admin area, choose the session, then open Attendance."
+      },
+      {
+        "title": "If something looks wrong",
+        "body": "\"Already logged in today\" means your login is already recorded — just use Logout at the end of the day. For anything else, contact your center or branch admin."
+      }
+    ]
   }
 }

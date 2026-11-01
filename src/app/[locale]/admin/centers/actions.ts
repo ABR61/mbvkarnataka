@@ -76,6 +76,17 @@ export async function deleteCenter(formData: FormData): Promise<void> {
   const id = formData.get("id") as string;
   if (!id) return;
 
+  // A center that has cohorts or recorded spending must be kept (cohorts would
+  // make the delete fail; venues would be cascade-deleted and expenses unlinked).
+  // Mark it Inactive instead.
+  const [cohorts, expenses] = await Promise.all([
+    prisma.cohort.count({ where: { centerId: id } }),
+    prisma.expense.count({ where: { centerId: id } }),
+  ]);
+  if (cohorts + expenses > 0) {
+    redirect(`/${locale}/admin/centers?error=inUse`);
+  }
+
   await prisma.center.delete({ where: { id } });
   await writeAudit(session.user.id, "delete", "Center", id);
 

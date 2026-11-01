@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requirePermission } from "@/lib/auth-guards";
 import { writeAudit } from "@/lib/audit";
+import { isUniqueViolationOn } from "@/lib/db-errors";
 import {
   cohortInput,
   cohortFromForm,
@@ -46,8 +47,10 @@ export async function createCohort(
   let cohort;
   try {
     cohort = await prisma.cohort.create({ data: cohortData(parsed.data) });
-  } catch {
-    return { fieldErrors: { code: "taken" } }; // unique code collision
+  } catch (e) {
+    if (isUniqueViolationOn(e, "code")) return { fieldErrors: { code: "taken" } };
+    console.error("[cohorts] create failed:", e);
+    return { error: "saveFailed" };
   }
   await writeAudit(session.user.id, "create", "Cohort", cohort.id);
 
@@ -69,8 +72,10 @@ export async function updateCohort(
 
   try {
     await prisma.cohort.update({ where: { id }, data: cohortData(parsed.data) });
-  } catch {
-    return { fieldErrors: { code: "taken" } };
+  } catch (e) {
+    if (isUniqueViolationOn(e, "code")) return { fieldErrors: { code: "taken" } };
+    console.error("[cohorts] update failed:", e);
+    return { error: "saveFailed" };
   }
   await writeAudit(session.user.id, "update", "Cohort", id);
 

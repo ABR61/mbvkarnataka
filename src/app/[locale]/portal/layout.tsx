@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireAuth } from "@/lib/auth-guards";
 import { signOutAction } from "@/app/actions/auth";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { Link } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default async function PortalLayout({
@@ -22,6 +23,9 @@ export default async function PortalLayout({
         <span className="text-lg font-bold text-emerald-700">MBV</span>
         <div className="flex items-center gap-4 text-sm">
           <span className="font-medium">{t("myPortal")}</span>
+          <Link href="/portal/help" className="text-gray-600 hover:text-emerald-700 hover:underline dark:text-gray-300">
+            {t("help")}
+          </Link>
           <LocaleSwitcher />
           <ThemeToggle />
           <span className="text-gray-500">
